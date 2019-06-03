@@ -132,6 +132,7 @@ void BosonCamera::agcBasicLinear(const Mat &input_16,
 
 bool BosonCamera::openCamera()
 {
+    SystemPtr system = System::GetInstance();
     CameraList camList = system->GetCameras();
     const unsigned int numCameras = camList.GetSize();
 
@@ -259,11 +260,17 @@ bool BosonCamera::openCamera()
         return false;
     }
 
-    // get first image to set width, height and buffer size
-    ImagePtr image = pCam->GetNextImage();
-    width = image->GetWidth();
-    height = image->GetHeight();
-    buffer_start = new char[image->GetBufferSize()];
+    try {
+        // get first image to set width, height and buffer size
+        ImagePtr image = pCam->GetNextImage();
+        width = image->GetWidth();
+        height = image->GetHeight();
+        buffer_start = new uint8_t[image->GetBufferSize()];
+    } catch(Spinnaker::Exception e) {
+        ROS_ERROR("flir_boson_ethernet - ERROR : GET_CONFIGURATION. Cannot get image for setting dimensions");
+        return false;
+    }
+
     initOpenCVBuffers();
 
     return true;
@@ -327,7 +334,7 @@ void BosonCamera::initOpenCVBuffers() {
     // Will be used in case we are reading RAW16 format
     // Boson320 , Boson 640
     // OpenCV input buffer  : Asking for all info: two bytes per pixel (RAW16)  RAW16 mode`
-    thermal16 = Mat(height, width, CV_16U, buffer_start);
+    thermal16 = Mat(height, width, CV_16U, reinterpret_cast<void*>(buffer_start));
     // OpenCV output buffer : Data used to display the video
     thermal16_linear = Mat(height, width, CV_8U, 1);
 
@@ -340,7 +347,7 @@ void BosonCamera::initOpenCVBuffers() {
 
     // Declarations for Zoom representation
     // Will be used or not depending on program arguments
-    thermal_luma = Mat(luma_height, luma_width, color_space, buffer_start); // OpenCV input buffer
+    thermal_luma = Mat(luma_height, luma_width, color_space, reinterpret_cast<void*>(buffer_start)); // OpenCV input buffer
     // OpenCV output buffer , BGR -> Three color spaces :
     // (640 - 640 - 640 : p11 p21 p31 .... / p12 p22 p32 ..../ p13 p23 p33 ...)
     thermal_rgb = Mat(height, width, CV_8UC3, 1);
@@ -374,7 +381,7 @@ void BosonCamera::captureAndPublish(const ros::TimerEvent &evt)
     ImagePtr resultImage = pCam->GetNextImage();
     memcpy(buffer_start, resultImage->GetData(), resultImage->GetBufferSize());
 
-    ci->header.frame_id = to_string(resultImage->GetFrameID());
+    ci->header.frame_id = std::to_string(resultImage->GetFrameID());
 
     // // Put the buffer in the incoming queue.
     // if (ioctl(fd, VIDIOC_QBUF, &bufferinfo) < 0)

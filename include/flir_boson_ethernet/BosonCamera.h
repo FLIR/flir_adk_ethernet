@@ -85,10 +85,10 @@ class BosonCamera : public nodelet::Nodelet
     bool openCamera();
     bool closeCamera();
     void captureAndPublish(const ros::TimerEvent& evt);
-    Spinnaker::CameraPtr BosonCamera::findMatchingCamera(CameraList camList, const unsigned int numCams);
-    bool BosonCamera::initCamera();
-    bool BosonCamera::setImageAcquisition();
-    void BosonCamera::initOpenCVBuffers();
+    Spinnaker::CameraPtr findMatchingCamera(CameraList camList, const unsigned int numCams);
+    bool initCamera();
+    bool setImageAcquisition();
+    void initOpenCVBuffers();
 
     ros::NodeHandle nh, pnh;
     std::shared_ptr<camera_info_manager::CameraInfoManager> camera_info;
@@ -104,7 +104,7 @@ class BosonCamera : public nodelet::Nodelet
     int32_t frame = 0;                // First frame number enumeration
     int8_t thermal_sensor_name[20];  // To store the sensor name
     struct v4l2_buffer bufferinfo;
-    void* buffer_start;
+    uint8_t *buffer_start;
     CameraPtr pCam;
 
     cv::Mat thermal16, thermal16_linear, thermal16_linear_zoom,
