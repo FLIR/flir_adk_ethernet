@@ -47,8 +47,9 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/Image.h>
 
-#include "Spinnaker.h"
-#include "SpinGenApi/SpinnakerGenApi.h"
+// Spinnaker Includes
+#include <spinnaker/Spinnaker.h>
+#include <spinnaker/SpinGenApi/SpinnakerGenApi.h>
 
 using namespace Spinnaker;
 using namespace Spinnaker::GenApi;

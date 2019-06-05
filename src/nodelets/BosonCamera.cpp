@@ -105,11 +105,13 @@ void BosonCamera::onInit()
     }
 
     if (!exit) 
-        exit = openCamera() ? exit : true;
+        exit = !openCamera() || exit;
 
     if (exit)
     {
+        ROS_INFO("GOT HERE");
         ros::shutdown();
+        ROS_INFO("GOT HERE!!!");
         return;
     }
     else
