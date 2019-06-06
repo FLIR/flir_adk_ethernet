@@ -6,14 +6,14 @@
                 "limitSymbolsToIncludedHeaders": true
             },
             "includePath": [
-                "/home/adhurjaty/catkin_ws/devel/include",
+                "~/catkin_ws/devel/include",
                 "/opt/ros/kinetic/include",
-                "/home/adhurjaty/catkin_ws/src/boson_camera/include",
-                "/home/adhurjaty/catkin_ws/src/image_pipeline/depth_image_proc/include",
-                "/home/adhurjaty/catkin_ws/src/flir_boson_ethernet/include",
-                "/home/adhurjaty/catkin_ws/src/flir_boson_usb/include",
-                "/home/adhurjaty/catkin_ws/src/image_pipeline/image_proc/include",
-                "/home/adhurjaty/catkin_ws/src/image_pipeline/stereo_image_proc/include",
+                "~/catkin_ws/src/boson_camera/include",
+                "~/catkin_ws/src/image_pipeline/depth_image_proc/include",
+                "~/catkin_ws/src/flir_boson_ethernet/include",
+                "~/catkin_ws/src/flir_boson_usb/include",
+                "~/catkin_ws/src/image_pipeline/image_proc/include",
+                "~/catkin_ws/src/image_pipeline/stereo_image_proc/include",
                 "/usr/include/**"
             ],
             "name": "Linux",

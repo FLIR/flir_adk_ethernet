@@ -49,7 +49,7 @@ BosonCamera::BosonCamera() : cv_img()
 
 BosonCamera::~BosonCamera()
 {
-    pCam = nullptr;
+    delete pCam;
     delete buffer_start;
     closeCamera();
 }
@@ -71,7 +71,7 @@ void BosonCamera::onInit()
     pnh.param<std::string>("video_mode", video_mode_str, "RAW16");
     pnh.param<bool>("zoon_enable", zoom_enable, false);
     // pnh.param<std::string>("sensor_type", sensor_type_str, "Boson_640");
-    // pnh.param<std::string>("camera_info_url", camera_info_url, "");
+    pnh.param<std::string>("camera_info_url", camera_info_url, "");
 
     ROS_INFO("flir_boson_ethernet - Got frame_id: %s.", frame_id.c_str());
     ROS_INFO("flir_boson_ethernet - Got IP: %s.", ip_addr.c_str());
@@ -79,7 +79,7 @@ void BosonCamera::onInit()
     ROS_INFO("flir_boson_ethernet - Got video mode: %s.", video_mode_str.c_str());
     ROS_INFO("flir_boson_ethernet - Got zoom enable: %s.", (zoom_enable ? "true" : "false"));
     // ROS_INFO("flir_boson_ethernet - Got sensor type: %s.", sensor_type_str.c_str());
-    // ROS_INFO("flir_boson_ethernet - Got camera_info_url: %s.", camera_info_url.c_str());
+    ROS_INFO("flir_boson_ethernet - Got camera_info_url: %s.", camera_info_url.c_str());
 
     if (video_mode_str == "RAW16")
     {
@@ -113,21 +113,14 @@ void BosonCamera::onInit()
     //     ROS_ERROR("flir_boson_ethernet - Invalid sensor_type value provided. Exiting.");
     // }
 
-    // if (camera_info->validateURL(camera_info_url))
-    // {
-    //     camera_info->loadCameraInfo(camera_info_url);
-    // }
-    // else
-    // {
-    //     ROS_INFO("flir_boson_ethernet - camera_info_url could not be validated. Publishing with unconfigured camera.");
-    // }
-
-    if (!exit) 
+    if (!exit) {
         exit = !openCamera() || exit;
+    }
 
-    ROS_INFO("CAMERA OPENED!");
+    ROS_INFO("OPENED CAMERA");
     if (exit)
     {
+        ROS_INFO("SHUTTING DOWN");
         ros::shutdown();
         return;
     }
@@ -151,7 +144,7 @@ void BosonCamera::agcBasicLinear(const Mat &input_16,
 
 bool BosonCamera::openCamera()
 {
-    SystemPtr system = System::GetInstance();
+    system = System::GetInstance();
     CameraList camList = system->GetCameras();
     const unsigned int numCameras = camList.GetSize();
 
@@ -162,121 +155,22 @@ bool BosonCamera::openCamera()
         return false;
     }
 
-    pCam = findMatchingCamera(camList, numCameras);
-    ROS_INFO("CAMERA FOUND");
-    if(!pCam) {
-        ROS_ERROR("flir_boson_ethernet - ERROR : OPEN. No device matches ip_addr: %s", ip_addr);
+    findMatchingCamera(camList, numCameras);
+    
+    if(!pCam.IsValid()) {
+        ROS_ERROR("flir_boson_ethernet - ERROR : OPEN. No device matches ip_addr: %s", ip_addr.c_str());
+        return false;
+    }
+    pCam->Init();
+
+    if (!setImageAcquisition())
+    {
+        ROS_ERROR("flir_boson_ethernet - ERROR : CAMERA_ACQUISITION. Cannot set image acquisition.");
         return false;
     }
 
     if(!initCamera()) {
         ROS_ERROR("flir_boson_ethernet - ERROR : INIT. Could not initialize camera");
-        return false;
-    }
-
-    // don't know the ethernet equivalent to this
-    // if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE))
-    // {
-    //     ROS_ERROR("flir_boson_ethernet - The device does not handle single-planar video capture.");
-    //     return false;
-    // }
-
-    // skip configuring image format for now
-    // struct v4l2_format format;
-
-    // // Two different FORMAT modes, 8 bits vs RAW16
-    // if (video_mode == RAW16)
-    // {
-    //     // I am requiring thermal 16 bits mode
-    //     format.fmt.pix.pixelformat = V4L2_PIX_FMT_Y16;
-
-    //     // Select the frame SIZE (will depend on the type of sensor)
-    //     switch (sensor_type)
-    //     {
-    //     case Boson320: // Boson320
-    //         width = 320;
-    //         height = 256;
-    //         break;
-    //     case Boson640: // Boson640
-    //         width = 640;
-    //         height = 512;
-    //         break;
-    //     default: // Boson320
-    //         width = 320;
-    //         height = 256;
-    //         break;
-    //     }
-    // }
-    // else // 8- bits is always 640x512 (even for a Boson 320)
-    // {
-    //     format.fmt.pix.pixelformat = V4L2_PIX_FMT_YVU420; // thermal, works   LUMA, full Cr, full Cb
-    //     width = 640;
-    //     height = 512;
-    // }
-
-    // // Common varibles
-    // format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    // format.fmt.pix.width = width;
-    // format.fmt.pix.height = height;
-
-    // // request desired FORMAT
-    // if (ioctl(fd, VIDIOC_S_FMT, &format) < 0)
-    // {
-    //     ROS_ERROR("flir_boson_ethernet - VIDIOC_S_FMT error. The camera does not support the requested video format.");
-    //     return false;
-    // }
-
-    // don't think I need to set a buffer for this directly - should be done behind the Spinnaker API
-
-    // we need to inform the device about buffers to use.
-    // and we need to allocate them.
-    // we'll use a single buffer, and map our memory using mmap.
-    // All this information is sent using the VIDIOC_REQBUFS call and a
-    // v4l2_requestbuffers structure:
-    // struct v4l2_requestbuffers bufrequest;
-    // bufrequest.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    // bufrequest.memory = V4L2_MEMORY_MMAP;
-    // bufrequest.count = 1; // we are asking for one buffer
-
-    // if (ioctl(fd, VIDIOC_REQBUFS, &bufrequest) < 0)
-    // {
-    //     ROS_ERROR("flir_boson_ethernet - VIDIOC_REQBUFS error. The camera failed to allocate a buffer.");
-    //     return false;
-    // }
-
-    // // Now that the device knows how to provide its data,
-    // // we need to ask it about the amount of memory it needs,
-    // // and allocate it. This information is retrieved using the VIDIOC_QUERYBUF call,
-    // // and its v4l2_buffer structure.
-
-    // memset(&bufferinfo, 0, sizeof(bufferinfo));
-
-    // bufferinfo.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    // bufferinfo.memory = V4L2_MEMORY_MMAP;
-    // bufferinfo.index = 0;
-
-    // if (ioctl(fd, VIDIOC_QUERYBUF, &bufferinfo) < 0)
-    // {
-    //     ROS_ERROR("flir_boson_ethernet - VIDIOC_QUERYBUF error. Failed to retreive buffer information.");
-    //     return false;
-    // }
-
-    // // map fd+offset into a process location (kernel will decide due to our NULL). length and
-    // // properties are also passed
-    // buffer_start = mmap(NULL, bufferinfo.length, PROT_READ | PROT_WRITE, MAP_SHARED, fd, bufferinfo.m.offset);
-
-    // if (buffer_start == MAP_FAILED)
-    // {
-    //     ROS_ERROR("flir_boson_ethernet - mmap error. Failed to create a memory map for buffer.");
-    //     return false;
-    // }
-
-    // // Fill this buffer with zeros. Initialization. Optional but nice to do
-    // memset(buffer_start, 0, bufferinfo.length);
-
-    if (!setImageAcquisition())
-    {
-        ROS_ERROR("flir_boson_ethernet - ERROR : CAMERA_ACQUISITION. Cannot set image acquisition.");
         return false;
     }
 
@@ -286,17 +180,19 @@ bool BosonCamera::openCamera()
         width = image->GetWidth();
         height = image->GetHeight();
         buffer_start = new uint8_t[image->GetBufferSize()];
+        ROS_INFO("Camera info - Width: %d, Height: %d, Image Size: %d", width, height, image->GetBufferSize());
     } catch(Spinnaker::Exception e) {
         ROS_ERROR("flir_boson_ethernet - ERROR : GET_CONFIGURATION. Cannot get image for setting dimensions");
         return false;
     }
 
     initOpenCVBuffers();
+    setCameraInfo();
 
     return true;
 }
 
-Spinnaker::CameraPtr BosonCamera::findMatchingCamera(CameraList camList, const unsigned int numCams) {
+void BosonCamera::findMatchingCamera(CameraList camList, const unsigned int numCams) {
     gcstring deviceIPAddress = "0.0.0.0";
 
     for (unsigned int i = 0; i < numCams; i++)
@@ -312,17 +208,15 @@ Spinnaker::CameraPtr BosonCamera::findMatchingCamera(CameraList camList, const u
         if(deviceIPAddress == ip_addr) {
             CStringPtr modelName = nodeMapTLDevice.GetNode("DeviceModelName");
             ROS_INFO("Found matching camera %s", modelName->ToString().c_str());
-            return cam;
+            pCam = cam;
         }
     }
-
-    return nullptr;
 }
 
 bool BosonCamera::initCamera() {
     try {
-        pCam->Init();
         pCam->BeginAcquisition();
+        ROS_INFO("Camera acquisition started...");
         return true;
     } catch(Spinnaker::Exception e) {
         return false;
@@ -334,9 +228,9 @@ bool BosonCamera::setImageAcquisition() {
     INodeMap &nodeMap = pCam->GetNodeMap();
 
     CEnumerationPtr ptrAcquisitionMode = nodeMap.GetNode("AcquisitionMode");
-    if (!IsAvailable(ptrAcquisitionMode) || !IsWritable(ptrAcquisitionMode))
+    if (!IsAvailable(ptrAcquisitionMode) || !IsWritable(ptrAcquisitionMode)) 
     {
-        ROS_ERROR("Unable to set acquisition mode to continuous (enum retrieval). Aborting...");
+        ROS_ERROR("Unable to set acquisition mode. Aborting...");
         return false;
     }
 
@@ -382,6 +276,18 @@ void BosonCamera::initOpenCVBuffers() {
     thermal_rgb = Mat(height, width, CV_8UC3, 1);
 }
 
+void BosonCamera::setCameraInfo() {
+    INodeMap &nodeMapTLDevice = pCam->GetTLDeviceNodeMap();
+    CStringPtr modelName = nodeMapTLDevice.GetNode("DeviceModelName");
+
+    camera_info->setCameraName(modelName->GetValue().c_str());
+    if (camera_info->validateURL(camera_info_url)) {
+        camera_info->loadCameraInfo(camera_info_url);
+    } else {
+        ROS_INFO("flir_boson_ethernet - camera_info_url could not be validated. Publishing with unconfigured camera.");
+    }
+}
+
 bool BosonCamera::closeCamera()
 {
     // Finish loop. Exiting.
@@ -394,24 +300,24 @@ bool BosonCamera::closeCamera()
     // };
 
     // close(fd);
-    pCam->EndAcquisition();
-    pCam->DeInit();
+    if(pCam != nullptr) {
+        pCam->EndAcquisition();
+        pCam->DeInit();
+    }
 
     return true;
 }
 
 void BosonCamera::captureAndPublish(const ros::TimerEvent &evt)
 {
-    Size size(640, 512);
+    Size size(width, height);
 
     sensor_msgs::CameraInfoPtr
         ci(new sensor_msgs::CameraInfo(camera_info->getCameraInfo()));
 
     ImagePtr resultImage = pCam->GetNextImage();
     memcpy(buffer_start, resultImage->GetData(), resultImage->GetBufferSize());
-
     ci->header.frame_id = std::to_string(resultImage->GetFrameID());
-
     // // Put the buffer in the incoming queue.
     // if (ioctl(fd, VIDIOC_QBUF, &bufferinfo) < 0)
     // {

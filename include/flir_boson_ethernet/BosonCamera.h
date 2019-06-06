@@ -86,10 +86,11 @@ class BosonCamera : public nodelet::Nodelet
     bool openCamera();
     bool closeCamera();
     void captureAndPublish(const ros::TimerEvent& evt);
-    Spinnaker::CameraPtr findMatchingCamera(CameraList camList, const unsigned int numCams);
+    void findMatchingCamera(CameraList camList, const unsigned int numCams);
     bool initCamera();
     bool setImageAcquisition();
     void initOpenCVBuffers();
+    void setCameraInfo();
 
     ros::NodeHandle nh, pnh;
     std::shared_ptr<camera_info_manager::CameraInfoManager> camera_info;
@@ -107,12 +108,13 @@ class BosonCamera : public nodelet::Nodelet
     struct v4l2_buffer bufferinfo;
     uint8_t *buffer_start;
     CameraPtr pCam;
+    SystemPtr system;
 
     cv::Mat thermal16, thermal16_linear, thermal16_linear_zoom,
             thermal_rgb_zoom, thermal_luma, thermal_rgb;
 
     // Default Program options
-    std::string frame_id, ip_addr, video_mode_str;
+    std::string frame_id, ip_addr, video_mode_str, camera_info_url;
     float frame_rate;
     Encoding video_mode;
     bool zoom_enable;
