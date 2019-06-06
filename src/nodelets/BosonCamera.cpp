@@ -26,12 +26,30 @@ PLUGINLIB_EXPORT_CLASS(flir_boson_ethernet::BosonCamera, nodelet::Nodelet)
 using namespace cv;
 using namespace flir_boson_ethernet;
 
+
+gcstring GetDottedAddress( int64_t value )
+{
+    // Helper function for formatting IP Address into the following format
+    // x.x.x.x
+    unsigned int inputValue = static_cast<unsigned int>( value );
+    ostringstream convertValue;
+    convertValue << ((inputValue & 0xFF000000) >> 24);
+    convertValue << ".";
+    convertValue << ((inputValue & 0x00FF0000) >> 16);
+    convertValue << ".";
+    convertValue << ((inputValue & 0x0000FF00) >> 8);
+    convertValue << ".";
+    convertValue << (inputValue & 0x000000FF);
+    return convertValue.str().c_str();
+}
+
 BosonCamera::BosonCamera() : cv_img()
 {
 }
 
 BosonCamera::~BosonCamera()
 {
+    pCam = nullptr;
     delete buffer_start;
     closeCamera();
 }
@@ -48,20 +66,20 @@ void BosonCamera::onInit()
     bool exit = false;
 
     pnh.param<std::string>("frame_id", frame_id, "boson_camera");
-    pnh.param<std::string>("dev", dev_path, "/dev/video0");
+    pnh.param<std::string>("ip_addr", ip_addr, "169.254.87.157");
     pnh.param<float>("frame_rate", frame_rate, 60.0);
     pnh.param<std::string>("video_mode", video_mode_str, "RAW16");
     pnh.param<bool>("zoon_enable", zoom_enable, false);
-    pnh.param<std::string>("sensor_type", sensor_type_str, "Boson_640");
-    pnh.param<std::string>("camera_info_url", camera_info_url, "");
+    // pnh.param<std::string>("sensor_type", sensor_type_str, "Boson_640");
+    // pnh.param<std::string>("camera_info_url", camera_info_url, "");
 
     ROS_INFO("flir_boson_ethernet - Got frame_id: %s.", frame_id.c_str());
-    ROS_INFO("flir_boson_ethernet - Got dev: %s.", dev_path.c_str());
+    ROS_INFO("flir_boson_ethernet - Got IP: %s.", ip_addr.c_str());
     ROS_INFO("flir_boson_ethernet - Got frame rate: %f.", frame_rate);
     ROS_INFO("flir_boson_ethernet - Got video mode: %s.", video_mode_str.c_str());
     ROS_INFO("flir_boson_ethernet - Got zoom enable: %s.", (zoom_enable ? "true" : "false"));
-    ROS_INFO("flir_boson_ethernet - Got sensor type: %s.", sensor_type_str.c_str());
-    ROS_INFO("flir_boson_ethernet - Got camera_info_url: %s.", camera_info_url.c_str());
+    // ROS_INFO("flir_boson_ethernet - Got sensor type: %s.", sensor_type_str.c_str());
+    // ROS_INFO("flir_boson_ethernet - Got camera_info_url: %s.", camera_info_url.c_str());
 
     if (video_mode_str == "RAW16")
     {
@@ -77,41 +95,40 @@ void BosonCamera::onInit()
         ROS_ERROR("flir_boson_ethernet - Invalid video_mode value provided. Exiting.");
     }
 
-    if (sensor_type_str == "Boson_320" ||
-        sensor_type_str == "boson_320")
-    {
-        sensor_type = Boson320;
-        camera_info->setCameraName("Boson320");
-    }
-    else if (sensor_type_str == "Boson_640" ||
-             sensor_type_str == "boson_640")
-    {
-        sensor_type = Boson640;
-        camera_info->setCameraName("Boson640");
-    }
-    else
-    {
-        exit = true;
-        ROS_ERROR("flir_boson_ethernet - Invalid sensor_type value provided. Exiting.");
-    }
+    // if (sensor_type_str == "Boson_320" ||
+    //     sensor_type_str == "boson_320")
+    // {
+    //     sensor_type = Boson320;
+    //     camera_info->setCameraName("Boson320");
+    // }
+    // else if (sensor_type_str == "Boson_640" ||
+    //          sensor_type_str == "boson_640")
+    // {
+    //     sensor_type = Boson640;
+    //     camera_info->setCameraName("Boson640");
+    // }
+    // else
+    // {
+    //     exit = true;
+    //     ROS_ERROR("flir_boson_ethernet - Invalid sensor_type value provided. Exiting.");
+    // }
 
-    if (camera_info->validateURL(camera_info_url))
-    {
-        camera_info->loadCameraInfo(camera_info_url);
-    }
-    else
-    {
-        ROS_INFO("flir_boson_ethernet - camera_info_url could not be validated. Publishing with unconfigured camera.");
-    }
+    // if (camera_info->validateURL(camera_info_url))
+    // {
+    //     camera_info->loadCameraInfo(camera_info_url);
+    // }
+    // else
+    // {
+    //     ROS_INFO("flir_boson_ethernet - camera_info_url could not be validated. Publishing with unconfigured camera.");
+    // }
 
     if (!exit) 
         exit = !openCamera() || exit;
 
+    ROS_INFO("CAMERA OPENED!");
     if (exit)
     {
-        ROS_INFO("GOT HERE");
         ros::shutdown();
-        ROS_INFO("GOT HERE!!!");
         return;
     }
     else
@@ -146,8 +163,9 @@ bool BosonCamera::openCamera()
     }
 
     pCam = findMatchingCamera(camList, numCameras);
+    ROS_INFO("CAMERA FOUND");
     if(!pCam) {
-        ROS_ERROR("flir_boson_ethernet - ERROR : OPEN. No device matches dev_path: %s", dev_path);
+        ROS_ERROR("flir_boson_ethernet - ERROR : OPEN. No device matches ip_addr: %s", ip_addr);
         return false;
     }
 
@@ -279,12 +297,21 @@ bool BosonCamera::openCamera()
 }
 
 Spinnaker::CameraPtr BosonCamera::findMatchingCamera(CameraList camList, const unsigned int numCams) {
+    gcstring deviceIPAddress = "0.0.0.0";
+
     for (unsigned int i = 0; i < numCams; i++)
     {
         // Select camera
         CameraPtr cam = camList.GetByIndex(i);
-        INodeMap &nodeMapTLDevice = pCam->GetTLDeviceNodeMap();
-        if(nodeMapTLDevice.GetDeviceName() == dev_path) {
+        INodeMap &nodeMapTLDevice = cam->GetTLDeviceNodeMap();
+
+        CIntegerPtr ptrIPAddress = nodeMapTLDevice.GetNode("GevDeviceIPAddress");
+        if (IsAvailable(ptrIPAddress) && IsReadable(ptrIPAddress)) {
+            deviceIPAddress = GetDottedAddress(ptrIPAddress->GetValue());
+        }
+        if(deviceIPAddress == ip_addr) {
+            CStringPtr modelName = nodeMapTLDevice.GetNode("DeviceModelName");
+            ROS_INFO("Found matching camera %s", modelName->ToString().c_str());
             return cam;
         }
     }

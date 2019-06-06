@@ -59,24 +59,12 @@ add_dependencies(BosonCameraEthernet
   ${catkin_EXPORTED_TARGETS}
 )
 
+FILE(GLOB SpinLibs /usr/lib/libSpin*.so)
+
 target_link_libraries(BosonCameraEthernet
   ${OpenCV_LIBRARIES}
   ${catkin_LIBRARIES}
-  /usr/lib/libSpinnaker_C.so          
-  /usr/lib/libSpinUpdate.so.1.23.0.27
-  /usr/lib/libSpinnaker_C.so.1          
-  /usr/lib/libSpinVideo_C.so
-  /usr/lib/libSpinnaker_C.so.1.23.0.27  
-  /usr/lib/libSpinVideo_C.so.1
-  /usr/lib/libSpinnaker.so              
-  /usr/lib/libSpinVideo_C.so.1.23.0.27
-  /usr/lib/libSpinnaker.so.1            
-  /usr/lib/libSpinVideo.so
-  /usr/lib/libSpinnaker.so.1.23.0.27    
-  /usr/lib/libSpinVideo.so.1
-  /usr/lib/libSpinUpdate.so             
-  /usr/lib/libSpinVideo.so.1.23.0.27
-  /usr/lib/libSpinUpdate.so.1
+  ${SpinLibs}
 )
 
 set(ROSLINT_CPP_OPTS "--filter=-runtime/threadsafe_fn,-build/namespaces,-build/include_what_you_use")
