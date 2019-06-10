@@ -63,9 +63,7 @@ void ImageEventHandler::Init(uint8_t *buffer) {
 
 ImageInfo ImageEventHandler::GetImageInfo() {
     m_imageWriteMutex.lock();
-    std::cout << "locked" << std::endl;
     m_imageWriteMutex.unlock();
-    std::cout << "unlocked" << std::endl;
     return m_imageInfo;
 }
 
@@ -78,16 +76,13 @@ void ImageEventHandler::OnImageEvent(ImagePtr image) {
     else
     {
         m_imageWriteMutex.lock();
-        std::cout << "Got a frame" << std::endl;
 
         // Convert image to mono 8
         ImagePtr resultImage = image->Convert(PixelFormat_Mono8, HQ_LINEAR);
         if(!m_isValid) {
-            std::cout << "buffer start null" << std::endl;
             m_imageInfo = ImageInfo {image->GetWidth(), image->GetHeight(),
                 image->GetBufferSize()};
             m_isValid = true;
-            std::cout << "got through" << std::endl;
         } else {
             // ROS_INFO("Copying frame");
             memcpy(m_bufferStart, resultImage->GetData(), resultImage->GetBufferSize());
@@ -231,12 +226,6 @@ bool BosonCamera::openCamera()
     }
 
     initOpenCVBuffers();
-
-    // if(!initCamera()) {
-    //     ROS_ERROR("flir_boson_ethernet - ERROR : INIT. Could not initialize camera");
-    //     return false;
-    // }
-
     setCameraInfo();
 
     return true;
@@ -248,12 +237,14 @@ void BosonCamera::setCameraEvents() {
 }
 
 bool BosonCamera::setImageInfo() {
+    // need to wait for the first image to be received
+    // (event based so not on this thread)
     while(!imageHandler->IsValid() && ros::ok()) {}
+
     try {
         auto imgInfo = imageHandler->GetImageInfo();
         width = imgInfo.width;
         height = imgInfo.height;
-        std::cout << "Image size: " << imgInfo.size << std::endl;
         buffer_start = new uint8_t[imgInfo.size];
         imageHandler->Init(buffer_start);
         ROS_INFO("Camera info - Width: %d, Height: %d", width, height);
@@ -284,16 +275,6 @@ void BosonCamera::findMatchingCamera(CameraList camList, const unsigned int numC
             pCam = cam;
         }
     }
-}
-
-bool BosonCamera::initCamera() {
-    // try {
-    //     pCam->BeginAcquisition();
-    //     ROS_INFO("Camera acquisition started...");
-    //     return true;
-    // } catch(Spinnaker::Exception e) {
-    //     return false;
-    // }
 }
 
 bool BosonCamera::setImageAcquisition() {
@@ -366,16 +347,6 @@ void BosonCamera::setCameraInfo() {
 
 bool BosonCamera::closeCamera()
 {
-    // Finish loop. Exiting.
-    // Deactivate streaming
-    // int type = bufferinfo.type;
-    // if (ioctl(fd, VIDIOC_STREAMOFF, &type) < 0)
-    // {
-    //     ROS_ERROR("flir_boson_ethernet - VIDIOC_STREAMOFF error. Failed to disable streaming on the camera.");
-    //     return false;
-    // };
-
-    // close(fd);
     if(pCam != nullptr) {
         unsetCameraEvents();
         pCam->EndAcquisition();
@@ -396,29 +367,6 @@ void BosonCamera::captureAndPublish(const ros::TimerEvent &evt)
 
     sensor_msgs::CameraInfoPtr
         ci(new sensor_msgs::CameraInfo(camera_info->getCameraInfo()));
-
-    // ImagePtr resultImage = nullptr;
-    // try {
-    //     resultImage = pCam->GetNextImage(0);
-        
-    //     memcpy(buffer_start, resultImage->GetData(), resultImage->GetBufferSize());
-    //     ci->header.frame_id = std::to_string(resultImage->GetFrameID());
-    // } catch(Spinnaker::Exception e) {
-    //     return;
-    // }
-    // // Put the buffer in the incoming queue.
-    // if (ioctl(fd, VIDIOC_QBUF, &bufferinfo) < 0)
-    // {
-    //     ROS_ERROR("flir_boson_ethernet - VIDIOC_QBUF error. Failed to queue the image buffer.");
-    //     return;
-    // }
-
-    // // The buffer's waiting in the outgoing queue.
-    // if (ioctl(fd, VIDIOC_DQBUF, &bufferinfo) < 0)
-    // {
-    //     ROS_ERROR("flir_boson_ethernet - VIDIOC_DQBUF error. Failed to dequeue the image buffer.");
-    //     return;
-    // }
 
     if (video_mode == RAW16)
     {
@@ -478,11 +426,6 @@ void BosonCamera::captureAndPublish(const ros::TimerEvent &evt)
         // DATA in YUV
         
         cvtColor(thermal_luma, thermal_rgb, COLOR_YUV2GRAY_I420, 0);
-
-        // cv::FileStorage fs("/home/flir/AnilROS/Notebook/cvImg.yml",
-        //     cv::FileStorage::WRITE);
-        // fs << "camera_matrix" << thermal_rgb;
-        // fs.release();
 
         cv_img.image = thermal_rgb;
         cv_img.encoding = "mono8";

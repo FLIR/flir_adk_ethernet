@@ -119,7 +119,6 @@ class BosonCamera : public nodelet::Nodelet
     bool closeCamera();
     void captureAndPublish(const ros::TimerEvent& evt);
     void findMatchingCamera(CameraList camList, const unsigned int numCams);
-    bool initCamera();
     bool setImageAcquisition();
     void initOpenCVBuffers();
     void setCameraInfo();
