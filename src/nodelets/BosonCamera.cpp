@@ -19,6 +19,7 @@
  */
 
 #include <pluginlib/class_list_macros.h>
+#include <fstream>
 #include "flir_boson_ethernet/BosonCamera.h"
 
 PLUGINLIB_EXPORT_CLASS(flir_boson_ethernet::BosonCamera, nodelet::Nodelet)
@@ -41,6 +42,62 @@ gcstring GetDottedAddress( int64_t value )
     convertValue << ".";
     convertValue << (inputValue & 0x000000FF);
     return convertValue.str().c_str();
+}
+
+ImageEventHandler::ImageEventHandler(CameraPtr pCam) {
+    // Retrieve device serial number
+    INodeMap & nodeMap = pCam->GetTLDeviceNodeMap();
+    m_deviceSerialNumber = "";
+    CStringPtr ptrDeviceSerialNumber = nodeMap.GetNode("DeviceSerialNumber");
+    if (IsAvailable(ptrDeviceSerialNumber) && IsReadable(ptrDeviceSerialNumber))
+    {
+        m_deviceSerialNumber = ptrDeviceSerialNumber->GetValue();
+    }
+    m_isValid = false;
+}
+ImageEventHandler::~ImageEventHandler() {}
+
+void ImageEventHandler::Init(uint8_t *buffer) {
+    m_bufferStart = buffer;
+}
+
+ImageInfo ImageEventHandler::GetImageInfo() {
+    m_imageWriteMutex.lock();
+    std::cout << "locked" << std::endl;
+    m_imageWriteMutex.unlock();
+    std::cout << "unlocked" << std::endl;
+    return m_imageInfo;
+}
+
+void ImageEventHandler::OnImageEvent(ImagePtr image) {
+    // Check image retrieval status
+    if (image->IsIncomplete())
+    {
+        return;
+    }
+    else
+    {
+        m_imageWriteMutex.lock();
+        std::cout << "Got a frame" << std::endl;
+
+        // Convert image to mono 8
+        ImagePtr resultImage = image->Convert(PixelFormat_Mono8, HQ_LINEAR);
+        if(!m_isValid) {
+            std::cout << "buffer start null" << std::endl;
+            m_imageInfo = ImageInfo {image->GetWidth(), image->GetHeight(),
+                image->GetBufferSize()};
+            m_isValid = true;
+            std::cout << "got through" << std::endl;
+        } else {
+            // ROS_INFO("Copying frame");
+            memcpy(m_bufferStart, resultImage->GetData(), resultImage->GetBufferSize());
+        }
+        m_imageWriteMutex.unlock();
+    }
+}
+
+bool ImageEventHandler::IsValid() {
+    return m_isValid;
 }
 
 BosonCamera::BosonCamera() : cv_img()
@@ -117,10 +174,8 @@ void BosonCamera::onInit()
         exit = !openCamera() || exit;
     }
 
-    ROS_INFO("OPENED CAMERA");
     if (exit)
     {
-        ROS_INFO("SHUTTING DOWN");
         ros::shutdown();
         return;
     }
@@ -162,6 +217,7 @@ bool BosonCamera::openCamera()
         return false;
     }
     pCam->Init();
+    setCameraEvents();
 
     if (!setImageAcquisition())
     {
@@ -169,27 +225,44 @@ bool BosonCamera::openCamera()
         return false;
     }
 
-    if(!initCamera()) {
-        ROS_ERROR("flir_boson_ethernet - ERROR : INIT. Could not initialize camera");
-        return false;
-    }
-
-    try {
-        // get first image to set width, height and buffer size
-        ImagePtr image = pCam->GetNextImage();
-        width = image->GetWidth();
-        height = image->GetHeight();
-        buffer_start = new uint8_t[image->GetBufferSize()];
-        ROS_INFO("Camera info - Width: %d, Height: %d, Image Size: %d", width, height, image->GetBufferSize());
-    } catch(Spinnaker::Exception e) {
+    if(!setImageInfo()) {
         ROS_ERROR("flir_boson_ethernet - ERROR : GET_CONFIGURATION. Cannot get image for setting dimensions");
         return false;
     }
 
     initOpenCVBuffers();
+
+    // if(!initCamera()) {
+    //     ROS_ERROR("flir_boson_ethernet - ERROR : INIT. Could not initialize camera");
+    //     return false;
+    // }
+
     setCameraInfo();
 
     return true;
+}
+
+void BosonCamera::setCameraEvents() {
+    imageHandler = new ImageEventHandler(pCam);
+    pCam->RegisterEvent(*imageHandler);
+}
+
+bool BosonCamera::setImageInfo() {
+    while(!imageHandler->IsValid() && ros::ok()) {}
+    try {
+        auto imgInfo = imageHandler->GetImageInfo();
+        width = imgInfo.width;
+        height = imgInfo.height;
+        std::cout << "Image size: " << imgInfo.size << std::endl;
+        buffer_start = new uint8_t[imgInfo.size];
+        imageHandler->Init(buffer_start);
+        ROS_INFO("Camera info - Width: %d, Height: %d", width, height);
+
+        return true;
+    } catch(Spinnaker::Exception e) {
+        ROS_ERROR("flir_boson_ethernet - ERROR : %s", e.what());
+        return false;
+    }
 }
 
 void BosonCamera::findMatchingCamera(CameraList camList, const unsigned int numCams) {
@@ -214,13 +287,13 @@ void BosonCamera::findMatchingCamera(CameraList camList, const unsigned int numC
 }
 
 bool BosonCamera::initCamera() {
-    try {
-        pCam->BeginAcquisition();
-        ROS_INFO("Camera acquisition started...");
-        return true;
-    } catch(Spinnaker::Exception e) {
-        return false;
-    }
+    // try {
+    //     pCam->BeginAcquisition();
+    //     ROS_INFO("Camera acquisition started...");
+    //     return true;
+    // } catch(Spinnaker::Exception e) {
+    //     return false;
+    // }
 }
 
 bool BosonCamera::setImageAcquisition() {
@@ -249,6 +322,9 @@ bool BosonCamera::setImageAcquisition() {
     ptrAcquisitionMode->SetIntValue(acquisitionModeContinuous);
 
     ROS_INFO("Acquisition mode set to continuous...");
+    
+    pCam->BeginAcquisition();
+
     return true;
 }
 
@@ -301,11 +377,17 @@ bool BosonCamera::closeCamera()
 
     // close(fd);
     if(pCam != nullptr) {
+        unsetCameraEvents();
         pCam->EndAcquisition();
         pCam->DeInit();
     }
 
     return true;
+}
+
+void BosonCamera::unsetCameraEvents() {
+    pCam->UnregisterEvent(*imageHandler);
+    delete imageHandler;
 }
 
 void BosonCamera::captureAndPublish(const ros::TimerEvent &evt)
@@ -315,9 +397,15 @@ void BosonCamera::captureAndPublish(const ros::TimerEvent &evt)
     sensor_msgs::CameraInfoPtr
         ci(new sensor_msgs::CameraInfo(camera_info->getCameraInfo()));
 
-    ImagePtr resultImage = pCam->GetNextImage();
-    memcpy(buffer_start, resultImage->GetData(), resultImage->GetBufferSize());
-    ci->header.frame_id = std::to_string(resultImage->GetFrameID());
+    // ImagePtr resultImage = nullptr;
+    // try {
+    //     resultImage = pCam->GetNextImage(0);
+        
+    //     memcpy(buffer_start, resultImage->GetData(), resultImage->GetBufferSize());
+    //     ci->header.frame_id = std::to_string(resultImage->GetFrameID());
+    // } catch(Spinnaker::Exception e) {
+    //     return;
+    // }
     // // Put the buffer in the incoming queue.
     // if (ioctl(fd, VIDIOC_QBUF, &bufferinfo) < 0)
     // {
@@ -388,7 +476,13 @@ void BosonCamera::captureAndPublish(const ros::TimerEvent &evt)
     {
         // ---------------------------------
         // DATA in YUV
+        
         cvtColor(thermal_luma, thermal_rgb, COLOR_YUV2GRAY_I420, 0);
+
+        // cv::FileStorage fs("/home/flir/AnilROS/Notebook/cvImg.yml",
+        //     cv::FileStorage::WRITE);
+        // fs << "camera_matrix" << thermal_rgb;
+        // fs.release();
 
         cv_img.image = thermal_rgb;
         cv_img.encoding = "mono8";

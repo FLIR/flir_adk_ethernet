@@ -23,6 +23,7 @@
 
 // C++ Includes
 #include <string>
+#include <mutex>
 
 // Linux system includes
 #include <fcntl.h>
@@ -71,6 +72,37 @@ enum SensorTypes
   Boson640
 };
 
+struct ImageInfo {
+  int32_t width, height, size;
+};
+
+class ImageEventHandler : public ImageEvent
+{
+public:
+    // The constructor retrieves the serial number and initializes the image 
+    // counter to 0.
+    ImageEventHandler(CameraPtr pCam);
+    ~ImageEventHandler();
+
+    ImageInfo GetImageInfo();
+    void Init(uint8_t *buffer);
+
+    // This method defines an image event. In it, the image that triggered the 
+    // event is converted and saved before incrementing the count. Please see 
+    // Acquisition_CSharp example for more in-depth comments on the acquisition 
+    // of images.
+    void OnImageEvent(ImagePtr image) override;
+    bool IsValid();
+
+
+private:
+    string m_deviceSerialNumber;
+    std::mutex m_imageWriteMutex;
+    uint8_t *m_bufferStart;
+    ImageInfo m_imageInfo;
+    bool m_isValid;
+};
+
 class BosonCamera : public nodelet::Nodelet
 {
   public:
@@ -91,6 +123,9 @@ class BosonCamera : public nodelet::Nodelet
     bool setImageAcquisition();
     void initOpenCVBuffers();
     void setCameraInfo();
+    void setCameraEvents();
+    void unsetCameraEvents();
+    bool setImageInfo();
 
     ros::NodeHandle nh, pnh;
     std::shared_ptr<camera_info_manager::CameraInfoManager> camera_info;
@@ -109,6 +144,7 @@ class BosonCamera : public nodelet::Nodelet
     uint8_t *buffer_start;
     CameraPtr pCam;
     SystemPtr system;
+    ImageEventHandler *imageHandler;
 
     cv::Mat thermal16, thermal16_linear, thermal16_linear_zoom,
             thermal_rgb_zoom, thermal_luma, thermal_rgb;
