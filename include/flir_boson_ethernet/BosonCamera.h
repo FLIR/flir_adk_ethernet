@@ -114,6 +114,7 @@ class BosonCamera : public nodelet::Nodelet
     CameraPtr pCam;
     SystemPtr system;
     ImageEventHandler *imageHandler;
+    std::shared_ptr<std::mutex> eventMutex;
 
     cv::Mat thermal16, thermal16_linear, thermal16_linear_zoom,
             thermal_rgb_zoom, thermal_luma, thermal_rgb;

@@ -46,6 +46,7 @@ gcstring GetDottedAddress( int64_t value )
 
 BosonCamera::BosonCamera() : cv_img()
 {
+    eventMutex = std::make_shared<std::mutex>();
 }
 
 BosonCamera::~BosonCamera()
@@ -179,7 +180,7 @@ bool BosonCamera::openCamera()
 }
 
 void BosonCamera::setCameraEvents() {
-    imageHandler = new ImageEventHandler(pCam);
+    imageHandler = new ImageEventHandler(pCam, eventMutex);
     pCam->RegisterEvent(*imageHandler);
 }
 
@@ -278,7 +279,7 @@ void BosonCamera::initOpenCVBuffers() {
     thermal_luma = Mat(luma_height, luma_width, color_space, reinterpret_cast<void*>(buffer_start)); // OpenCV input buffer
     // OpenCV output buffer , BGR -> Three color spaces :
     // (640 - 640 - 640 : p11 p21 p31 .... / p12 p22 p32 ..../ p13 p23 p33 ...)
-    thermal_rgb = Mat(height, width, CV_8UC3, 1);
+    thermal_rgb = Mat(height, width, CV_8UC3, reinterpret_cast<void *>(buffer_start));
 }
 
 void BosonCamera::setCameraInfo() {
@@ -372,14 +373,14 @@ void BosonCamera::captureAndPublish(const ros::TimerEvent &evt)
     {
         // ---------------------------------
         // DATA in YUV
-        
-        cvtColor(thermal_luma, thermal_rgb, COLOR_YUV2GRAY_I420, 0);
 
+        eventMutex->lock();
         cv_img.image = thermal_rgb;
-        cv_img.encoding = "mono8";
+        cv_img.encoding = "rgb8";
         cv_img.header.stamp = ros::Time::now();
         cv_img.header.frame_id = frame_id;
         pub_image = cv_img.toImageMsg();
+        eventMutex->unlock();
 
         ci->header.stamp = pub_image->header.stamp;
         image_pub.publish(pub_image, ci);

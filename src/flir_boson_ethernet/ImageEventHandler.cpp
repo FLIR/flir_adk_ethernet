@@ -10,7 +10,16 @@ ImageEventHandler::ImageEventHandler(CameraPtr pCam) {
         m_deviceSerialNumber = ptrDeviceSerialNumber->GetValue();
     }
     m_isValid = false;
+
+    m_imageWriteMutex = std::make_shared<std::mutex>();
 }
+ImageEventHandler::ImageEventHandler(CameraPtr pCam, 
+    std::shared_ptr<std::mutex> m)
+    : ImageEventHandler(pCam) 
+{
+    m_imageWriteMutex = m;
+}
+
 ImageEventHandler::~ImageEventHandler() {}
 
 void ImageEventHandler::Init(uint8_t *buffer) {
@@ -18,11 +27,10 @@ void ImageEventHandler::Init(uint8_t *buffer) {
 }
 
 ImageInfo ImageEventHandler::GetImageInfo() {
-    m_imageWriteMutex.lock();
-    m_imageWriteMutex.unlock();
+    m_imageWriteMutex->lock();
+    m_imageWriteMutex->unlock();
     return m_imageInfo;
 }
-
 void ImageEventHandler::OnImageEvent(ImagePtr image) {
     // Check image retrieval status
     if (image->IsIncomplete())
@@ -31,18 +39,18 @@ void ImageEventHandler::OnImageEvent(ImagePtr image) {
     }
     else
     {
-        m_imageWriteMutex.lock();
+        m_imageWriteMutex->lock();
 
         // Convert image to mono 8
-        ImagePtr resultImage = image->Convert(PixelFormat_Mono8, HQ_LINEAR);
+        ImagePtr resultImage = image->Convert(PixelFormat_RGB8, HQ_LINEAR);
         if(!m_isValid) {
-            m_imageInfo = ImageInfo {image->GetWidth(), image->GetHeight(),
-                image->GetBufferSize()};
+            m_imageInfo = ImageInfo {resultImage->GetWidth(), resultImage->GetHeight(),
+                resultImage->GetBufferSize()};
             m_isValid = true;
         } else {
             memcpy(m_bufferStart, resultImage->GetData(), resultImage->GetBufferSize());
         }
-        m_imageWriteMutex.unlock();
+        m_imageWriteMutex->unlock();
     }
 }
 

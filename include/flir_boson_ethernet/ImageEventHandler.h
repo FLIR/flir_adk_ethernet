@@ -27,6 +27,7 @@ public:
     // The constructor retrieves the serial number and initializes the image 
     // counter to 0.
     ImageEventHandler(CameraPtr pCam);
+    ImageEventHandler(CameraPtr pCam, std::shared_ptr<std::mutex> m);
     ~ImageEventHandler();
 
     ImageInfo GetImageInfo();
@@ -39,10 +40,9 @@ public:
     void OnImageEvent(ImagePtr image) override;
     bool IsValid();
 
-
 private:
     string m_deviceSerialNumber;
-    std::mutex m_imageWriteMutex;
+    std::shared_ptr<std::mutex> m_imageWriteMutex;
     uint8_t *m_bufferStart;
     ImageInfo m_imageInfo;
     bool m_isValid;
