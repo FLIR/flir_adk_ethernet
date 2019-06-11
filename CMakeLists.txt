@@ -50,16 +50,17 @@ target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
 )
 
+FILE(GLOB SpinLibs /usr/lib/libSpin*.so)
+
 add_library(BosonCameraEthernet
   src/nodelets/BosonCamera.cpp
+  src/flir_boson_ethernet/ImageEventHandler.cpp
 )
 
 add_dependencies(BosonCameraEthernet
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
-
-FILE(GLOB SpinLibs /usr/lib/libSpin*.so)
 
 target_link_libraries(BosonCameraEthernet
   ${OpenCV_LIBRARIES}

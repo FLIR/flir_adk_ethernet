@@ -44,57 +44,6 @@ gcstring GetDottedAddress( int64_t value )
     return convertValue.str().c_str();
 }
 
-ImageEventHandler::ImageEventHandler(CameraPtr pCam) {
-    // Retrieve device serial number
-    INodeMap & nodeMap = pCam->GetTLDeviceNodeMap();
-    m_deviceSerialNumber = "";
-    CStringPtr ptrDeviceSerialNumber = nodeMap.GetNode("DeviceSerialNumber");
-    if (IsAvailable(ptrDeviceSerialNumber) && IsReadable(ptrDeviceSerialNumber))
-    {
-        m_deviceSerialNumber = ptrDeviceSerialNumber->GetValue();
-    }
-    m_isValid = false;
-}
-ImageEventHandler::~ImageEventHandler() {}
-
-void ImageEventHandler::Init(uint8_t *buffer) {
-    m_bufferStart = buffer;
-}
-
-ImageInfo ImageEventHandler::GetImageInfo() {
-    m_imageWriteMutex.lock();
-    m_imageWriteMutex.unlock();
-    return m_imageInfo;
-}
-
-void ImageEventHandler::OnImageEvent(ImagePtr image) {
-    // Check image retrieval status
-    if (image->IsIncomplete())
-    {
-        return;
-    }
-    else
-    {
-        m_imageWriteMutex.lock();
-
-        // Convert image to mono 8
-        ImagePtr resultImage = image->Convert(PixelFormat_Mono8, HQ_LINEAR);
-        if(!m_isValid) {
-            m_imageInfo = ImageInfo {image->GetWidth(), image->GetHeight(),
-                image->GetBufferSize()};
-            m_isValid = true;
-        } else {
-            // ROS_INFO("Copying frame");
-            memcpy(m_bufferStart, resultImage->GetData(), resultImage->GetBufferSize());
-        }
-        m_imageWriteMutex.unlock();
-    }
-}
-
-bool ImageEventHandler::IsValid() {
-    return m_isValid;
-}
-
 BosonCamera::BosonCamera() : cv_img()
 {
 }
@@ -174,11 +123,9 @@ void BosonCamera::onInit()
         ros::shutdown();
         return;
     }
-    else
-    {
-        capture_timer = nh.createTimer(ros::Duration(1.0 / frame_rate),
-                                       boost::bind(&BosonCamera::captureAndPublish, this, _1));
-    }
+
+    capture_timer = nh.createTimer(ros::Duration(1.0 / frame_rate),
+                    boost::bind(&BosonCamera::captureAndPublish, this, _1));
 }
 
 // AGC Sample ONE: Linear from min to max.
@@ -273,6 +220,7 @@ void BosonCamera::findMatchingCamera(CameraList camList, const unsigned int numC
             CStringPtr modelName = nodeMapTLDevice.GetNode("DeviceModelName");
             ROS_INFO("Found matching camera %s", modelName->ToString().c_str());
             pCam = cam;
+            return;
         }
     }
 }
