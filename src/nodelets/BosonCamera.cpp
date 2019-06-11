@@ -374,11 +374,12 @@ void BosonCamera::captureAndPublish(const ros::TimerEvent &evt)
         // ---------------------------------
         // DATA in YUV
 
-        eventMutex->lock();
         cv_img.image = thermal_rgb;
         cv_img.encoding = "rgb8";
         cv_img.header.stamp = ros::Time::now();
         cv_img.header.frame_id = frame_id;
+
+        eventMutex->lock();
         pub_image = cv_img.toImageMsg();
         eventMutex->unlock();
 

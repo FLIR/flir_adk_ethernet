@@ -31,26 +31,29 @@ ImageInfo ImageEventHandler::GetImageInfo() {
     m_imageWriteMutex->unlock();
     return m_imageInfo;
 }
+
 void ImageEventHandler::OnImageEvent(ImagePtr image) {
     // Check image retrieval status
     if (image->IsIncomplete())
     {
+        std::cout << "INCOMPLETE IMAGE" << std::endl;
         return;
     }
     else
     {
-        m_imageWriteMutex->lock();
 
-        // Convert image to mono 8
         ImagePtr resultImage = image->Convert(PixelFormat_RGB8, HQ_LINEAR);
         if(!m_isValid) {
             m_imageInfo = ImageInfo {resultImage->GetWidth(), resultImage->GetHeight(),
                 resultImage->GetBufferSize()};
             m_isValid = true;
         } else {
+
+            m_imageWriteMutex->lock();
             memcpy(m_bufferStart, resultImage->GetData(), resultImage->GetBufferSize());
+            m_imageWriteMutex->unlock();
+
         }
-        m_imageWriteMutex->unlock();
     }
 }
 
