@@ -116,7 +116,7 @@ class BosonCamera : public nodelet::Nodelet
     ImageEventHandler *imageHandler;
 
     cv::Mat thermal16, thermal16_linear, thermal16_linear_zoom,
-            thermal_rgb_zoom, thermal_luma, thermal_rgb;
+            thermal_rgb_zoom, thermal_rgb;
 
     // Default Program options
     std::string frame_id, ip_addr, video_mode_str, camera_info_url;

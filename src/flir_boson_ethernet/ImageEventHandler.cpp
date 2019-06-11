@@ -36,8 +36,8 @@ void ImageEventHandler::OnImageEvent(ImagePtr image) {
         // Convert image to mono 8
         ImagePtr resultImage = image->Convert(PixelFormat_Mono8, HQ_LINEAR);
         if(!m_isValid) {
-            m_imageInfo = ImageInfo {image->GetWidth(), image->GetHeight(),
-                image->GetBufferSize()};
+            m_imageInfo = ImageInfo {resultImage->GetWidth(), resultImage->GetHeight(),
+                resultImage->GetBufferSize()};
             m_isValid = true;
         } else {
             memcpy(m_bufferStart, resultImage->GetData(), resultImage->GetBufferSize());

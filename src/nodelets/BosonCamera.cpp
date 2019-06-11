@@ -268,17 +268,11 @@ void BosonCamera::initOpenCVBuffers() {
 
     // Declarations for 8bits YCbCr mode
     // Will be used in case we are reading YUV format
-    // Boson320, 640 :  4:2:0
-    int luma_height = height + height / 2;
-    int luma_width = width;
     int color_space = CV_8UC1;
 
-    // Declarations for Zoom representation
-    // Will be used or not depending on program arguments
-    thermal_luma = Mat(luma_height, luma_width, color_space, reinterpret_cast<void*>(buffer_start)); // OpenCV input buffer
     // OpenCV output buffer , BGR -> Three color spaces :
     // (640 - 640 - 640 : p11 p21 p31 .... / p12 p22 p32 ..../ p13 p23 p33 ...)
-    thermal_rgb = Mat(height, width, CV_8UC3, 1);
+    thermal_rgb = Mat(height, width, CV_8UC1, reinterpret_cast<void*>(buffer_start));
 }
 
 void BosonCamera::setCameraInfo() {
@@ -373,8 +367,6 @@ void BosonCamera::captureAndPublish(const ros::TimerEvent &evt)
         // ---------------------------------
         // DATA in YUV
         
-        cvtColor(thermal_luma, thermal_rgb, COLOR_YUV2GRAY_I420, 0);
-
         cv_img.image = thermal_rgb;
         cv_img.encoding = "mono8";
         cv_img.header.stamp = ros::Time::now();
