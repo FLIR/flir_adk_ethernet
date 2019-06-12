@@ -49,7 +49,7 @@ enum Encoding
 class EthernetCamera
 {
   public:
-    EthernetCamera();
+    EthernetCamera(string ip, string camInfoPath);
     ~EthernetCamera();
 
     void agcBasicLinear(const cv::Mat& input_16,
@@ -62,7 +62,6 @@ class EthernetCamera
     cv::Mat getImageMatrix();
 
   private:
-    void captureAndPublish(const ros::TimerEvent& evt);
     void findMatchingCamera(CameraList camList, const unsigned int numCams);
     bool setImageAcquisition();
     void initOpenCVBuffers();

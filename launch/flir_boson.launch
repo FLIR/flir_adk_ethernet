@@ -5,6 +5,9 @@
 
   <!-- the linux file descriptor location for the camera -->
   <arg name="ip_addr" default="169.254.87.157"/>
+  <arg name="ip_addr2" default=""/>
+  <arg name="ip_addr3" default=""/>
+  <arg name="ip_addr4" default=""/>
     
   <!-- valid values are 30.0 or 60.0 for Bosons -->
   <arg name="frame_rate" default="60.0"/>
@@ -25,6 +28,9 @@
         output="screen">
     <param name="frame_id" type="str" value="$(arg frame_id)"/>
     <param name="ip_addr" type="str" value="$(arg ip_addr)"/>
+    <param name="ip_addr2" type="str" value="$(arg ip_addr2)"/>
+    <param name="ip_addr3" type="str" value="$(arg ip_addr3)"/>
+    <param name="ip_addr4" type="str" value="$(arg ip_addr4)"/>
     <param name="frame_rate" type="double" value="$(arg frame_rate)"/>
     <param name="video_mode" type="str" value="$(arg video_mode)"/>
     <param name="zoom_enable" type="bool" value="$(arg zoom_enable)"/>

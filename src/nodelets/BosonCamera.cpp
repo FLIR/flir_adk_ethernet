@@ -46,7 +46,6 @@ gcstring GetDottedAddress( int64_t value )
 
 BosonCamera::BosonCamera() : cv_img()
 {
-    eventMutex = std::make_shared<std::mutex>();
 }
 
 BosonCamera::~BosonCamera()
