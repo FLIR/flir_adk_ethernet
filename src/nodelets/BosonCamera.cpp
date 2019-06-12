@@ -263,21 +263,11 @@ void BosonCamera::initOpenCVBuffers() {
     // OpenCV output buffer : Data used to display the video
     thermal16_linear = Mat(height, width, CV_8U, 1);
 
-<<<<<<< HEAD
-    // Declarations for 8bits YCbCr mode
-    // Will be used in case we are reading YUV format
-    int color_space = CV_8UC1;
-
-    // OpenCV output buffer , BGR -> Three color spaces :
-    // (640 - 640 - 640 : p11 p21 p31 .... / p12 p22 p32 ..../ p13 p23 p33 ...)
-    thermal_rgb = Mat(height, width, CV_8UC1, reinterpret_cast<void*>(buffer_start));
-=======
     // Declarations for Zoom representation
     // Will be used or not depending on program arguments
     // OpenCV output buffer , BGR -> Three color spaces :
     // (640 - 640 - 640 : p11 p21 p31 .... / p12 p22 p32 ..../ p13 p23 p33 ...)
     thermal_rgb = Mat(height, width, CV_8UC3, reinterpret_cast<void *>(buffer_start));
->>>>>>> color-image
 }
 
 void BosonCamera::setCameraInfo() {
