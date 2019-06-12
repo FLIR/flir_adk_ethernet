@@ -20,10 +20,11 @@ gcstring GetDottedAddress( int64_t value )
 }
 
 EthernetCamera::EthernetCamera(string ip, string camInfoPath) :
-    _ipAddr(ip),     
+    _ipAddr(ip), _cameraInfoPath(_cameraInfoPath)    
 {
 
 }
+
 EthernetCamera::~EthernetCamera() {
     delete _pCam;
     delete _bufferStart;
@@ -168,8 +169,8 @@ void EthernetCamera::setCameraInfo() {
     CStringPtr modelName = nodeMapTLDevice.GetNode("DeviceModelName");
 
     _cameraInfo->setCameraName(modelName->GetValue().c_str());
-    if (_cameraInfo->validateURL(camera_info_url)) {
-        _cameraInfo->loadCameraInfo(camera_info_url);
+    if (_cameraInfo->validateURL(_cameraInfoPath)) {
+        _cameraInfo->loadCameraInfo(_cameraInfoPath);
     } else {
         ROS_INFO("flir_boson_ethernet - camera_info_url could not be validated. Publishing with unconfigured camera.");
     }
@@ -189,5 +190,9 @@ bool EthernetCamera::closeCamera()
 void EthernetCamera::unsetCameraEvents() {
     _pCam->UnregisterEvent(*_imageHandler);
     delete _imageHandler;
+}
+
+cv::Mat EthernetCamera::getImageMatrix() {
+    return _thermalImageMat;
 }
 

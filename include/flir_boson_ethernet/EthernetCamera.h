@@ -49,7 +49,7 @@ enum Encoding
 class EthernetCamera
 {
   public:
-    EthernetCamera(string ip, string camInfoPath);
+    EthernetCamera(std::string ip, std::string camInfoPath);
     ~EthernetCamera();
 
     void agcBasicLinear(const cv::Mat& input_16,
@@ -81,7 +81,7 @@ class EthernetCamera
     cv::Mat _thermalImageMat;
 
     // Default Program options
-    std::string _ipAddr;
+    std::string _ipAddr, _cameraInfoPath;
     bool _zoomEnable;
 };
 
