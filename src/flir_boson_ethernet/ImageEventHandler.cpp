@@ -32,7 +32,9 @@ void ImageEventHandler::OnImageEvent(ImagePtr image) {
     if (image->IsIncomplete()) {
         return;
     }
+    m_mutex.lock();
     m_resultImage = image->Convert(PixelFormat_RGB8, HQ_LINEAR);
+    m_mutex.unlock();
 
     framesPerSecond++;
     if(std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() 
@@ -49,5 +51,7 @@ void *ImageEventHandler::GetImageData() {
         throw "No image has been received";
     }
 
+    m_mutex.lock();
+    m_mutex.unlock();
     return m_resultImage->GetData();
 }
