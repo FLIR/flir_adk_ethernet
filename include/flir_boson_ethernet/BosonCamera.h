@@ -103,7 +103,7 @@ class BosonCamera : public nodelet::Nodelet
     cv_bridge::CvImage cv_img;
     sensor_msgs::ImagePtr pub_image;
     ros::Timer capture_timer;
-    int32_t width, height;
+    int32_t width, height, imageSize;
     int32_t fd;
     int32_t i;
     struct v4l2_capability cap;
@@ -114,6 +114,7 @@ class BosonCamera : public nodelet::Nodelet
     CameraPtr pCam;
     SystemPtr system;
     ImageEventHandler *imageHandler;
+    std::shared_ptr<std::mutex> eventMutex;
 
     cv::Mat thermal16, thermal16_linear, thermal16_linear_zoom,
             thermal_rgb_zoom, thermal_rgb;

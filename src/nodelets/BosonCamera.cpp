@@ -46,6 +46,7 @@ gcstring GetDottedAddress( int64_t value )
 
 BosonCamera::BosonCamera() : cv_img()
 {
+    eventMutex = std::make_shared<std::mutex>();
 }
 
 BosonCamera::~BosonCamera()
@@ -184,16 +185,12 @@ void BosonCamera::setCameraEvents() {
 }
 
 bool BosonCamera::setImageInfo() {
-    // need to wait for the first image to be received
-    // (event based so not on this thread)
-    while(!imageHandler->IsValid() && ros::ok()) {}
-
     try {
         auto imgInfo = imageHandler->GetImageInfo();
         width = imgInfo.width;
         height = imgInfo.height;
-        buffer_start = new uint8_t[imgInfo.size];
-        imageHandler->Init(buffer_start);
+        imageSize = imgInfo.size;
+        buffer_start = new uint8_t[imageSize];
         ROS_INFO("Camera info - Width: %d, Height: %d", width, height);
 
         return true;
@@ -266,6 +263,7 @@ void BosonCamera::initOpenCVBuffers() {
     // OpenCV output buffer : Data used to display the video
     thermal16_linear = Mat(height, width, CV_8U, 1);
 
+<<<<<<< HEAD
     // Declarations for 8bits YCbCr mode
     // Will be used in case we are reading YUV format
     int color_space = CV_8UC1;
@@ -273,6 +271,13 @@ void BosonCamera::initOpenCVBuffers() {
     // OpenCV output buffer , BGR -> Three color spaces :
     // (640 - 640 - 640 : p11 p21 p31 .... / p12 p22 p32 ..../ p13 p23 p33 ...)
     thermal_rgb = Mat(height, width, CV_8UC1, reinterpret_cast<void*>(buffer_start));
+=======
+    // Declarations for Zoom representation
+    // Will be used or not depending on program arguments
+    // OpenCV output buffer , BGR -> Three color spaces :
+    // (640 - 640 - 640 : p11 p21 p31 .... / p12 p22 p32 ..../ p13 p23 p33 ...)
+    thermal_rgb = Mat(height, width, CV_8UC3, reinterpret_cast<void *>(buffer_start));
+>>>>>>> color-image
 }
 
 void BosonCamera::setCameraInfo() {
@@ -366,11 +371,14 @@ void BosonCamera::captureAndPublish(const ros::TimerEvent &evt)
     {
         // ---------------------------------
         // DATA in YUV
-        
+        auto data = imageHandler->GetImageData();
+        memcpy(buffer_start, data, imageSize);
+
         cv_img.image = thermal_rgb;
-        cv_img.encoding = "mono8";
+        cv_img.encoding = "rgb8";
         cv_img.header.stamp = ros::Time::now();
         cv_img.header.frame_id = frame_id;
+
         pub_image = cv_img.toImageMsg();
 
         ci->header.stamp = pub_image->header.stamp;

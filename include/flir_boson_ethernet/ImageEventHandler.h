@@ -5,6 +5,8 @@
 #include <string>
 #include <mutex>
 
+#include <chrono>
+
 // ROS Includes
 #include <ros/ros.h>
 
@@ -16,6 +18,8 @@ using namespace std;
 using namespace Spinnaker;
 using namespace Spinnaker::GenApi;
 using namespace Spinnaker::GenICam;
+
+typedef std::chrono::high_resolution_clock Clock;
 
 struct ImageInfo {
   int32_t width, height, size;
@@ -29,23 +33,22 @@ public:
     ImageEventHandler(CameraPtr pCam);
     ~ImageEventHandler();
 
-    ImageInfo GetImageInfo();
-    void Init(uint8_t *buffer);
 
     // This method defines an image event. In it, the image that triggered the 
     // event is converted and saved before incrementing the count. Please see 
     // Acquisition_CSharp example for more in-depth comments on the acquisition 
     // of images.
     void OnImageEvent(ImagePtr image) override;
-    bool IsValid();
-
+    void *GetImageData();
+    ImageInfo GetImageInfo();
 
 private:
     string m_deviceSerialNumber;
-    std::mutex m_imageWriteMutex;
-    uint8_t *m_bufferStart;
-    ImageInfo m_imageInfo;
-    bool m_isValid;
+    ImagePtr m_resultImage;
+    // uint8_t *m_imageBuffer;
+    std::mutex m_mutex;
+
+    std::chrono::_V2::system_clock::time_point startTime;
 };
 
 #endif
