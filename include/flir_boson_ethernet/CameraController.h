@@ -27,10 +27,6 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/Image.h>
 
-// Spinnaker Includes
-#include <spinnaker/Spinnaker.h>
-#include <spinnaker/SpinGenApi/SpinnakerGenApi.h>
-
 #include "flir_boson_ethernet/EthernetCamera.h"
 
 using namespace Spinnaker;
@@ -61,18 +57,15 @@ class CameraController : public nodelet::Nodelet
 
   private:
     virtual void onInit();
-    void agcBasicLinear(const cv::Mat& input_16,
-                        cv::Mat* output_8,
-                        const int& height,
-                        const int& width);
     void captureAndPublish(const ros::TimerEvent& evt);
 
     ros::NodeHandle nh, pnh;
     std::shared_ptr<image_transport::ImageTransport> it;
-    image_transport::CameraPublisher image_pub;
-    sensor_msgs::ImagePtr pub_image;
+    cv_bridge::CvImage _cvImage;
+    image_transport::CameraPublisher _imagePublisher;
+    sensor_msgs::ImagePtr _publishedImage;
     ros::Timer capture_timer;
-    std::vector<EthernetCamera> _cameras;
+    EthernetCamera *_camera;
 
     // Default Program options
     std::string frame_id, video_mode_str;
@@ -80,6 +73,7 @@ class CameraController : public nodelet::Nodelet
     Encoding video_mode;
     bool zoom_enable;
     SensorTypes sensor_type;
+    Encoding _videoMode;
 };
 
 }  // namespace flir_boson_ethernet

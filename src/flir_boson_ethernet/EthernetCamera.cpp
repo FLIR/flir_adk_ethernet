@@ -19,10 +19,11 @@ gcstring GetDottedAddress( int64_t value )
     return convertValue.str().c_str();
 }
 
-EthernetCamera::EthernetCamera(string ip, string camInfoPath) :
-    _ipAddr(ip), _cameraInfoPath(_cameraInfoPath)    
+EthernetCamera::EthernetCamera(string ip, string camInfoPath, ros::NodeHandle nh) :
+    _ipAddr(ip), _cameraInfoPath(camInfoPath)
 {
-
+    _cameraInfo = std::shared_ptr<camera_info_manager::CameraInfoManager>(
+        new camera_info_manager::CameraInfoManager(nh));
 }
 
 EthernetCamera::~EthernetCamera() {
@@ -193,6 +194,12 @@ void EthernetCamera::unsetCameraEvents() {
 }
 
 cv::Mat EthernetCamera::getImageMatrix() {
+    auto data = _imageHandler->GetImageData();
+    memcpy(_bufferStart, data, _imageSize);
     return _thermalImageMat;
+}
+
+sensor_msgs::CameraInfo EthernetCamera::getCameraInfo() {
+    return _cameraInfo->getCameraInfo();
 }
 

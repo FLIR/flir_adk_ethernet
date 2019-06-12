@@ -40,16 +40,10 @@ using namespace std;
 namespace flir_boson_ethernet
 {
 
-enum Encoding
-{
-  YUV = 0,
-  RAW16 = 1
-};
-
 class EthernetCamera
 {
   public:
-    EthernetCamera(std::string ip, std::string camInfoPath);
+    EthernetCamera(std::string ip, std::string camInfoPath, ros::NodeHandle);
     ~EthernetCamera();
 
     void agcBasicLinear(const cv::Mat& input_16,
@@ -60,6 +54,7 @@ class EthernetCamera
     bool closeCamera();
 
     cv::Mat getImageMatrix();
+    sensor_msgs::CameraInfo getCameraInfo();
 
   private:
     void findMatchingCamera(CameraList camList, const unsigned int numCams);
