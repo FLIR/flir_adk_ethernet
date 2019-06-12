@@ -125,8 +125,8 @@ void BosonCamera::onInit()
         return;
     }
 
-    capture_timer = nh.createTimer(ros::Duration(1.0 / frame_rate),
-                    boost::bind(&BosonCamera::captureAndPublish, this, _1));
+    // capture_timer = nh.createTimer(ros::Duration(1.0 / frame_rate),
+    //                 boost::bind(&BosonCamera::captureAndPublish, this, _1));
 }
 
 // AGC Sample ONE: Linear from min to max.
@@ -180,21 +180,17 @@ bool BosonCamera::openCamera()
 }
 
 void BosonCamera::setCameraEvents() {
-    imageHandler = new ImageEventHandler(pCam, eventMutex);
+    imageHandler = new ImageEventHandler(pCam);
     pCam->RegisterEvent(*imageHandler);
 }
 
 bool BosonCamera::setImageInfo() {
-    // need to wait for the first image to be received
-    // (event based so not on this thread)
-    while(!imageHandler->IsValid() && ros::ok()) {}
-
     try {
         auto imgInfo = imageHandler->GetImageInfo();
         width = imgInfo.width;
         height = imgInfo.height;
-        buffer_start = new uint8_t[imgInfo.size];
-        imageHandler->Init(buffer_start);
+        imageSize = imgInfo.size;
+        buffer_start = new uint8_t[imageSize];
         ROS_INFO("Camera info - Width: %d, Height: %d", width, height);
 
         return true;
@@ -267,16 +263,8 @@ void BosonCamera::initOpenCVBuffers() {
     // OpenCV output buffer : Data used to display the video
     thermal16_linear = Mat(height, width, CV_8U, 1);
 
-    // Declarations for 8bits YCbCr mode
-    // Will be used in case we are reading YUV format
-    // Boson320, 640 :  4:2:0
-    int luma_height = height + height / 2;
-    int luma_width = width;
-    int color_space = CV_8UC1;
-
     // Declarations for Zoom representation
     // Will be used or not depending on program arguments
-    thermal_luma = Mat(luma_height, luma_width, color_space, reinterpret_cast<void*>(buffer_start)); // OpenCV input buffer
     // OpenCV output buffer , BGR -> Three color spaces :
     // (640 - 640 - 640 : p11 p21 p31 .... / p12 p22 p32 ..../ p13 p23 p33 ...)
     thermal_rgb = Mat(height, width, CV_8UC3, reinterpret_cast<void *>(buffer_start));
@@ -373,15 +361,15 @@ void BosonCamera::captureAndPublish(const ros::TimerEvent &evt)
     {
         // ---------------------------------
         // DATA in YUV
+        auto data = imageHandler->GetImageData();
+        memcpy(buffer_start, data, imageSize);
 
         cv_img.image = thermal_rgb;
         cv_img.encoding = "rgb8";
         cv_img.header.stamp = ros::Time::now();
         cv_img.header.frame_id = frame_id;
 
-        eventMutex->lock();
         pub_image = cv_img.toImageMsg();
-        eventMutex->unlock();
 
         ci->header.stamp = pub_image->header.stamp;
         image_pub.publish(pub_image, ci);

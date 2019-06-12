@@ -9,54 +9,45 @@ ImageEventHandler::ImageEventHandler(CameraPtr pCam) {
     {
         m_deviceSerialNumber = ptrDeviceSerialNumber->GetValue();
     }
-    m_isValid = false;
 
-    m_imageWriteMutex = std::make_shared<std::mutex>();
-}
-ImageEventHandler::ImageEventHandler(CameraPtr pCam, 
-    std::shared_ptr<std::mutex> m)
-    : ImageEventHandler(pCam) 
-{
-    m_imageWriteMutex = m;
+    m_resultImage = nullptr;
+    // m_imageBuffer = nullptr;
+    startTime = Clock::now();
 }
 
 ImageEventHandler::~ImageEventHandler() {}
 
-void ImageEventHandler::Init(uint8_t *buffer) {
-    m_bufferStart = buffer;
-}
-
 ImageInfo ImageEventHandler::GetImageInfo() {
-    m_imageWriteMutex->lock();
-    m_imageWriteMutex->unlock();
-    return m_imageInfo;
+    // need to wait for the first image to be received
+    // (event based so not on this thread)
+    while(m_resultImage == nullptr && ros::ok()) {}
+
+    return ImageInfo {m_resultImage->GetWidth(), m_resultImage->GetHeight(),
+                m_resultImage->GetBufferSize()};
 }
 
+static int framesPerSecond = 0;
 void ImageEventHandler::OnImageEvent(ImagePtr image) {
     // Check image retrieval status
-    if (image->IsIncomplete())
-    {
-        std::cout << "INCOMPLETE IMAGE" << std::endl;
+    if (image->IsIncomplete()) {
         return;
     }
-    else
-    {
+    m_resultImage = image->Convert(PixelFormat_RGB8, HQ_LINEAR);
 
-        ImagePtr resultImage = image->Convert(PixelFormat_RGB8, HQ_LINEAR);
-        if(!m_isValid) {
-            m_imageInfo = ImageInfo {resultImage->GetWidth(), resultImage->GetHeight(),
-                resultImage->GetBufferSize()};
-            m_isValid = true;
-        } else {
-
-            m_imageWriteMutex->lock();
-            memcpy(m_bufferStart, resultImage->GetData(), resultImage->GetBufferSize());
-            m_imageWriteMutex->unlock();
-
-        }
+    framesPerSecond++;
+    if(std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() 
+        - startTime).count() >= 1000) {
+        startTime = Clock::now();
+        std::cout << "FPS: " << framesPerSecond << std::endl;
+        framesPerSecond = 0;
     }
+
 }
 
-bool ImageEventHandler::IsValid() {
-    return m_isValid;
+void *ImageEventHandler::GetImageData() {
+    if(m_resultImage == nullptr) {
+        throw "No image has been received";
+    }
+
+    return m_resultImage->GetData();
 }
