@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <library path="lib/libBosonCameraEthernet">
-  <class name="flir_boson_ethernet/BosonCamera" type="flir_boson_ethernet::BosonCamera" base_class_type="nodelet::Nodelet">
+  <class name="flir_boson_ethernet/CameraController" type="flir_boson_ethernet::CameraController" base_class_type="nodelet::Nodelet">
     <description>
       Handles the connection to a FLIR Boson Ethernet camera and grabs frames using OpenCV.
     </description>

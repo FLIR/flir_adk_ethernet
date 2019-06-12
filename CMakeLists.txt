@@ -53,7 +53,8 @@ target_link_libraries(${PROJECT_NAME}_node
 FILE(GLOB SpinLibs /usr/lib/libSpin*.so)
 
 add_library(BosonCameraEthernet
-  src/nodelets/BosonCamera.cpp
+  src/nodelets/CameraController.cpp
+  src/flir_boson_ethernet/EthernetCamera.cpp
   src/flir_boson_ethernet/ImageEventHandler.cpp
 )
 

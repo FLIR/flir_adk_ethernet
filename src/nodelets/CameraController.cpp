@@ -7,23 +7,6 @@ PLUGINLIB_EXPORT_CLASS(flir_boson_ethernet::CameraController, nodelet::Nodelet)
 using namespace cv;
 using namespace flir_boson_ethernet;
 
-
-gcstring GetDottedAddress( int64_t value )
-{
-    // Helper function for formatting IP Address into the following format
-    // x.x.x.x
-    unsigned int inputValue = static_cast<unsigned int>( value );
-    ostringstream convertValue;
-    convertValue << ((inputValue & 0xFF000000) >> 24);
-    convertValue << ".";
-    convertValue << ((inputValue & 0x00FF0000) >> 16);
-    convertValue << ".";
-    convertValue << ((inputValue & 0x0000FF00) >> 8);
-    convertValue << ".";
-    convertValue << (inputValue & 0x000000FF);
-    return convertValue.str().c_str();
-}
-
 CameraController::CameraController() : _cvImage()
 {
 }
