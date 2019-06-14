@@ -32,7 +32,7 @@ void CameraController::onInit()
     std::string ip, cameraInfoStr;
 
     pnh.param<std::string>("frame_id", frame_id, "boson_camera");
-    pnh.param<std::string>("ip_addr", ip, "169.254.87.157");
+    pnh.param<std::string>("ip_addr", ip, "");
     pnh.param<float>("frame_rate", _frameRate, 60.0);
     pnh.param<std::string>("video_mode", video_mode_str, "RAW16");
     pnh.param<bool>("zoon_enable", zoom_enable, false);
