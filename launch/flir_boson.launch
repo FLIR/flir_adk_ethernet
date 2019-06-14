@@ -5,8 +5,6 @@
 
   <!-- the linux file descriptor location for the camera -->
   <arg name="ip_addr" default="169.254.87.157"/>
-  <arg name="left_ip" default="169.254.87.157"/>
-  <arg name="right_ip" default="169.254.82.142"/>
     
   <!-- valid values are 30.0 or 60.0 for Bosons -->
   <arg name="frame_rate" default="60.0"/>
@@ -32,8 +30,6 @@
     <!-- <remap from="~ip_addr" to="~right_ip" /> -->
     <param name="frame_id" type="str" value="$(arg frame_id)"/>
     <param name="ip_addr" type="str" value="$(arg ip_addr)"/>
-    <param name="left_ip" type="str" value="$(arg left_ip)"/>
-    <param name="right_ip" type="str" value="$(arg right_ip)"/>
     <param name="frame_rate" type="double" value="$(arg frame_rate)"/>
     <param name="video_mode" type="str" value="$(arg video_mode)"/>
     <param name="zoom_enable" type="bool" value="$(arg zoom_enable)"/>
@@ -42,7 +38,7 @@
   </node>
 
   <node name="image_view" pkg="image_view" type="image_view" respawn="false" output="screen">
-    <remap from="image" to="flir_boson/left/image_raw" />
+    <remap from="image" to="flir_boson/image_raw" />
   </node>
   <!-- <node name="stereo_cam" pkg="image_view" type="stereo_view">
     <remap from="image" to="image_raw" />
