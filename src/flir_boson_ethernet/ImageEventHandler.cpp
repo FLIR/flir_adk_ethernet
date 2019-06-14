@@ -17,11 +17,14 @@ ImageEventHandler::ImageEventHandler(CameraPtr pCam) {
 
 ImageEventHandler::~ImageEventHandler() {}
 
-ImageInfo ImageEventHandler::GetImageInfo() {
+// must be called after camera acquisition has been enabled
+void ImageEventHandler::Init() {
     // need to wait for the first image to be received
     // (event based so not on this thread)
     while(m_resultImage == nullptr && ros::ok()) {}
+}
 
+ImageInfo ImageEventHandler::GetImageInfo() {
     return ImageInfo {m_resultImage->GetWidth(), m_resultImage->GetHeight(),
                 m_resultImage->GetBufferSize()};
 }

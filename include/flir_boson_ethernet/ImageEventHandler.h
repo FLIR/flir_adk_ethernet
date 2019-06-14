@@ -33,6 +33,7 @@ public:
     ImageEventHandler(CameraPtr pCam);
     ~ImageEventHandler();
 
+    void Init();
 
     // This method defines an image event. In it, the image that triggered the 
     // event is converted and saved before incrementing the count. Please see 

@@ -24,6 +24,11 @@ EthernetCamera::EthernetCamera(string ip, string camInfoPath, ros::NodeHandle nh
 {
     _cameraInfo = std::shared_ptr<camera_info_manager::CameraInfoManager>(
         new camera_info_manager::CameraInfoManager(nh));
+
+    // hard-code image dims for now
+    _width = 800;
+    _height = 600;
+    _imageSize = _width * _height * 3;
 }
 
 EthernetCamera::~EthernetCamera() {
@@ -62,6 +67,12 @@ bool EthernetCamera::openCamera()
         return false;
     }
     _pCam->Init();
+
+    if(!setImageInfo()) {
+        ROS_ERROR("flir_boson_ethernet - ERROR : GET_CONFIGURATION. Cannot get image for setting dimensions");
+        return false;
+    }
+
     setCameraEvents();
 
     if (!setImageAcquisition())
@@ -70,10 +81,7 @@ bool EthernetCamera::openCamera()
         return false;
     }
 
-    if(!setImageInfo()) {
-        ROS_ERROR("flir_boson_ethernet - ERROR : GET_CONFIGURATION. Cannot get image for setting dimensions");
-        return false;
-    }
+    _imageHandler->Init();
 
     initOpenCVBuffers();
     setCameraInfo();
@@ -88,10 +96,12 @@ void EthernetCamera::setCameraEvents() {
 
 bool EthernetCamera::setImageInfo() {
     try {
-        auto imgInfo = _imageHandler->GetImageInfo();
-        _width = imgInfo.width;
-        _height = imgInfo.height;
-        _imageSize = imgInfo.size;
+        INodeMap &nodeMap = _pCam->GetNodeMap();
+        CIntegerPtr widthNode = nodeMap.GetNode("Width");
+        widthNode->SetValue(_width);
+        CIntegerPtr heightNode = nodeMap.GetNode("Height");
+        heightNode->SetValue(_height);
+
         _bufferStart = new uint8_t[_imageSize];
         ROS_INFO("Camera info - Width: %d, Height: %d", _width, _height);
 
@@ -101,6 +111,22 @@ bool EthernetCamera::setImageInfo() {
         return false;
     }
 }
+
+// bool EthernetCamera::setImageInfo() {
+//     try {
+//         auto imgInfo = _imageHandler->GetImageInfo();
+//         _width = imgInfo.width;
+//         _height = imgInfo.height;
+//         _imageSize = imgInfo.size;
+//         _bufferStart = new uint8_t[_imageSize];
+//         ROS_INFO("Camera info - Width: %d, Height: %d", _width, _height);
+
+//         return true;
+//     } catch(Spinnaker::Exception e) {
+//         ROS_ERROR("flir_boson_ethernet - ERROR : %s", e.what());
+//         return false;
+//     }
+// }
 
 void EthernetCamera::findMatchingCamera(CameraList camList, const unsigned int numCams) {
     gcstring deviceIPAddress = "0.0.0.0";
