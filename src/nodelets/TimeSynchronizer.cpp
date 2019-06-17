@@ -22,5 +22,7 @@ void TimeSynchronizer::onInit() {
 }
 
 void TimeSynchronizer::publishTime(const ros::TimerEvent& evt) {
-    _publisher.publish(ros::Time::now());
+    std_msgs::Time timeToPublish;
+    timeToPublish.data = ros::Time::now();
+    _publisher.publish(timeToPublish);
 }
