@@ -24,7 +24,7 @@ void SyncCameraController::onInit()
     pnh = getPrivateNodeHandle();
     
     it = std::shared_ptr<image_transport::ImageTransport>(new image_transport::ImageTransport(nh));
-        _imagePublisher = it->advertiseCamera("image_raw", 1);
+    _imagePublisher = it->advertiseCamera("image_raw", 1);
 
     bool exit = false;
 

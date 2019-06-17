@@ -50,20 +50,6 @@ target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
 )
 
-add_executable(${PROJECT_NAME}_sync_node
-  src/flir_boson_ethernet_sync_node.cpp
-)
-
-add_dependencies(${PROJECT_NAME}_sync_node
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS}
-)
-
-target_link_libraries(${PROJECT_NAME}_sync_node
-  ${OpenCV_LIBRARIES}
-  ${catkin_LIBRARIES}
-)
-
 FILE(GLOB SpinLibs /usr/lib/libSpin*.so)
 
 add_library(BosonCameraEthernet
