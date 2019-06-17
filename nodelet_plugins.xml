@@ -10,4 +10,9 @@
       Handles the connection to a FLIR Boson Ethernet camera and grabs frames using OpenCV.
     </description>
   </class>
+  <class name="flir_boson_ethernet/TimeSynchronizer" type="flir_boson_ethernet::TimeSynchronizer" base_class_type="nodelet::Nodelet">
+    <description>
+      Sends signal to trigger sending image frames to topics
+    </description>
+  </class>
 </library>

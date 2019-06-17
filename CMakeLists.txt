@@ -55,6 +55,7 @@ FILE(GLOB SpinLibs /usr/lib/libSpin*.so)
 add_library(BosonCameraEthernet
   src/nodelets/CameraController.cpp
   src/nodelets/SyncCameraController.cpp
+  src/nodelets/TimeSynchronizer.cpp
   src/flir_boson_ethernet/EthernetCamera.cpp
   src/flir_boson_ethernet/ImageEventHandler.cpp
 )
