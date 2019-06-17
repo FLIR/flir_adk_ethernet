@@ -1,5 +1,5 @@
-#ifndef FLIR_BOSON_ETHERNET_CAMERACONTROLLER_H
-#define FLIR_BOSON_ETHERNET_CAMERACONTROLLER_H
+#ifndef FLIR_BOSON_ETHERNET_SYNCCAMERACONTROLLER_H
+#define FLIR_BOSON_ETHERNET_SYNCCAMERACONTROLLER_H
 
 // C++ Includes
 #include <string>
@@ -23,6 +23,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
+#include <std_msgs/Time.h>
 
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/Image.h>
@@ -30,41 +31,30 @@
 #include "flir_boson_ethernet/SharedTypes.h"
 #include "flir_boson_ethernet/EthernetCamera.h"
 
-using namespace Spinnaker;
-using namespace Spinnaker::GenApi;
-using namespace Spinnaker::GenICam;
 using namespace std;
 
 namespace flir_boson_ethernet
 {
 
-class CameraController : public nodelet::Nodelet
+class SyncCameraController : public nodelet::Nodelet
 {
   public:
-    CameraController();
-    ~CameraController();
+    SyncCameraController();
+    ~SyncCameraController();
 
   private:
     virtual void onInit();
-    void captureAndPublish(const ros::TimerEvent& evt);
+    void publishImage(const std_msgs::Time::ConstPtr& message);
 
     ros::NodeHandle nh, pnh;
     std::shared_ptr<image_transport::ImageTransport> it;
     cv_bridge::CvImage _cvImage;
     image_transport::CameraPublisher _imagePublisher;
-    sensor_msgs::ImagePtr _publishedImage;
-    ros::Timer capture_timer;
     EthernetCamera *_camera;
-
-    // Default Program options
-    std::string frame_id, video_mode_str;
-    float _frameRate;
-    Encoding video_mode;
-    bool zoom_enable;
-    SensorTypes sensor_type;
-    Encoding _videoMode;
+    std::string frame_id;
+    ros::Subscriber _sub;
 };
 
-}  // namespace flir_boson_ethernet
+}
 
-#endif  // FLIR_BOSON_ETHERNET_BOSONCAMERA_H
+#endif
