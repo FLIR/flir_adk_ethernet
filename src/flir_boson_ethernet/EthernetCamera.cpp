@@ -67,12 +67,12 @@ bool EthernetCamera::openCamera()
         return false;
     }
     _pCam->Init();
+    setCameraPixelFormat();
 
     if(!setImageInfo()) {
         ROS_ERROR("flir_boson_ethernet - ERROR : GET_CONFIGURATION. Cannot get image for setting dimensions");
         return false;
     }
-
     setCameraEvents();
 
     if (!setImageAcquisition())
@@ -88,45 +88,6 @@ bool EthernetCamera::openCamera()
 
     return true;
 } 
-
-void EthernetCamera::setCameraEvents() {
-    _imageHandler = new ImageEventHandler(_pCam);
-    _pCam->RegisterEvent(*_imageHandler);
-}
-
-bool EthernetCamera::setImageInfo() {
-    try {
-        INodeMap &nodeMap = _pCam->GetNodeMap();
-        CIntegerPtr widthNode = nodeMap.GetNode("Width");
-        widthNode->SetValue(_width);
-        CIntegerPtr heightNode = nodeMap.GetNode("Height");
-        heightNode->SetValue(_height);
-
-        _bufferStart = new uint8_t[_imageSize];
-        ROS_INFO("Camera info - Width: %d, Height: %d", _width, _height);
-
-        return true;
-    } catch(Spinnaker::Exception e) {
-        ROS_ERROR("flir_boson_ethernet - ERROR : %s", e.what());
-        return false;
-    }
-}
-
-// bool EthernetCamera::setImageInfo() {
-//     try {
-//         auto imgInfo = _imageHandler->GetImageInfo();
-//         _width = imgInfo.width;
-//         _height = imgInfo.height;
-//         _imageSize = imgInfo.size;
-//         _bufferStart = new uint8_t[_imageSize];
-//         ROS_INFO("Camera info - Width: %d, Height: %d", _width, _height);
-
-//         return true;
-//     } catch(Spinnaker::Exception e) {
-//         ROS_ERROR("flir_boson_ethernet - ERROR : %s", e.what());
-//         return false;
-//     }
-// }
 
 void EthernetCamera::findMatchingCamera(CameraList camList, const unsigned int numCams) {
     gcstring deviceIPAddress = "0.0.0.0";
@@ -148,6 +109,38 @@ void EthernetCamera::findMatchingCamera(CameraList camList, const unsigned int n
             return;
         }
     }
+}
+
+bool EthernetCamera::setImageInfo() {
+    try {
+        INodeMap &nodeMap = _pCam->GetNodeMap();
+        CIntegerPtr widthNode = nodeMap.GetNode("Width");
+        widthNode->SetValue(_width);
+        CIntegerPtr heightNode = nodeMap.GetNode("Height");
+        heightNode->SetValue(_height);
+
+        _bufferStart = new uint8_t[_imageSize];
+        ROS_INFO("Camera info - Width: %d, Height: %d", _width, _height);
+
+        return true;
+    } catch(Spinnaker::Exception e) {
+        ROS_ERROR("flir_boson_ethernet - ERROR : %s", e.what());
+        return false;
+    }
+}
+
+void EthernetCamera::setCameraPixelFormat() {
+    INodeMap &nodeMap = _pCam->GetNodeMap();
+    CEnumerationPtr pixelFormatNode = nodeMap.GetNode("PixelFormat");
+    CEnumerationPtr pixelCodingNode = nodeMap.GetNode("PixelCoding");
+
+    pixelFormatNode->SetIntValue(PixelFormat_BayerRG8);
+    pixelCodingNode->SetIntValue(PixelSize_Bpp8);
+}
+
+void EthernetCamera::setCameraEvents() {
+    _imageHandler = new ImageEventHandler(_pCam);
+    _pCam->RegisterEvent(*_imageHandler);
 }
 
 bool EthernetCamera::setImageAcquisition() {
