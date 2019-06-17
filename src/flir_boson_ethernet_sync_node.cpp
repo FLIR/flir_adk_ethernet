@@ -14,15 +14,15 @@ int main(int argc, char** argv)
   std::string nodelet_name = ros::this_node::getName();
 
   nodelet::M_string leftRemap(ros::names::getRemappings());
-  leftRemap.insert({"left_ip", "ip_addr"});
+  leftRemap.insert({"ip_addr", "left_ip"});
 
   nodelet::M_string rightRemap(ros::names::getRemappings());
-  rightRemap.insert({"right_ip", "ip_addr"});
+  rightRemap.insert({"ip_addr", "right_ip"});
   
-  nodelet.load(nodelet_name + "_left", "flir_boson_ethernet/SyncCameraController", 
+  nodelet.load(nodelet_name, "flir_boson_ethernet/SyncCameraController", 
     leftRemap, nargv);
-  nodelet.load(nodelet_name + "_right", "flir_boson_ethernet/SyncCameraController", 
-    rightRemap, nargv);
+//   nodelet.load(nodelet_name, "flir_boson_ethernet/SyncCameraController", 
+//     rightRemap, nargv);
   ros::spin();
   return 0;
 }

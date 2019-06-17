@@ -50,7 +50,8 @@ void SyncCameraController::onInit()
         return;
     }
     
-    _sub = nh.subscribe("image_sync", 1, boost::bind(&SyncCameraController::publishImage, this, _1));
+    _sub = nh.subscribe<std_msgs::Time>("image_sync", 1, 
+        boost::bind(&SyncCameraController::publishImage, this, _1));
 }
 
 void SyncCameraController::publishImage(const std_msgs::Time::ConstPtr& message)
