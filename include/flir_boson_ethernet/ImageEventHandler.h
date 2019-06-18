@@ -33,6 +33,7 @@ public:
     ImageEventHandler(CameraPtr pCam);
     ~ImageEventHandler();
 
+    void Init();
 
     // This method defines an image event. In it, the image that triggered the 
     // event is converted and saved before incrementing the count. Please see 
@@ -41,6 +42,7 @@ public:
     void OnImageEvent(ImagePtr image) override;
     void *GetImageData();
     ImageInfo GetImageInfo();
+    uint64_t GetCaptureTime();
 
 private:
     string m_deviceSerialNumber;
@@ -49,6 +51,7 @@ private:
     std::mutex m_mutex;
 
     std::chrono::_V2::system_clock::time_point startTime;
+    uint64_t m_lastTimeStamp;
 };
 
 #endif

@@ -17,11 +17,14 @@ ImageEventHandler::ImageEventHandler(CameraPtr pCam) {
 
 ImageEventHandler::~ImageEventHandler() {}
 
-ImageInfo ImageEventHandler::GetImageInfo() {
+// must be called after camera acquisition has been enabled
+void ImageEventHandler::Init() {
     // need to wait for the first image to be received
     // (event based so not on this thread)
     while(m_resultImage == nullptr && ros::ok()) {}
+}
 
+ImageInfo ImageEventHandler::GetImageInfo() {
     return ImageInfo {m_resultImage->GetWidth(), m_resultImage->GetHeight(),
                 m_resultImage->GetBufferSize()};
 }
@@ -34,6 +37,7 @@ void ImageEventHandler::OnImageEvent(ImagePtr image) {
     }
     m_mutex.lock();
     m_resultImage = image->Convert(PixelFormat_RGB8, HQ_LINEAR);
+    m_lastTimeStamp = image->GetTimeStamp();
     m_mutex.unlock();
 
     framesPerSecond++;
@@ -54,4 +58,8 @@ void *ImageEventHandler::GetImageData() {
     m_mutex.lock();
     m_mutex.unlock();
     return m_resultImage->GetData();
+}
+
+uint64_t ImageEventHandler::GetCaptureTime() {
+    return m_lastTimeStamp;
 }

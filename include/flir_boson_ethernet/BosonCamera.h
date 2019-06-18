@@ -104,8 +104,6 @@ class BosonCamera : public nodelet::Nodelet
     sensor_msgs::ImagePtr pub_image;
     ros::Timer capture_timer;
     int32_t width, height, imageSize;
-    int32_t fd;
-    int32_t i;
     struct v4l2_capability cap;
     int32_t frame = 0;                // First frame number enumeration
     int8_t thermal_sensor_name[20];  // To store the sensor name
@@ -114,7 +112,6 @@ class BosonCamera : public nodelet::Nodelet
     CameraPtr pCam;
     SystemPtr system;
     ImageEventHandler *imageHandler;
-    std::shared_ptr<std::mutex> eventMutex;
 
     cv::Mat thermal16, thermal16_linear, thermal16_linear_zoom,
             thermal_rgb_zoom, thermal_rgb;
