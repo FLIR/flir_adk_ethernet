@@ -43,10 +43,15 @@ using namespace std;
 namespace flir_boson_ethernet
 {
 
+struct EthernetCameraInfo {
+    string ip, camInfoPath;
+    int width, height;
+};
+
 class EthernetCamera
 {
   public:
-    EthernetCamera(std::string ip, std::string camInfoPath, ros::NodeHandle);
+    EthernetCamera(EthernetCameraInfo info, ros::NodeHandle);
     ~EthernetCamera();
 
     void agcBasicLinear(const cv::Mat& input_16,

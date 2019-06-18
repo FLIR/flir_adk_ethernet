@@ -19,15 +19,15 @@ gcstring GetDottedAddress( int64_t value )
     return convertValue.str().c_str();
 }
 
-EthernetCamera::EthernetCamera(string ip, string camInfoPath, ros::NodeHandle nh) :
-    _ipAddr(ip), _cameraInfoPath(camInfoPath)
+EthernetCamera::EthernetCamera(EthernetCameraInfo info, ros::NodeHandle nh) :
+    _ipAddr(info.ip), 
+    _cameraInfoPath(info.camInfoPath),
+    _width(info.width),
+    _height(info.height)
 {
     _cameraInfo = std::shared_ptr<camera_info_manager::CameraInfoManager>(
         new camera_info_manager::CameraInfoManager(nh));
 
-    // hard-code image dims for now
-    _width = 800;
-    _height = 600;
     _imageSize = _width * _height * 3;
 }
 
