@@ -28,6 +28,10 @@ void CameraWrapper::RegisterEvent(Spinnaker::Event &e) {
     _cam->RegisterEvent(e);
 }
 
+void CameraWrapper::UnregisterEvent(Spinnaker::Event &e) {
+    _cam->UnregisterEvent(e);
+}
+
 void CameraWrapper::BeginAcquisition() {
     _cam->BeginAcquisition();
 }

@@ -15,14 +15,15 @@ class CameraWrapper {
   public:
     CameraWrapper(CameraPtr cam);
     virtual ~CameraWrapper();
-    virtual void Init() = 0;
-    virtual bool IsValid() = 0;
-    virtual INodeMap& GetNodeMap() = 0;
-    virtual INodeMap& GetTLDeviceNodeMap() = 0;
-    virtual void RegisterEvent(Spinnaker::Event &e) = 0;
-    virtual void BeginAcquisition() = 0;
-    virtual void EndAcquisition() = 0;
-    virtual void DeInit() = 0;
+    virtual void Init();
+    virtual bool IsValid();
+    virtual INodeMap& GetNodeMap();
+    virtual INodeMap& GetTLDeviceNodeMap();
+    virtual void RegisterEvent(Spinnaker::Event &e);
+    virtual void UnregisterEvent(Spinnaker::Event &e);
+    virtual void BeginAcquisition();
+    virtual void EndAcquisition();
+    virtual void DeInit();
   private:
     CameraPtr _cam;
 };
