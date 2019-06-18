@@ -226,3 +226,7 @@ sensor_msgs::CameraInfo EthernetCamera::getCameraInfo() {
     return _cameraInfo->getCameraInfo();
 }
 
+uint64_t EthernetCamera::getActualTimestamp() {
+    return _imageHandler->GetCaptureTime();
+}
+

@@ -42,6 +42,7 @@ public:
     void OnImageEvent(ImagePtr image) override;
     void *GetImageData();
     ImageInfo GetImageInfo();
+    uint64_t GetCaptureTime();
 
 private:
     string m_deviceSerialNumber;
@@ -50,6 +51,7 @@ private:
     std::mutex m_mutex;
 
     std::chrono::_V2::system_clock::time_point startTime;
+    uint64_t m_lastTimeStamp;
 };
 
 #endif

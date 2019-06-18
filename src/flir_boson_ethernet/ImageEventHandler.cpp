@@ -37,6 +37,7 @@ void ImageEventHandler::OnImageEvent(ImagePtr image) {
     }
     m_mutex.lock();
     m_resultImage = image->Convert(PixelFormat_RGB8, HQ_LINEAR);
+    m_lastTimeStamp = image->GetTimeStamp();
     m_mutex.unlock();
 
     framesPerSecond++;
@@ -57,4 +58,8 @@ void *ImageEventHandler::GetImageData() {
     m_mutex.lock();
     m_mutex.unlock();
     return m_resultImage->GetData();
+}
+
+uint64_t ImageEventHandler::GetCaptureTime() {
+    return m_lastTimeStamp;
 }

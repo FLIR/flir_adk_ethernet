@@ -60,13 +60,19 @@ void SyncCameraController::publishImage(const std_msgs::Time::ConstPtr& message)
         ci(new sensor_msgs::CameraInfo(_camera->getCameraInfo()));
 
     auto thermalMat = _camera->getImageMatrix();
+    uint64_t actualCaptureTime = _camera->getActualTimestamp();
     _cvImage.image = thermalMat;
     _cvImage.encoding = "rgb8";
     _cvImage.header.stamp = message->data;
+    // _cvImage.header.stamp = timeFromNSec(actualCaptureTime);
     _cvImage.header.frame_id = frame_id;
 
     auto publishedImage = _cvImage.toImageMsg();
 
     ci->header.stamp = publishedImage->header.stamp;
     _imagePublisher.publish(publishedImage, ci);
+}
+
+ros::Time SyncCameraController::timeFromNSec(uint64_t nsec) {
+    return ros::Time(nsec / 1e9, nsec % (uint32_t)1e9);
 }

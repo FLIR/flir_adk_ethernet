@@ -45,6 +45,7 @@ class SyncCameraController : public nodelet::Nodelet
   private:
     virtual void onInit();
     void publishImage(const std_msgs::Time::ConstPtr& message);
+    ros::Time timeFromNSec(uint64_t nsecs);
 
     ros::NodeHandle nh, pnh;
     std::shared_ptr<image_transport::ImageTransport> it;

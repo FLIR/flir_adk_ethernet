@@ -58,6 +58,7 @@ class EthernetCamera
 
     cv::Mat getImageMatrix();
     sensor_msgs::CameraInfo getCameraInfo();
+    uint64_t getActualTimestamp();
 
   private:
     void findMatchingCamera(CameraList camList, const unsigned int numCams);
