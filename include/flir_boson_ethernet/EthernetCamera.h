@@ -32,6 +32,9 @@
 
 #include "flir_boson_ethernet/ImageEventHandler.h"
 
+#define RG8_PIXEL_FORMAT 17301513
+#define BPP8_FORMAT 3
+
 using namespace Spinnaker;
 using namespace Spinnaker::GenApi;
 using namespace Spinnaker::GenICam;
@@ -64,6 +67,7 @@ class EthernetCamera
     void setCameraEvents();
     void unsetCameraEvents();
     bool setImageInfo();
+    void setCameraPixelFormat();
 
     std::shared_ptr<camera_info_manager::CameraInfoManager> _cameraInfo;
     int32_t _width, _height, _imageSize;
