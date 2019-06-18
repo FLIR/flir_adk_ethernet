@@ -1,6 +1,8 @@
 #include "flir_boson_ethernet/ImageEventHandler.h"
 
-ImageEventHandler::ImageEventHandler(CameraPtr pCam) {
+using namespace flir_boson_ethernet;
+
+ImageEventHandler::ImageEventHandler(CameraWrapper *pCam) {
     // Retrieve device serial number
     INodeMap & nodeMap = pCam->GetTLDeviceNodeMap();
     m_deviceSerialNumber = "";
@@ -11,7 +13,6 @@ ImageEventHandler::ImageEventHandler(CameraPtr pCam) {
     }
 
     m_resultImage = nullptr;
-    // m_imageBuffer = nullptr;
     startTime = Clock::now();
 }
 

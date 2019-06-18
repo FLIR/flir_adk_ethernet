@@ -14,6 +14,8 @@
 #include <spinnaker/Spinnaker.h>
 #include <spinnaker/SpinGenApi/SpinnakerGenApi.h>
 
+#include "../spinnaker_wrappers/CameraWrapper.h"
+
 using namespace std;
 using namespace Spinnaker;
 using namespace Spinnaker::GenApi;
@@ -21,16 +23,17 @@ using namespace Spinnaker::GenICam;
 
 typedef std::chrono::high_resolution_clock Clock;
 
+namespace flir_boson_ethernet {
+
 struct ImageInfo {
   int32_t width, height, size;
 };
 
-class ImageEventHandler : public ImageEvent
-{
-public:
+class ImageEventHandler : public ImageEvent {
+  public:
     // The constructor retrieves the serial number and initializes the image 
     // counter to 0.
-    ImageEventHandler(CameraPtr pCam);
+    ImageEventHandler(CameraWrapper *pCam);
     ~ImageEventHandler();
 
     void Init();
@@ -44,7 +47,7 @@ public:
     ImageInfo GetImageInfo();
     uint64_t GetCaptureTime();
 
-private:
+  private:
     string m_deviceSerialNumber;
     ImagePtr m_resultImage;
     // uint8_t *m_imageBuffer;
@@ -53,5 +56,7 @@ private:
     std::chrono::_V2::system_clock::time_point startTime;
     uint64_t m_lastTimeStamp;
 };
+
+}
 
 #endif

@@ -31,6 +31,7 @@
 #include <spinnaker/SpinGenApi/SpinnakerGenApi.h>
 
 #include "flir_boson_ethernet/ImageEventHandler.h"
+#include "../spinnaker_wrappers/SystemWrapper.h"
 
 #define RG8_PIXEL_FORMAT 17301513
 #define BPP8_FORMAT 3
@@ -51,7 +52,7 @@ struct EthernetCameraInfo {
 class EthernetCamera
 {
   public:
-    EthernetCamera(EthernetCameraInfo info, ros::NodeHandle);
+    EthernetCamera(EthernetCameraInfo info, SystemWrapper sys, ros::NodeHandle);
     ~EthernetCamera();
 
     void agcBasicLinear(const cv::Mat& input_16,
@@ -66,7 +67,7 @@ class EthernetCamera
     uint64_t getActualTimestamp();
 
   private:
-    void findMatchingCamera(CameraList camList, const unsigned int numCams);
+    void findMatchingCamera(CameraListWrapper camList, const unsigned int numCams);
     bool setImageAcquisition();
     void initOpenCVBuffers();
     void setCameraInfo();
@@ -79,8 +80,8 @@ class EthernetCamera
     int32_t _width, _height, _imageSize;
     int32_t _frame = 0;                // First frame number enumeration
     uint8_t *_bufferStart;
-    CameraPtr _pCam;
-    SystemPtr _system;
+    CameraWrapper *_pCam;
+    SystemWrapper _system;
     ImageEventHandler *_imageHandler;
 
     cv::Mat _thermalImageMat;

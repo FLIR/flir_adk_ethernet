@@ -19,11 +19,13 @@ gcstring GetDottedAddress( int64_t value )
     return convertValue.str().c_str();
 }
 
-EthernetCamera::EthernetCamera(EthernetCameraInfo info, ros::NodeHandle nh) :
+EthernetCamera::EthernetCamera(EthernetCameraInfo info, SystemWrapper sys,
+        ros::NodeHandle nh) :
     _ipAddr(info.ip), 
     _cameraInfoPath(info.camInfoPath),
     _width(info.width),
-    _height(info.height)
+    _height(info.height),
+    _system(sys)
 {
     _cameraInfo = std::shared_ptr<camera_info_manager::CameraInfoManager>(
         new camera_info_manager::CameraInfoManager(nh));
@@ -49,20 +51,19 @@ void EthernetCamera::agcBasicLinear(const Mat &input_16,
 
 bool EthernetCamera::openCamera()
 {
-    _system = System::GetInstance();
-    CameraList camList = _system->GetCameras();
+    CameraListWrapper camList = _system.GetCameras();
     const unsigned int numCameras = camList.GetSize();
 
     if(numCameras == 0) {
         ROS_ERROR("flir_boson_ethernet - ERROR : NO_CAMERAS. No cameras found");
         camList.Clear();
-        _system->ReleaseInstance();
+        _system.ReleaseInstance();
         return false;
     }
 
     findMatchingCamera(camList, numCameras);
     
-    if(!_pCam.IsValid()) {
+    if(!_pCam->IsValid()) {
         ROS_ERROR("flir_boson_ethernet - ERROR : OPEN. No device matches ip_addr: %s", _ipAddr.c_str());
         return false;
     }
@@ -89,14 +90,14 @@ bool EthernetCamera::openCamera()
     return true;
 } 
 
-void EthernetCamera::findMatchingCamera(CameraList camList, const unsigned int numCams) {
+void EthernetCamera::findMatchingCamera(CameraListWrapper camList, const unsigned int numCams) {
     gcstring deviceIPAddress = "0.0.0.0";
 
     for (unsigned int i = 0; i < numCams; i++)
     {
         // Select camera
-        CameraPtr cam = camList.GetByIndex(i);
-        INodeMap &nodeMapTLDevice = cam->GetTLDeviceNodeMap();
+        CameraWrapper cam = camList.GetByIndex(i);
+        INodeMap &nodeMapTLDevice = cam.GetTLDeviceNodeMap();
 
         CIntegerPtr ptrIPAddress = nodeMapTLDevice.GetNode("GevDeviceIPAddress");
         if (IsAvailable(ptrIPAddress) && IsReadable(ptrIPAddress)) {
@@ -105,7 +106,7 @@ void EthernetCamera::findMatchingCamera(CameraList camList, const unsigned int n
         if(deviceIPAddress == _ipAddr) {
             CStringPtr modelName = nodeMapTLDevice.GetNode("DeviceModelName");
             ROS_INFO("Found matching camera %s", modelName->ToString().c_str());
-            _pCam = cam;
+            _pCam = &cam;
             return;
         }
     }

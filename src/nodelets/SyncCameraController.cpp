@@ -38,7 +38,13 @@ void SyncCameraController::onInit()
     ROS_INFO("flir_boson_ethernet - Got IP: %s.", ip.c_str());
     ROS_INFO("flir_boson_ethernet - Got camera_info_url: %s.", cameraInfoStr.c_str());
 
-    _camera = new EthernetCamera(ip, cameraInfoStr, nh);
+    EthernetCameraInfo info;
+    info.ip = ip;
+    info.camInfoPath = cameraInfoStr;
+    info.width = 800;
+    info.height = 600;
+    SystemWrapper sys(System::GetInstance());
+    _camera = new EthernetCamera(info, sys, nh);
 
     if (!exit) {
         exit = !_camera->openCamera() || exit;
