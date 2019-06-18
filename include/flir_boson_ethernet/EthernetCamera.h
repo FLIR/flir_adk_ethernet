@@ -61,7 +61,6 @@ class EthernetCamera
     bool setImageAcquisition();
     void initOpenCVBuffers();
     void setCameraInfo();
-    void setCameraPixelFormat();
     void setCameraEvents();
     void unsetCameraEvents();
     bool setImageInfo();

@@ -67,7 +67,6 @@ bool EthernetCamera::openCamera()
         return false;
     }
     _pCam->Init();
-    setCameraPixelFormat();
 
     if(!setImageInfo()) {
         ROS_ERROR("flir_boson_ethernet - ERROR : GET_CONFIGURATION. Cannot get image for setting dimensions");
@@ -127,15 +126,6 @@ bool EthernetCamera::setImageInfo() {
         ROS_ERROR("flir_boson_ethernet - ERROR : %s", e.what());
         return false;
     }
-}
-
-void EthernetCamera::setCameraPixelFormat() {
-    INodeMap &nodeMap = _pCam->GetNodeMap();
-    CEnumerationPtr pixelFormatNode = nodeMap.GetNode("PixelFormat");
-    CEnumerationPtr pixelCodingNode = nodeMap.GetNode("PixelCoding");
-
-    pixelFormatNode->SetIntValue(PixelFormat_BayerRG8);
-    pixelCodingNode->SetIntValue(PixelSize_Bpp8);
 }
 
 void EthernetCamera::setCameraEvents() {
