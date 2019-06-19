@@ -58,6 +58,9 @@ add_library(BosonCameraEthernet
   src/nodelets/TimeSynchronizer.cpp
   src/flir_boson_ethernet/EthernetCamera.cpp
   src/flir_boson_ethernet/ImageEventHandler.cpp
+  spinnaker_wrappers/CameraListWrapper.cpp
+  spinnaker_wrappers/SystemWrapper.cpp
+  spinnaker_wrappers/CameraWrapper.cpp
 )
 
 add_dependencies(BosonCameraEthernet
