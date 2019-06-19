@@ -115,6 +115,8 @@ void EthernetCamera::findMatchingCamera(CameraListWrapper camList, const unsigne
 bool EthernetCamera::setImageInfo() {
     try {
         INodeMap &nodeMap = _pCam->GetNodeMap();
+        setWidthHeight(nodeMap);
+
         CIntegerPtr widthNode = nodeMap.GetNode("Width");
         widthNode->SetValue(_width);
         CIntegerPtr heightNode = nodeMap.GetNode("Height");
@@ -128,6 +130,16 @@ bool EthernetCamera::setImageInfo() {
         ROS_ERROR("flir_boson_ethernet - ERROR : %s", e.what());
         return false;
     }
+}
+
+void EthernetCamera::setWidthHeight(INodeMap& nodeMap) {
+    CIntegerPtr maxWidthNode = nodeMap.GetNode("WidthMax");
+    CIntegerPtr maxHeightNode = nodeMap.GetNode("HeightMax");
+    int maxWidth = maxWidthNode->GetValue();
+    int maxHeight = maxHeightNode->GetValue();
+
+    _width = min(_width, maxWidth);
+    _height = min(_height, maxHeight);
 }
 
 void EthernetCamera::setCameraPixelFormat() {

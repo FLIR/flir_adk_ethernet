@@ -75,6 +75,7 @@ class EthernetCamera
     void setCameraEvents();
     void unsetCameraEvents();
     bool setImageInfo();
+    void setWidthHeight(INodeMap& nodeMap);
     void setCameraPixelFormat();
 
     std::shared_ptr<camera_info_manager::CameraInfoManager> _cameraInfo;
