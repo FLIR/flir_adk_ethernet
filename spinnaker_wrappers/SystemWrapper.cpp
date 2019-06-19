@@ -4,9 +4,7 @@ using namespace flir_boson_ethernet;
 
 SystemWrapper::SystemWrapper(SystemPtr sys) : _sys(sys) {}
 
-SystemWrapper::~SystemWrapper() {
-    delete _sys;
-}
+SystemWrapper::~SystemWrapper() {}
 
 CameraListWrapper SystemWrapper::GetCameras() {
     CameraList lst = _sys->GetCameras();

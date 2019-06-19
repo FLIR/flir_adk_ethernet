@@ -4,8 +4,11 @@ using namespace flir_boson_ethernet;
 
 CameraWrapper::CameraWrapper(CameraPtr cam) : _cam(cam) {}
 
+CameraWrapper::CameraWrapper(const CameraWrapper& wrapper) {
+    _cam = wrapper._cam;
+}
 CameraWrapper::~CameraWrapper() {
-    delete _cam;
+    _cam = nullptr;
 }
 
 void CameraWrapper::Init() {

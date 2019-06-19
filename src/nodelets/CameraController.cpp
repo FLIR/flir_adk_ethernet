@@ -61,7 +61,14 @@ void CameraController::onInit()
         ROS_ERROR("flir_boson_ethernet - Invalid video_mode value provided. Exiting.");
     }
 
-    _camera = new EthernetCamera(ip, cameraInfoStr, nh);
+    EthernetCameraInfo info;
+    info.ip = ip;
+    info.camInfoPath = cameraInfoStr;
+    info.width = 800;
+    info.height = 600;
+    auto sys = std::make_shared<SystemWrapper>(
+        SystemWrapper(System::GetInstance()));
+    _camera = new EthernetCamera(info, sys, nh);
 
     if (!exit) {
         exit = !_camera->openCamera() || exit;

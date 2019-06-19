@@ -2,7 +2,9 @@
 
 using namespace flir_boson_ethernet;
 
-ImageEventHandler::ImageEventHandler(CameraWrapper *pCam) {
+ImageEventHandler::ImageEventHandler(std::shared_ptr<CameraWrapper> pCam) :
+    _pCam(pCam)
+{
     // Retrieve device serial number
     INodeMap & nodeMap = pCam->GetTLDeviceNodeMap();
     m_deviceSerialNumber = "";
@@ -14,6 +16,12 @@ ImageEventHandler::ImageEventHandler(CameraWrapper *pCam) {
 
     m_resultImage = nullptr;
     startTime = Clock::now();
+}
+
+ImageEventHandler::ImageEventHandler(const ImageEventHandler& handler) :
+    ImageEventHandler(handler._pCam)
+{
+
 }
 
 ImageEventHandler::~ImageEventHandler() {}
@@ -48,7 +56,6 @@ void ImageEventHandler::OnImageEvent(ImagePtr image) {
         std::cout << "FPS: " << framesPerSecond << std::endl;
         framesPerSecond = 0;
     }
-
 }
 
 void *ImageEventHandler::GetImageData() {

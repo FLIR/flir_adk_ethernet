@@ -19,7 +19,8 @@ gcstring GetDottedAddress( int64_t value )
     return convertValue.str().c_str();
 }
 
-EthernetCamera::EthernetCamera(EthernetCameraInfo info, SystemWrapper sys,
+EthernetCamera::EthernetCamera(EthernetCameraInfo info, 
+        std::shared_ptr<SystemWrapper> sys,
         ros::NodeHandle nh) :
     _ipAddr(info.ip), 
     _cameraInfoPath(info.camInfoPath),
@@ -34,7 +35,6 @@ EthernetCamera::EthernetCamera(EthernetCameraInfo info, SystemWrapper sys,
 }
 
 EthernetCamera::~EthernetCamera() {
-    delete _pCam;
     delete _bufferStart;
     closeCamera();
 }
@@ -51,18 +51,18 @@ void EthernetCamera::agcBasicLinear(const Mat &input_16,
 
 bool EthernetCamera::openCamera()
 {
-    CameraListWrapper camList = _system.GetCameras();
+    CameraListWrapper camList = _system->GetCameras();
     const unsigned int numCameras = camList.GetSize();
 
     if(numCameras == 0) {
         ROS_ERROR("flir_boson_ethernet - ERROR : NO_CAMERAS. No cameras found");
         camList.Clear();
-        _system.ReleaseInstance();
+        _system->ReleaseInstance();
         return false;
     }
 
     findMatchingCamera(camList, numCameras);
-    
+
     if(!_pCam->IsValid()) {
         ROS_ERROR("flir_boson_ethernet - ERROR : OPEN. No device matches ip_addr: %s", _ipAddr.c_str());
         return false;
@@ -106,7 +106,7 @@ void EthernetCamera::findMatchingCamera(CameraListWrapper camList, const unsigne
         if(deviceIPAddress == _ipAddr) {
             CStringPtr modelName = nodeMapTLDevice.GetNode("DeviceModelName");
             ROS_INFO("Found matching camera %s", modelName->ToString().c_str());
-            _pCam = &cam;
+            _pCam = std::make_shared<CameraWrapper>(cam);
             return;
         }
     }
@@ -144,7 +144,7 @@ void EthernetCamera::setCameraPixelFormat() {
 }
 
 void EthernetCamera::setCameraEvents() {
-    _imageHandler = new ImageEventHandler(_pCam);
+    _imageHandler = std::make_shared<ImageEventHandler>(ImageEventHandler(_pCam));
     _pCam->RegisterEvent(*_imageHandler);
 }
 
@@ -214,7 +214,6 @@ bool EthernetCamera::closeCamera()
 
 void EthernetCamera::unsetCameraEvents() {
     _pCam->UnregisterEvent(*_imageHandler);
-    delete _imageHandler;
 }
 
 cv::Mat EthernetCamera::getImageMatrix() {

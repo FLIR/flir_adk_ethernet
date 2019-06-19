@@ -52,7 +52,8 @@ struct EthernetCameraInfo {
 class EthernetCamera
 {
   public:
-    EthernetCamera(EthernetCameraInfo info, SystemWrapper sys, ros::NodeHandle);
+    EthernetCamera(EthernetCameraInfo info, 
+      std::shared_ptr<SystemWrapper> sys, ros::NodeHandle);
     ~EthernetCamera();
 
     void agcBasicLinear(const cv::Mat& input_16,
@@ -80,9 +81,9 @@ class EthernetCamera
     int32_t _width, _height, _imageSize;
     int32_t _frame = 0;                // First frame number enumeration
     uint8_t *_bufferStart;
-    CameraWrapper *_pCam;
-    SystemWrapper _system;
-    ImageEventHandler *_imageHandler;
+    std::shared_ptr<CameraWrapper> _pCam;
+    std::shared_ptr<SystemWrapper> _system;
+    std::shared_ptr<ImageEventHandler> _imageHandler;
 
     cv::Mat _thermalImageMat;
 

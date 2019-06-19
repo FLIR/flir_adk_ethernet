@@ -33,7 +33,8 @@ class ImageEventHandler : public ImageEvent {
   public:
     // The constructor retrieves the serial number and initializes the image 
     // counter to 0.
-    ImageEventHandler(CameraWrapper *pCam);
+    ImageEventHandler(std::shared_ptr<CameraWrapper> pCam);
+    ImageEventHandler(const ImageEventHandler& handler);
     ~ImageEventHandler();
 
     void Init();
@@ -48,6 +49,7 @@ class ImageEventHandler : public ImageEvent {
     uint64_t GetCaptureTime();
 
   private:
+    std::shared_ptr<CameraWrapper> _pCam;
     string m_deviceSerialNumber;
     ImagePtr m_resultImage;
     // uint8_t *m_imageBuffer;

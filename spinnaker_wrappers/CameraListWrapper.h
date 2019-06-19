@@ -16,6 +16,7 @@ namespace flir_boson_ethernet {
 class CameraListWrapper {
   public:
     CameraListWrapper(CameraList camList);
+    CameraListWrapper(const CameraListWrapper& wrapper);
     virtual ~CameraListWrapper();
     virtual const unsigned int GetSize();
     virtual void Clear();
@@ -26,4 +27,4 @@ class CameraListWrapper {
 
 }
 
-#endif;
+#endif

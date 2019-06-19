@@ -43,7 +43,8 @@ void SyncCameraController::onInit()
     info.camInfoPath = cameraInfoStr;
     info.width = 800;
     info.height = 600;
-    SystemWrapper sys(System::GetInstance());
+    auto sys = std::make_shared<SystemWrapper>(
+        SystemWrapper(System::GetInstance()));
     _camera = new EthernetCamera(info, sys, nh);
 
     if (!exit) {
@@ -58,6 +59,7 @@ void SyncCameraController::onInit()
     
     _sub = nh.subscribe<std_msgs::Time>("image_sync", 1, 
         boost::bind(&SyncCameraController::publishImage, this, _1));
+    std::cout << "HERE" << std::endl;
 }
 
 void SyncCameraController::publishImage(const std_msgs::Time::ConstPtr& message)

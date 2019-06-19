@@ -111,7 +111,7 @@ class BosonCamera : public nodelet::Nodelet
     uint8_t *buffer_start;
     CameraPtr pCam;
     SystemPtr system;
-    ImageEventHandler *imageHandler;
+    std::shared_ptr<ImageEventHandler> imageHandler;
 
     cv::Mat thermal16, thermal16_linear, thermal16_linear_zoom,
             thermal_rgb_zoom, thermal_rgb;
