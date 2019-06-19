@@ -102,7 +102,9 @@ if (CATKIN_ENABLE_TESTING)
     test/test_flir_boson_ethernet.cpp
     test/stringCompare.cpp
   )
-  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME}-test 
+    ${catkin_LIBRARIES}
+  )
 endif()
 
 ## Add folders to be run by python nosetests

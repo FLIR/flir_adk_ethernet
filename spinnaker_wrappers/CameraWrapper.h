@@ -13,6 +13,7 @@ namespace flir_boson_ethernet {
 
 class CameraWrapper {
   public:
+    CameraWrapper();
     CameraWrapper(CameraPtr cam);
     CameraWrapper(const CameraWrapper& wrapper);
     virtual ~CameraWrapper();

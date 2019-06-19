@@ -1,7 +1,28 @@
 #include <gtest/gtest.h>
+// #include <gmock/gmock.h>
+// #include "mocks/MockCamera.h"
+// #include "flir_boson_ethernet/ImageEventHandler.h"
+
+// using ::testing::Return;
+// using ::testing::ReturnRef;
+// using ::testing::_;
+// using namespace flir_boson_ethernet;
 
 // ImageEvent tests
-// TEST(ImageEventTests, )
+// TEST(ImageEventTests, ConstructImageHandler) {
+//     MockCamera camera;
+//     MockNodeMap nodeMap;
+
+//     EXPECT_CALL(camera, GetTLDeviceNodeMap())
+//         .Times(1)
+//         .WillRepeatedly(ReturnRef(nodeMap));
+//     // EXPECT_CALL(camera, )
+
+//     auto camPtr = std::make_shared<CameraWrapper>(camera);
+//     ImageEventHandler handler = ImageEventHandler(camPtr);
+
+
+// }
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv); 
