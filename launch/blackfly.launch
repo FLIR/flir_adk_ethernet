@@ -4,7 +4,7 @@
   <arg name="frame_id" default="boson_camera"/>
 
   <!-- the linux file descriptor location for the camera -->
-  <arg name="ip_addr" default="169.254.94.215"/>
+  <arg name="ip_addr" default="169.254.87.157"/>
     
   <!-- valid values are 30.0 or 60.0 for Bosons -->
   <arg name="frame_rate" default="60.0"/>
@@ -19,13 +19,15 @@
   <!-- <arg name="sensor_type" default="Boson_640"/> -->
 
   <!-- location of the camera calibration file -->
-  <arg name="camera_info_url" default="package://flir_boson_ethernet/example_calibrations/Boson640.yaml"/>
+  <arg name="camera_info_url" default="package://flir_boson_ethernet/example_calibrations/BlackFlyS.yaml"/>
 
   <node pkg="flir_boson_ethernet" 
         type="flir_boson_ethernet_node" 
         name="flir_boson_ethernet_node" 
         ns="$(arg namespace)"
         output="screen">
+    <!-- <remap from="image_raw" to="left/image_raw" /> -->
+    <!-- <remap from="~ip_addr" to="~right_ip" /> -->
     <param name="frame_id" type="str" value="$(arg frame_id)"/>
     <param name="ip_addr" type="str" value="$(arg ip_addr)"/>
     <param name="frame_rate" type="double" value="$(arg frame_rate)"/>
@@ -39,4 +41,8 @@
   <node name="image_view" pkg="image_view" type="image_view" respawn="false" output="screen">
     <remap from="image" to="flir_boson/image_raw" />
   </node>
+  <!-- <node name="stereo_cam" pkg="image_view" type="stereo_view">
+    <remap from="image" to="image_raw" />
+    <remap from="stereo" to="flir_boson" />
+  </node> -->
 </launch>
