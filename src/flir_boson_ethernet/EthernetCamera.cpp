@@ -30,8 +30,6 @@ EthernetCamera::EthernetCamera(EthernetCameraInfo info,
 {
     _cameraInfo = std::shared_ptr<camera_info_manager::CameraInfoManager>(
         new camera_info_manager::CameraInfoManager(nh));
-
-    _imageSize = _width * _height * 3;
 }
 
 EthernetCamera::~EthernetCamera() {
@@ -140,6 +138,7 @@ void EthernetCamera::setWidthHeight(INodeMap& nodeMap) {
 
     _width = min(_width, maxWidth);
     _height = min(_height, maxHeight);
+    _imageSize = _height * _width * 3;
 }
 
 void EthernetCamera::setCameraPixelFormat() {
