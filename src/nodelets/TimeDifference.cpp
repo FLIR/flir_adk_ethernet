@@ -1,4 +1,7 @@
+#include <pluginlib/class_list_macros.h>
 #include "flir_boson_ethernet/TimeDifference.h"
+
+PLUGINLIB_EXPORT_CLASS(flir_boson_ethernet::TimeDifference, nodelet::Nodelet)
 
 using namespace flir_boson_ethernet;
 
@@ -14,10 +17,10 @@ void TimeDifference::onInit() {
     _nh = getNodeHandle();
     _pnh = getPrivateNodeHandle();
 
-    _imgSubscriber = _nh.subscribe<sensor_msgs::ImageConstPtr>("image_raw", 1,
+    _imgSubscriber = _nh.subscribe<sensor_msgs::Image>("image_raw", 1,
         boost::bind(&TimeDifference::getImageHeader, this, _1));
     _actualTimeSubscriber = _nh.subscribe<std_msgs::Header>("actual_timestamp", 1,
-        boost::bind(&TimeDifference::getImageHeader, this, _1));
+        boost::bind(&TimeDifference::getActualTimeHeader, this, _1));
 }
 
 void TimeDifference::calculateDifferences() {
@@ -28,7 +31,7 @@ void TimeDifference::calculateDifferences() {
     std::cout << getName() << " - Avg timestamp difference: " << msAvg << " ms" << std::endl;
 }
 
-void TimeDifference::getImageHeader(const sensor_msgs::ImageConstPtr& img) {
+void TimeDifference::getImageHeader(const sensor_msgs::Image::ConstPtr& img) {
     _imgHeader = img->header;
     if(_imgHeader.seq == _actualTimeHeader.seq) {
         addTimeDiff();

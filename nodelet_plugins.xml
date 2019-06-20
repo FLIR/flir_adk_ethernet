@@ -15,4 +15,9 @@
       Sends signal to trigger sending image frames to topics
     </description>
   </class>
+  <class name="flir_boson_ethernet/TimeDifference" type="flir_boson_ethernet::TimeDifference" base_class_type="nodelet::Nodelet">
+    <description>
+      Quantifies the difference in timing between ethernet and ROS timestamps
+    </description>
+  </class>
 </library>

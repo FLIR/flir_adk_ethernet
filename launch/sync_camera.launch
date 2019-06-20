@@ -72,6 +72,12 @@
 
     <node pkg="nodelet"
           type="nodelet"
+          name="left_time_diff"
+          args="load flir_boson_ethernet/TimeDifference nodelet_manager">
+    </node>
+
+    <node pkg="nodelet"
+          type="nodelet"
           name="stereo_proc"
           args="load stereo_image_proc/disparity nodelet_manager">
       <remap from="left/image_rect" to="left/image_raw" />

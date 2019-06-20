@@ -24,7 +24,7 @@ class TimeDifference : public nodelet::Nodelet {
   private:
     virtual void onInit();
     void calculateDifferences();
-    void getImageHeader(const sensor_msgs::ImageConstPtr& msg);
+    void getImageHeader(const sensor_msgs::Image::ConstPtr& msg);
     void getActualTimeHeader(const std_msgs::Header::ConstPtr& msg);
     void addTimeDiff();
 
