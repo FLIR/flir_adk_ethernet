@@ -74,6 +74,8 @@
           type="nodelet"
           name="left_time_diff"
           args="load flir_boson_ethernet/TimeDifference nodelet_manager">
+      <remap from="image_raw" to="$(arg left_namespace)/image_raw" />
+      <remap from="actual_timestamp" to="$(arg left_namespace)/actual_timestamp" />
     </node>
 
     <node pkg="nodelet"

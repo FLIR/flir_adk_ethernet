@@ -71,6 +71,7 @@ void SyncCameraController::publishImage(const std_msgs::Time::ConstPtr& message)
     _cvImage.image = thermalMat;
     _cvImage.encoding = "rgb8";
     _cvImage.header.stamp = message->data;
+    _cvImage.header.seq = _seq;
     _cvImage.header.frame_id = frame_id;
 
     auto publishedImage = _cvImage.toImageMsg();
@@ -84,7 +85,8 @@ void SyncCameraController::publishImage(const std_msgs::Time::ConstPtr& message)
     timeHeader.seq = _cvImage.header.seq;
     timeHeader.stamp = timeFromNSec(actualCaptureTime);;
     _timePublisher.publish(timeHeader);
-    
+
+    _seq++;
 }
 
 ros::Time SyncCameraController::timeFromNSec(uint64_t nsec) {

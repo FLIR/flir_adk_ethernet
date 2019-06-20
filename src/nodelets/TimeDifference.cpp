@@ -29,6 +29,7 @@ void TimeDifference::calculateDifferences() {
     auto msAvg = avg / 1e6;
 
     std::cout << getName() << " - Avg timestamp difference: " << msAvg << " ms" << std::endl;
+    _timeDifferences.clear();
 }
 
 void TimeDifference::getImageHeader(const sensor_msgs::Image::ConstPtr& img) {
@@ -46,9 +47,16 @@ void TimeDifference::getActualTimeHeader(const std_msgs::Header::ConstPtr& msg) 
 }
 
 void TimeDifference::addTimeDiff() {
-    auto t1 = _imgHeader.stamp.nsec;
-    auto t2 = _actualTimeHeader.stamp.nsec;
-    auto diff = abs(t1 - t2);
+    int64_t t1 = _imgHeader.stamp.nsec;
+    int64_t t2 = _actualTimeHeader.stamp.nsec;
+
+    // temporary correction for Spinnaker bug giving 0 time
+    if(t2 == 0) {
+        return;
+    }
+
+    double diff = abs(t1 - t2);
+    // std::cout << "t1: " << t1 << ", t2: " << t2 << ", diff: " << diff << std::endl;
     _timeDifferences.push_back((uint32_t)diff);
 
     if(_timeDifferences.size() >= NUM_READINGS) {

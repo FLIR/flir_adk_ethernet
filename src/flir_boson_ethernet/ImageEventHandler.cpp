@@ -38,7 +38,7 @@ ImageInfo ImageEventHandler::GetImageInfo() {
                 m_resultImage->GetBufferSize()};
 }
 
-static int framesPerSecond = 0;
+int framesPerSecond = 0;
 void ImageEventHandler::OnImageEvent(ImagePtr image) {
     // Check image retrieval status
     if (image->IsIncomplete()) {
