@@ -6,6 +6,9 @@
   <!-- the linux file descriptor location for the camera -->
   <arg name="left_ip" default="169.254.87.157"/>
   <arg name="right_ip" default="169.254.82.142"/>
+
+  <arg name="left_namespace" default="left" />
+  <arg name="right_namespace" default="right" />
     
   <!-- valid values are 30.0 or 60.0 for Bosons -->
   <arg name="frame_rate" default="60.0"/>
@@ -34,9 +37,9 @@
           name="left_camera_node"
           args="load flir_boson_ethernet/SyncCameraController nodelet_manager"
           output="screen">
-      <remap from="image_raw" to="left/image_raw" />
-      <remap from="camera_info_url" to="left/camera_info_url" />
-      <remap from="set_camera_info" to="left/set_camera_info" />
+      <remap from="image_raw" to="$(arg left_namespace)/image_raw" />
+      <remap from="camera_info_url" to="$(arg left_namespace)/camera_info_url" />
+      <remap from="set_camera_info" to="$(arg left_namespace)/set_camera_info" />
       
       <param name="frame_id" type="str" value="$(arg frame_id)"/>
       <param name="ip_addr" type="str" value="$(arg left_ip)"/>
@@ -48,9 +51,9 @@
           name="right_camera_node"
           args="load flir_boson_ethernet/SyncCameraController nodelet_manager"
           output="screen">
-      <remap from="image_raw" to="right/image_raw" />
-      <remap from="camera_info_url" to="right/camera_info_url" />
-      <remap from="set_camera_info" to="right/set_camera_info" />
+      <remap from="image_raw" to="$(arg right_namespace)/image_raw" />
+      <remap from="camera_info_url" to="$(arg right_namespace)/camera_info_url" />
+      <remap from="set_camera_info" to="$(arg right_namespace)/set_camera_info" />
 
       <param name="frame_id" type="str" value="$(arg frame_id)"/>
       <param name="ip_addr" type="str" value="$(arg right_ip)"/>
