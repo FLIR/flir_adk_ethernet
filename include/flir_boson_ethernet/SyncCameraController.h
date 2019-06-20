@@ -51,6 +51,7 @@ class SyncCameraController : public nodelet::Nodelet
     std::shared_ptr<image_transport::ImageTransport> it;
     cv_bridge::CvImage _cvImage;
     image_transport::CameraPublisher _imagePublisher;
+    ros::Publisher _timePublisher;
     EthernetCamera *_camera;
     std::string frame_id;
     ros::Subscriber _sub;

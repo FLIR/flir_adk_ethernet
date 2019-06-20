@@ -40,6 +40,7 @@
       <remap from="image_raw" to="$(arg left_namespace)/image_raw" />
       <remap from="camera_info_url" to="$(arg left_namespace)/camera_info_url" />
       <remap from="set_camera_info" to="$(arg left_namespace)/set_camera_info" />
+      <remap from="actual_timestamp" to="$(arg left_namespace)/actual_timestamp" />
       
       <param name="frame_id" type="str" value="$(arg frame_id)"/>
       <param name="ip_addr" type="str" value="$(arg left_ip)"/>
@@ -54,6 +55,7 @@
       <remap from="image_raw" to="$(arg right_namespace)/image_raw" />
       <remap from="camera_info_url" to="$(arg right_namespace)/camera_info_url" />
       <remap from="set_camera_info" to="$(arg right_namespace)/set_camera_info" />
+      <remap from="actual_timestamp" to="$(arg right_namespace)/actual_timestamp" />
 
       <param name="frame_id" type="str" value="$(arg frame_id)"/>
       <param name="ip_addr" type="str" value="$(arg right_ip)"/>

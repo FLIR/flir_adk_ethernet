@@ -25,6 +25,7 @@ void SyncCameraController::onInit()
     
     it = std::shared_ptr<image_transport::ImageTransport>(new image_transport::ImageTransport(nh));
     _imagePublisher = it->advertiseCamera("image_raw", 1);
+    _timePublisher = nh.advertise<std_msgs::Header>("actual_timestamp", 1);
 
     bool exit = false;
 
@@ -67,17 +68,23 @@ void SyncCameraController::publishImage(const std_msgs::Time::ConstPtr& message)
         ci(new sensor_msgs::CameraInfo(_camera->getCameraInfo()));
 
     auto thermalMat = _camera->getImageMatrix();
-    uint64_t actualCaptureTime = _camera->getActualTimestamp();
     _cvImage.image = thermalMat;
     _cvImage.encoding = "rgb8";
     _cvImage.header.stamp = message->data;
-    // _cvImage.header.stamp = timeFromNSec(actualCaptureTime);
     _cvImage.header.frame_id = frame_id;
 
     auto publishedImage = _cvImage.toImageMsg();
 
     ci->header.stamp = publishedImage->header.stamp;
     _imagePublisher.publish(publishedImage, ci);
+
+    uint64_t actualCaptureTime = _camera->getActualTimestamp();
+    std_msgs::Header timeHeader;
+    timeHeader.frame_id = frame_id;
+    timeHeader.seq = _cvImage.header.seq;
+    timeHeader.stamp = timeFromNSec(actualCaptureTime);;
+    _timePublisher.publish(timeHeader);
+    
 }
 
 ros::Time SyncCameraController::timeFromNSec(uint64_t nsec) {
