@@ -83,9 +83,13 @@ void SyncCameraController::publishImage(const std_msgs::Time::ConstPtr& message)
     std_msgs::Header timeHeader;
     timeHeader.frame_id = frame_id;
     timeHeader.seq = _cvImage.header.seq;
-    timeHeader.stamp = timeFromNSec(actualCaptureTime);;
+    timeHeader.stamp = timeFromNSec(actualCaptureTime);
     _timePublisher.publish(timeHeader);
 
+    auto stampTime = message->data;
+    auto actualTime = timeFromNSec(actualCaptureTime);
+    auto diff = abs((stampTime - actualTime).nsec);
+    std::cout << "t1: " << stampTime << ", t2: " << actualCaptureTime << ", diff: " << diff << std::endl;
     _seq++;
 }
 

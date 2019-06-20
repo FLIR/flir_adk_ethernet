@@ -16,9 +16,20 @@ find_package(catkin REQUIRED COMPONENTS
   roslint
   sensor_msgs
   std_msgs
+  message_generation
 )
 
 find_package(OpenCV REQUIRED)
+
+add_message_files(
+  FILES
+  MultiTimeHeader.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 catkin_package(
   CATKIN_DEPENDS
@@ -27,6 +38,7 @@ catkin_package(
   cv_bridge
   nodelet
   sensor_msgs
+  message_runtime
 )
 
 include_directories(

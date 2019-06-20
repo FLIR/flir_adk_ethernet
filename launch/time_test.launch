@@ -9,15 +9,6 @@
   <!-- valid values are 30.0 or 60.0 for Bosons -->
   <arg name="frame_rate" default="60.0"/>
 
-  <!-- valid values are RAW16 or YUV -->
-  <arg name="video_mode" default="YUV"/>
-
-  <!-- valid values are TRUE or FALSE -->
-  <arg name="zoom_enable" default="FALSE"/>
-
-  <!-- valid values are Boson_320 or Boson_640 -->
-  <!-- <arg name="sensor_type" default="Boson_640"/> -->
-
   <!-- location of the camera calibration file -->
   <arg name="camera_info_url" default="package://flir_boson_ethernet/example_calibrations/BlackFlyS.yaml"/>
 
@@ -49,6 +40,8 @@
           type="nodelet"
           name="time_diff"
           args="load flir_boson_ethernet/TimeDifference nodelet_manager">
+      <param name="image_topic1" type="string" value="image_raw" />
+      <param name="header_topic2" type="string" value="actual_timestamp" />
     </node>
 
     <node name="image_view"
