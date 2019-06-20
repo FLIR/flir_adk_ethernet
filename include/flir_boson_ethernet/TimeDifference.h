@@ -10,6 +10,7 @@
 #include <sensor_msgs/Image.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
+#include <message_filters/sync_policies/approximate_time.h>
 #include <flir_boson_ethernet/MultiTimeHeader.h>
 
 
@@ -27,17 +28,15 @@ class TimeDifference : public nodelet::Nodelet {
 
   private:
     virtual void onInit();
-    void calculateDifferences(const MultiTimeHeaderConstPtr& leftMsg,
-      const MultiTimeHeaderConstPtr& rightMsg);
-    // void getImageHeader(const sensor_msgs::Image::ConstPtr& msg);
-    // void getActualTimeHeader(const std_msgs::Header::ConstPtr& msg);
-    // void addTimeDiff();
+    void calculateDifferences(const MultiTimeHeaderConstPtr& msg,
+      MultiTimeHeader *header, MultiTimeHeader *otherHeader);
 
     ros::NodeHandle _nh, _pnh;
-    // MultiTimeHeader _leftHeader;
-    // MultiTimeHeader _rightHeader;
+    ros::Subscriber _leftSub;
+    ros::Subscriber _rightSub;
 
-    // message_filters::TimeSynchronizer<MultiTimeHeader, MultiTimeHeader> _sync;
+    MultiTimeHeader _leftHeader;
+    MultiTimeHeader _rightHeader;
 
     std::vector<uint32_t> _timeDifferences;
 };

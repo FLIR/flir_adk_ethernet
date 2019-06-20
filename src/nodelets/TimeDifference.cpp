@@ -17,30 +17,33 @@ void TimeDifference::onInit() {
     _nh = getNodeHandle();
     _pnh = getPrivateNodeHandle();
 
-    message_filters::Subscriber<MultiTimeHeader> left(_nh, 
-        "left/actual_timestamp", 1);
-    message_filters::Subscriber<MultiTimeHeader> right(_nh, 
-        "right/actual_timestamp", 1);
+    _leftSub = _nh.subscribe<MultiTimeHeader>("left/actual_timestamp", 1, 
+        boost::bind(&TimeDifference::calculateDifferences, this, _1,
+            &_leftHeader, &_rightHeader));
+    _rightSub = _nh.subscribe<MultiTimeHeader>("right/actual_timestamp", 1, 
+        boost::bind(&TimeDifference::calculateDifferences, this, _1,
+            &_rightHeader, &_leftHeader));
+    // message_filters::Subscriber<MultiTimeHeader> right(_nh, 
+    //     "right/actual_timestamp", 1);
 
-    message_filters::TimeSynchronizer<MultiTimeHeader, MultiTimeHeader> 
-        sync(left, right, 1);
 
-    NODELET_INFO("SET UP TIME SYNC");
-    sync.registerCallback(boost::bind(&TimeDifference::calculateDifferences, 
-        this, _1, _2));
-    // _leftSubscriber = _nh.subscribe<MultiTimeHeader>("image_raw", 1,
-    //     boost::bind(&TimeDifference::getImageHeader, this, _1));
-    // _rightSubscriber = _nh.subscribe<MultiTimeHeader>("actual_timestamp", 1,
-    //     boost::bind(&TimeDifference::getActualTimeHeader, this, _1));
+    // message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(1), 
+    //     left, right);
+
+    // _conn = sync.registerCallback(boost::bind(
+    //     &TimeDifference::calculateDifferences, this, _1, _2));
 }
 
-void TimeDifference::calculateDifferences(const MultiTimeHeaderConstPtr& leftMsg,
-    const MultiTimeHeaderConstPtr& rightMsg)
+void TimeDifference::calculateDifferences(const MultiTimeHeaderConstPtr& msg,
+    MultiTimeHeader *header, MultiTimeHeader *otherHeader)
 {
-    auto t1 = leftMsg->actual_stamp;
-    auto t2 = rightMsg->actual_stamp;
-    auto diff = abs((t1 - t2).nsec);
-    std::cout << "t1: " << t1 << ", t2: " << t2 << ", diff: " << diff << std::endl;
+    *header = *msg;
+    if(header->header.stamp == otherHeader->header.stamp) {
+        auto t1 = header->actual_stamp;
+        auto t2 = otherHeader->actual_stamp;
+        auto diff = abs((t1 - t2).nsec);
+        std::cout << "t1: " << t1 << ", t2: " << t2 << ", diff: " << diff << std::endl;
+    }
     
     // auto sum = accumulate(_timeDifferences.begin(), _timeDifferences.end(), 0.0);
     // auto avg = sum / (double)_timeDifferences.size();
