@@ -1,4 +1,2 @@
-string frame_id
-uint32 seq
-time ros_stamp
+Header header
 time actual_stamp

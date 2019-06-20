@@ -7,8 +7,10 @@
 // ROS Includes
 #include <ros/ros.h>
 #include <nodelet/nodelet.h>
-#include <std_msgs/Header.h>
 #include <sensor_msgs/Image.h>
+#include <message_filters/subscriber.h>
+#include <message_filters/time_synchronizer.h>
+
 
 #define NUM_READINGS 60
 
@@ -24,16 +26,17 @@ class TimeDifference : public nodelet::Nodelet {
 
   private:
     virtual void onInit();
-    void calculateDifferences();
-    void getImageHeader(const sensor_msgs::Image::ConstPtr& msg);
-    void getActualTimeHeader(const std_msgs::Header::ConstPtr& msg);
-    void addTimeDiff();
+    // void calculateDifferences(const MultiTimeHeaderConstPtr& leftMsg,
+    //   const MultiTimeHeaderConstPtr& rightMsg);
+    // void getImageHeader(const sensor_msgs::Image::ConstPtr& msg);
+    // void getActualTimeHeader(const std_msgs::Header::ConstPtr& msg);
+    // void addTimeDiff();
 
     ros::NodeHandle _nh, _pnh;
-    ros::Subscriber _imgSubscriber;
-    ros::Subscriber _actualTimeSubscriber;
-    std_msgs::Header _imgHeader;
-    std_msgs::Header _actualTimeHeader;
+    // MultiTimeHeader _leftHeader;
+    // MultiTimeHeader _rightHeader;
+
+    // message_filters::TimeSynchronizer<MultiTimeHeader, MultiTimeHeader> _sync;
 
     std::vector<uint32_t> _timeDifferences;
 };

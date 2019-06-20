@@ -25,7 +25,8 @@ void SyncCameraController::onInit()
     
     it = std::shared_ptr<image_transport::ImageTransport>(new image_transport::ImageTransport(nh));
     _imagePublisher = it->advertiseCamera("image_raw", 1);
-    _timePublisher = nh.advertise<std_msgs::Header>("actual_timestamp", 1);
+    _timePublisher = nh.advertise<flir_boson_ethernet::MultiTimeHeader>(
+        "actual_timestamp", 1);
 
     bool exit = false;
 
@@ -79,17 +80,14 @@ void SyncCameraController::publishImage(const std_msgs::Time::ConstPtr& message)
     ci->header.stamp = publishedImage->header.stamp;
     _imagePublisher.publish(publishedImage, ci);
 
-    uint64_t actualCaptureTime = _camera->getActualTimestamp();
-    std_msgs::Header timeHeader;
-    timeHeader.frame_id = frame_id;
-    timeHeader.seq = _cvImage.header.seq;
-    timeHeader.stamp = timeFromNSec(actualCaptureTime);
-    _timePublisher.publish(timeHeader);
+    // uint64_t actualCaptureTime = _camera->getActualTimestamp();
+    // MultiTimeHeader timeHeader;
+    // timeHeader.frame_id = frame_id;
+    // timeHeader.seq = _cvImage.header.seq;
+    // timeHeader.ros_stamp = _cvImage.header.stamp;
+    // timeHeader.actual_stamp = timeFromNSec(actualCaptureTime);
+    // _timePublisher.publish(timeHeader);
 
-    auto stampTime = message->data;
-    auto actualTime = timeFromNSec(actualCaptureTime);
-    auto diff = abs((stampTime - actualTime).nsec);
-    std::cout << "t1: " << stampTime << ", t2: " << actualCaptureTime << ", diff: " << diff << std::endl;
     _seq++;
 }
 
