@@ -10,6 +10,7 @@
 #include <sensor_msgs/Image.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
+#include <flir_boson_ethernet/MultiTimeHeader.h>
 
 
 #define NUM_READINGS 60
@@ -26,8 +27,8 @@ class TimeDifference : public nodelet::Nodelet {
 
   private:
     virtual void onInit();
-    // void calculateDifferences(const MultiTimeHeaderConstPtr& leftMsg,
-    //   const MultiTimeHeaderConstPtr& rightMsg);
+    void calculateDifferences(const MultiTimeHeaderConstPtr& leftMsg,
+      const MultiTimeHeaderConstPtr& rightMsg);
     // void getImageHeader(const sensor_msgs::Image::ConstPtr& msg);
     // void getActualTimeHeader(const std_msgs::Header::ConstPtr& msg);
     // void addTimeDiff();

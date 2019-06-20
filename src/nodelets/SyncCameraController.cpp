@@ -80,13 +80,13 @@ void SyncCameraController::publishImage(const std_msgs::Time::ConstPtr& message)
     ci->header.stamp = publishedImage->header.stamp;
     _imagePublisher.publish(publishedImage, ci);
 
-    // uint64_t actualCaptureTime = _camera->getActualTimestamp();
-    // MultiTimeHeader timeHeader;
-    // timeHeader.frame_id = frame_id;
-    // timeHeader.seq = _cvImage.header.seq;
-    // timeHeader.ros_stamp = _cvImage.header.stamp;
-    // timeHeader.actual_stamp = timeFromNSec(actualCaptureTime);
-    // _timePublisher.publish(timeHeader);
+    uint64_t actualCaptureTime = _camera->getActualTimestamp();
+    MultiTimeHeader timeHeader;
+    timeHeader.header.frame_id = frame_id;
+    timeHeader.header.seq = _cvImage.header.seq;
+    timeHeader.header.stamp = _cvImage.header.stamp;
+    timeHeader.actual_stamp = timeFromNSec(actualCaptureTime);
+    _timePublisher.publish(timeHeader);
 
     _seq++;
 }

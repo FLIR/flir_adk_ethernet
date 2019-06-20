@@ -17,37 +17,38 @@ void TimeDifference::onInit() {
     _nh = getNodeHandle();
     _pnh = getPrivateNodeHandle();
 
-    // message_filters::Subscriber<MultiTimeHeader> left(_nh, 
-    //     "left/actual_timestamp", 1);
-    // message_filters::Subscriber<MultiTimeHeader> right(_nh, 
-    //     "right/actual_timestamp", 1);
+    message_filters::Subscriber<MultiTimeHeader> left(_nh, 
+        "left/actual_timestamp", 1);
+    message_filters::Subscriber<MultiTimeHeader> right(_nh, 
+        "right/actual_timestamp", 1);
 
-    // message_filters::TimeSynchronizer<MultiTimeHeader, MultiTimeHeader> 
-    //     sync(left, right, 1);
-    // sync.registerCallback(boost::bind(&TimeDifference::calculateDifferences, 
-    //     this, _1, _2));
+    message_filters::TimeSynchronizer<MultiTimeHeader, MultiTimeHeader> 
+        sync(left, right, 1);
+
+    NODELET_INFO("SET UP TIME SYNC");
+    sync.registerCallback(boost::bind(&TimeDifference::calculateDifferences, 
+        this, _1, _2));
     // _leftSubscriber = _nh.subscribe<MultiTimeHeader>("image_raw", 1,
     //     boost::bind(&TimeDifference::getImageHeader, this, _1));
     // _rightSubscriber = _nh.subscribe<MultiTimeHeader>("actual_timestamp", 1,
     //     boost::bind(&TimeDifference::getActualTimeHeader, this, _1));
 }
 
-// void TimeDifference::calculateDifferences(const MultiTimeHeaderConstPtr& leftMsg,
-//     const MultiTimeHeaderConstPtr& rightMsg)
-// {
-//     std::cout << "here" << std::endl;
-//     // auto t1 = leftMsg->actual_stamp;
-//     // auto t2 = rightMsg->actual_stamp;
-//     // auto diff = abs((t1 - t2).nsec);
-//     // std::cout << "t1: " << t1 << ", t2: " << t2 << ", diff: " << diff << std::endl;
+void TimeDifference::calculateDifferences(const MultiTimeHeaderConstPtr& leftMsg,
+    const MultiTimeHeaderConstPtr& rightMsg)
+{
+    auto t1 = leftMsg->actual_stamp;
+    auto t2 = rightMsg->actual_stamp;
+    auto diff = abs((t1 - t2).nsec);
+    std::cout << "t1: " << t1 << ", t2: " << t2 << ", diff: " << diff << std::endl;
     
-//     // auto sum = accumulate(_timeDifferences.begin(), _timeDifferences.end(), 0.0);
-//     // auto avg = sum / (double)_timeDifferences.size();
-//     // auto msAvg = avg / 1e6;
+    // auto sum = accumulate(_timeDifferences.begin(), _timeDifferences.end(), 0.0);
+    // auto avg = sum / (double)_timeDifferences.size();
+    // auto msAvg = avg / 1e6;
 
-//     // std::cout << getName() << " - Avg timestamp difference: " << msAvg << " ms" << std::endl;
-//     // _timeDifferences.clear();
-// }
+    // std::cout << getName() << " - Avg timestamp difference: " << msAvg << " ms" << std::endl;
+    // _timeDifferences.clear();
+}
 
 // void TimeDifference::getImageHeader(const sensor_msgs::Image::ConstPtr& img) {
 //     _imgHeader = img->header;

@@ -30,6 +30,7 @@
 
 #include "flir_boson_ethernet/SharedTypes.h"
 #include "flir_boson_ethernet/EthernetCamera.h"
+#include <flir_boson_ethernet/MultiTimeHeader.h>
 
 using namespace std;
 
