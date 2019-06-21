@@ -2,7 +2,9 @@
 #define FLIR_BOSON_ETHERNET_ETHERNETCAMERA_H
 
 // C++ Includes
+#include <iostream>
 #include <string>
+#include <locale>
 
 // Linux system includes
 #include <fcntl.h>
@@ -44,16 +46,16 @@ using namespace std;
 namespace flir_boson_ethernet
 {
 
-struct EthernetCameraInfo {
-    string ip, camInfoPath;
-    int width, height;
-};
-
 enum PixelFormat {
   MONO_8 = PixelFormat_Mono8,
   COLOR_8 = PixelFormat_BayerRG8,
   MONO_16 = PixelFormat_Mono16,
   COLOR_16 = PixelFormat_BayerRG16
+};
+
+struct EthernetCameraInfo {
+    string ip, camInfoPath, pixelFormat;
+    int width, height;
 };
 
 enum Polarity {
@@ -84,6 +86,7 @@ class EthernetCamera
     void setPolarity(Polarity pol);
 
   private:
+    PixelFormat getPixelFormat(string formatStr);
     void findMatchingCamera(CameraListWrapper camList, const unsigned int numCams);
     bool setImageAcquisition();
     void initOpenCVBuffers();
@@ -91,6 +94,7 @@ class EthernetCamera
     void setCameraEvents();
     void unsetCameraEvents();
     bool setImageInfo();
+    void createBuffer();
     void setWidthHeight(INodeMap& nodeMap);
     void initPixelFormat();
     int getPixelSize();

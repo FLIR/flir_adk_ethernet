@@ -19,6 +19,12 @@ gcstring GetDottedAddress( int64_t value )
     return convertValue.str().c_str();
 }
 
+std::string toLower(std::string s) {
+    auto newStr = s;
+    std::transform(newStr.begin(), newStr.end(), newStr.begin(), ::tolower);
+    return newStr;
+}
+
 EthernetCamera::EthernetCamera(EthernetCameraInfo info, 
         std::shared_ptr<SystemWrapper> sys,
         ros::NodeHandle nh) :
@@ -27,7 +33,7 @@ EthernetCamera::EthernetCamera(EthernetCameraInfo info,
     _width(info.width),
     _height(info.height),
     _system(sys),
-    _selectedFormat(COLOR_8)
+    _selectedFormat(getPixelFormat(info.pixelFormat))
 {
     _cameraInfo = std::shared_ptr<camera_info_manager::CameraInfoManager>(
         new camera_info_manager::CameraInfoManager(nh));
@@ -46,6 +52,18 @@ void EthernetCamera::agcBasicLinear(const Mat &input_16,
                                     const int &height,
                                     const int &width)
 {
+}
+
+PixelFormat EthernetCamera::getPixelFormat(string formatStr) {
+    if(toLower(formatStr) == "mono_8")
+        return MONO_8;
+    if(toLower(formatStr) == "mono_16")
+        return MONO_16;
+    if(toLower(formatStr) == "color_8")
+        std::cout << "HERE" << std::endl;
+    if(toLower(formatStr) == "color_16")
+        return COLOR_16;
+    return COLOR_8;
 }
 
 bool EthernetCamera::openCamera()
@@ -121,8 +139,9 @@ bool EthernetCamera::setImageInfo() {
         CIntegerPtr heightNode = nodeMap.GetNode("Height");
         heightNode->SetValue(_height);
 
-        _bufferStart = new uint8_t[_imageSize];
         ROS_INFO("Camera info - Width: %d, Height: %d", _width, _height);
+
+        createBuffer();
 
         return true;
     } catch(Spinnaker::Exception e) {
@@ -139,7 +158,12 @@ void EthernetCamera::setWidthHeight(INodeMap& nodeMap) {
 
     _width = min(_width, maxWidth);
     _height = min(_height, maxHeight);
+}
+
+void EthernetCamera::createBuffer() {
     _imageSize = _height * _width * getPixelSize();
+    delete _bufferStart;
+    _bufferStart = new uint8_t[_imageSize];
 }
 
 int EthernetCamera::getPixelSize() {
@@ -259,7 +283,7 @@ void EthernetCamera::setPixelFormat(PixelFormat format) {
 
     _selectedFormat = format;
     initPixelFormat();
-    setImageInfo();
+    createBuffer();
 
     startCapture();
 }

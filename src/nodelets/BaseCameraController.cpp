@@ -28,31 +28,25 @@ void BaseCameraController::onInit()
 
     bool exit = false;
 
-    std::string ip, cameraInfoStr;
-    bool grayscale, bit16;
+    std::string ip, cameraInfoStr, formatStr;
 
     pnh.param<std::string>("frame_id", frame_id, "boson_camera");
     pnh.param<std::string>("ip_addr", ip, "");
     pnh.param<std::string>("camera_info_url", cameraInfoStr, "");
-    pnh.param<bool>("grayscale", grayscale, false);
-    pnh.param<bool>("raw_16", bit16, false);
+    pnh.param<std::string>("video_format", formatStr, "COLOR_8");
 
     ROS_INFO("flir_boson_ethernet - Got frame_id: %s.", frame_id.c_str());
     ROS_INFO("flir_boson_ethernet - Got IP: %s.", ip.c_str());
     ROS_INFO("flir_boson_ethernet - Got camera_info_url: %s.", 
         cameraInfoStr.c_str());
-    ROS_INFO("flir_boson_ethernet - Got grayscale: %s.", 
-        grayscale ? "TRUE" : "FALSE");
-    ROS_INFO("flir_boson_ethernet - Got %s Bit.", 
-        bit16 ? "16" : "8");
+    ROS_INFO("flir_boson_ethernet - Got video_format: %s.", formatStr.c_str());
 
     EthernetCameraInfo info;
     info.ip = ip;
     info.camInfoPath = cameraInfoStr;
     info.width = 800;
     info.height = 600;
-    // info.grayscale = grayscale;
-    // info.bit16 = bit16;
+    info.pixelFormat = formatStr;
     auto sys = std::make_shared<SystemWrapper>(
         SystemWrapper(System::GetInstance()));
 
