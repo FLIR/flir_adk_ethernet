@@ -26,6 +26,8 @@ void BaseCameraController::onInit()
     _imagePublisher = it->advertiseCamera("image_raw", 1);
     setupExtraPubSub();
 
+    setupCommandListeners();
+
     bool exit = false;
 
     std::string ip, cameraInfoStr, formatStr;
@@ -68,6 +70,17 @@ void BaseCameraController::onInit()
 void BaseCameraController::setupExtraPubSub() {
     // do nothing for base class;
 }
+
+void BaseCameraController::setupCommandListeners() {
+    _pixelFormatListener = nh.subscribe<std_msgs::String>("pixel_format", 10,
+        boost::bind(&BaseCameraController::setPixelFormat, this, _1));
+}
+
+void BaseCameraController::setPixelFormat(const std_msgs::StringConstPtr& msg) {
+    auto format = _camera->setPixelFormat(msg->data);
+    ROS_INFO("%s - Changed format to %s.", getName().c_str(), format.c_str());
+}
+
 
 void BaseCameraController::publishImage(ros::Time timestamp) {
         sensor_msgs::CameraInfoPtr

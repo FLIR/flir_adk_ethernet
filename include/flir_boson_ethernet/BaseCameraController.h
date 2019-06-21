@@ -23,7 +23,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
-#include <std_msgs/Time.h>
+#include <std_msgs/String.h>
 
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/Image.h>
@@ -48,6 +48,8 @@ class BaseCameraController : public nodelet::Nodelet
     virtual void setupExtraPubSub();
     virtual void setupFramePublish() = 0;
     void publishImage(ros::Time timestamp);
+    virtual void setupCommandListeners();
+    void setPixelFormat(const std_msgs::StringConstPtr& msg);
 
     ros::NodeHandle nh, pnh;
     uint64_t _seq = 0;
@@ -56,6 +58,8 @@ class BaseCameraController : public nodelet::Nodelet
     image_transport::CameraPublisher _imagePublisher;
     EthernetCamera *_camera;
     std::string frame_id, video_mode_str;
+
+    ros::Subscriber _pixelFormatListener;
 };
 
 }

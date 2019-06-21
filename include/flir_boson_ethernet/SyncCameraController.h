@@ -6,6 +6,7 @@
 
 // ROS Includes
 #include <ros/ros.h>
+#include <std_msgs/Time.h>
 
 #include "flir_boson_ethernet/BaseCameraController.h"
 #include <flir_boson_ethernet/MultiTimeHeader.h>

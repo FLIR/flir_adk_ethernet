@@ -80,7 +80,7 @@ class EthernetCamera
     sensor_msgs::CameraInfo getCameraInfo();
     uint64_t getActualTimestamp();
 
-    void setPixelFormat(PixelFormat format);
+    std::string setPixelFormat(std::string format);
     void performFFC();
     void setAutoFFC(bool autoFFC);
     void setPolarity(Polarity pol);
@@ -98,6 +98,7 @@ class EthernetCamera
     void setWidthHeight(INodeMap& nodeMap);
     void initPixelFormat();
     int getPixelSize();
+    std::string formatToString(PixelFormat format);
 
     void stopCapture();
     void startCapture();

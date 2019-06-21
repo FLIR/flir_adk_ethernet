@@ -60,7 +60,7 @@ PixelFormat EthernetCamera::getPixelFormat(string formatStr) {
     if(toLower(formatStr) == "mono_16")
         return MONO_16;
     if(toLower(formatStr) == "color_8")
-        std::cout << "HERE" << std::endl;
+        return COLOR_8;
     if(toLower(formatStr) == "color_16")
         return COLOR_16;
     return COLOR_8;
@@ -162,16 +162,15 @@ void EthernetCamera::setWidthHeight(INodeMap& nodeMap) {
 
 void EthernetCamera::createBuffer() {
     _imageSize = _height * _width * getPixelSize();
-    delete _bufferStart;
     _bufferStart = new uint8_t[_imageSize];
 }
 
 int EthernetCamera::getPixelSize() {
     switch(_selectedFormat) {
     case MONO_8:
-        return 1;
+        return 3;
     case MONO_16:
-        return 2;
+        return 3;
     case COLOR_8:
         return 3;
     case COLOR_16:
@@ -183,7 +182,6 @@ void EthernetCamera::initPixelFormat() {
     try {
         INodeMap &nodeMap = _pCam->GetNodeMap();
         CEnumerationPtr pixelFormatNode = nodeMap.GetNode("PixelFormat");
-        CEnumerationPtr pixelCodingNode = nodeMap.GetNode("PixelCoding");
 
         pixelFormatNode->SetIntValue(_selectedFormat);
     } catch(Spinnaker::Exception e) {
@@ -192,7 +190,8 @@ void EthernetCamera::initPixelFormat() {
 }
 
 void EthernetCamera::setCameraEvents() {
-    _imageHandler = std::make_shared<ImageEventHandler>(ImageEventHandler(_pCam));
+    _imageHandler = std::make_shared<ImageEventHandler>(
+        ImageEventHandler(_pCam));
     _pCam->RegisterEvent(*_imageHandler);
 }
 
@@ -278,14 +277,36 @@ uint64_t EthernetCamera::getActualTimestamp() {
     return _imageHandler->GetCaptureTime();
 }
 
-void EthernetCamera::setPixelFormat(PixelFormat format) {
+std::string EthernetCamera::setPixelFormat(std::string format) {
     stopCapture();
 
-    _selectedFormat = format;
+    _selectedFormat = getPixelFormat(format);
     initPixelFormat();
+
+    auto oldAddress = _bufferStart;
     createBuffer();
+    memcpy(oldAddress, _bufferStart, _imageSize);
+    delete _bufferStart;
+    _bufferStart = oldAddress;
 
     startCapture();
+
+    return formatToString(_selectedFormat);
+}
+
+std::string EthernetCamera::formatToString(PixelFormat format) {
+    switch(format) {
+    case MONO_8:
+        return "MONO_8";
+    case MONO_16:
+        return "MONO_16";
+    case COLOR_8:
+        return "COLOR_8";
+    case COLOR_16:
+        return "COLOR_16";
+    default:
+        return "COLOR_8";
+    }
 }
 
 void EthernetCamera::performFFC() {
