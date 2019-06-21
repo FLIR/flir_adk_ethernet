@@ -19,16 +19,8 @@
 
 // ROS Includes
 #include <ros/ros.h>
-#include <nodelet/nodelet.h>
-#include <cv_bridge/cv_bridge.h>
-#include <image_transport/image_transport.h>
-#include <camera_info_manager/camera_info_manager.h>
 
-#include <sensor_msgs/CameraInfo.h>
-#include <sensor_msgs/Image.h>
-
-#include "flir_boson_ethernet/SharedTypes.h"
-#include "flir_boson_ethernet/EthernetCamera.h"
+#include "flir_boson_ethernet/BaseCameraController.h"
 
 using namespace Spinnaker;
 using namespace Spinnaker::GenApi;
@@ -38,28 +30,20 @@ using namespace std;
 namespace flir_boson_ethernet
 {
 
-class CameraController : public nodelet::Nodelet
+class CameraController : public BaseCameraController
 {
   public:
     CameraController();
     ~CameraController();
 
   private:
-    virtual void onInit();
+    virtual void setupFramePublish() override;
     void captureAndPublish(const ros::TimerEvent& evt);
 
-    ros::NodeHandle nh, pnh;
-    std::shared_ptr<image_transport::ImageTransport> it;
-    cv_bridge::CvImage _cvImage;
-    image_transport::CameraPublisher _imagePublisher;
-    sensor_msgs::ImagePtr _publishedImage;
     ros::Timer capture_timer;
-    EthernetCamera *_camera;
 
     // Default Program options
-    std::string frame_id, video_mode_str;
     float _frameRate;
-    Encoding video_mode;
     bool zoom_enable;
     SensorTypes sensor_type;
     Encoding _videoMode;

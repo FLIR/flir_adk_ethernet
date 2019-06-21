@@ -55,7 +55,7 @@ class BaseCameraController : public nodelet::Nodelet
     cv_bridge::CvImage _cvImage;
     image_transport::CameraPublisher _imagePublisher;
     EthernetCamera *_camera;
-    std::string frame_id;
+    std::string frame_id, video_mode_str;
 };
 
 }
