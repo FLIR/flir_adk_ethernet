@@ -50,8 +50,8 @@ void BaseCameraController::onInit()
     info.camInfoPath = cameraInfoStr;
     info.width = 800;
     info.height = 600;
-    info.grayscale = grayscale;
-    info.bit16 = bit16;
+    // info.grayscale = grayscale;
+    // info.bit16 = bit16;
     auto sys = std::make_shared<SystemWrapper>(
         SystemWrapper(System::GetInstance()));
 
