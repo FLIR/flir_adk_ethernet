@@ -13,10 +13,6 @@ CameraController::CameraController() : BaseCameraController()
 
 CameraController::~CameraController()
 {
-    if(_camera) {
-        _camera->closeCamera();
-        delete _camera;
-    }
 }
 
 void CameraController::setupFramePublish() {

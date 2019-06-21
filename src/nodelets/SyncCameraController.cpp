@@ -12,10 +12,7 @@ SyncCameraController::SyncCameraController() : BaseCameraController()
 
 SyncCameraController::~SyncCameraController()
 {
-    if(_camera) {
-        _camera->closeCamera();
-        delete _camera;
-    }
+    
 }
 
 void SyncCameraController::setupExtraPubSub() {
