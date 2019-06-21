@@ -65,6 +65,7 @@ target_link_libraries(${PROJECT_NAME}_node
 FILE(GLOB SpinLibs /usr/lib/libSpin*.so)
 
 add_library(BosonCameraEthernet
+  src/nodelets/BaseCameraController.cpp
   src/nodelets/CameraController.cpp
   src/nodelets/SyncCameraController.cpp
   src/nodelets/TimeSynchronizer.cpp
