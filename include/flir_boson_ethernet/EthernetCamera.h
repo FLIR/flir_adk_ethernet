@@ -49,6 +49,17 @@ struct EthernetCameraInfo {
     int width, height;
 };
 
+enum PixelFormat {
+  MONO_8 = PixelFormat_Mono8,
+  COLOR_8 = PixelFormat_BayerRG8,
+  MONO_16 = PixelFormat_Mono16,
+  COLOR_16 = PixelFormat_BayerRG16
+};
+
+enum Polarity {
+
+};
+
 class EthernetCamera
 {
   public:
@@ -67,6 +78,11 @@ class EthernetCamera
     sensor_msgs::CameraInfo getCameraInfo();
     uint64_t getActualTimestamp();
 
+    void setPixelFormat(PixelFormat format);
+    void performFFC();
+    void setAutoFFC(bool autoFFC);
+    void setPolarity(Polarity pol);
+
   private:
     void findMatchingCamera(CameraListWrapper camList, const unsigned int numCams);
     bool setImageAcquisition();
@@ -76,7 +92,11 @@ class EthernetCamera
     void unsetCameraEvents();
     bool setImageInfo();
     void setWidthHeight(INodeMap& nodeMap);
-    void setCameraPixelFormat();
+    void initPixelFormat();
+    int getPixelSize();
+
+    void stopCapture();
+    void startCapture();
 
     std::shared_ptr<camera_info_manager::CameraInfoManager> _cameraInfo;
     int32_t _width, _height, _imageSize;
@@ -91,6 +111,7 @@ class EthernetCamera
     // Default Program options
     std::string _ipAddr, _cameraInfoPath;
     bool _zoomEnable;
+    PixelFormat _selectedFormat;
 };
 
 }  // namespace flir_boson_ethernet

@@ -26,7 +26,8 @@ EthernetCamera::EthernetCamera(EthernetCameraInfo info,
     _cameraInfoPath(info.camInfoPath),
     _width(info.width),
     _height(info.height),
-    _system(sys)
+    _system(sys),
+    _selectedFormat(COLOR_8)
 {
     _cameraInfo = std::shared_ptr<camera_info_manager::CameraInfoManager>(
         new camera_info_manager::CameraInfoManager(nh));
@@ -66,7 +67,7 @@ bool EthernetCamera::openCamera()
         return false;
     }
     _pCam->Init();
-    setCameraPixelFormat();
+    initPixelFormat();
 
     if(!setImageInfo()) {
         ROS_ERROR("flir_boson_ethernet - ERROR : GET_CONFIGURATION. Cannot get image for setting dimensions");
@@ -138,17 +139,29 @@ void EthernetCamera::setWidthHeight(INodeMap& nodeMap) {
 
     _width = min(_width, maxWidth);
     _height = min(_height, maxHeight);
-    _imageSize = _height * _width * 3;
+    _imageSize = _height * _width * getPixelSize();
 }
 
-void EthernetCamera::setCameraPixelFormat() {
+int EthernetCamera::getPixelSize() {
+    switch(_selectedFormat) {
+    case MONO_8:
+        return 1;
+    case MONO_16:
+        return 2;
+    case COLOR_8:
+        return 3;
+    case COLOR_16:
+        return 6;
+    }
+}
+
+void EthernetCamera::initPixelFormat() {
     try {
         INodeMap &nodeMap = _pCam->GetNodeMap();
         CEnumerationPtr pixelFormatNode = nodeMap.GetNode("PixelFormat");
         CEnumerationPtr pixelCodingNode = nodeMap.GetNode("PixelCoding");
 
-        pixelFormatNode->SetIntValue(RG8_PIXEL_FORMAT);
-        pixelCodingNode->SetIntValue(BPP8_FORMAT);
+        pixelFormatNode->SetIntValue(_selectedFormat);
     } catch(Spinnaker::Exception e) {
         ROS_ERROR("ERROR: %s", e.what());
     }
@@ -186,7 +199,7 @@ bool EthernetCamera::setImageAcquisition() {
 
     ROS_INFO("Acquisition mode set to continuous...");
     
-    _pCam->BeginAcquisition();
+    startCapture();
 
     return true;
 }
@@ -216,7 +229,7 @@ bool EthernetCamera::closeCamera()
 {
     if(_pCam != nullptr) {
         unsetCameraEvents();
-        _pCam->EndAcquisition();
+        stopCapture();
         _pCam->DeInit();
     }
 
@@ -241,3 +254,32 @@ uint64_t EthernetCamera::getActualTimestamp() {
     return _imageHandler->GetCaptureTime();
 }
 
+void EthernetCamera::setPixelFormat(PixelFormat format) {
+    stopCapture();
+
+    _selectedFormat = format;
+    initPixelFormat();
+    setImageInfo();
+
+    startCapture();
+}
+
+void EthernetCamera::performFFC() {
+
+}
+
+void EthernetCamera::setAutoFFC(bool autoFFC) {
+
+}
+
+void EthernetCamera::setPolarity(Polarity pol) {
+
+}
+
+void EthernetCamera::startCapture() {
+    _pCam->BeginAcquisition();
+}
+
+void EthernetCamera::stopCapture() {
+    _pCam->EndAcquisition();
+}
