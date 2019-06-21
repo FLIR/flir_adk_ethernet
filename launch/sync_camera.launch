@@ -38,10 +38,7 @@
           name="left_camera_node"
           args="load flir_boson_ethernet/SyncCameraController nodelet_manager"
           output="screen">
-      <remap from="image_raw" to="$(arg left_namespace)/image_raw" />
-      <remap from="camera_info_url" to="$(arg left_namespace)/camera_info_url" />
-      <remap from="set_camera_info" to="$(arg left_namespace)/set_camera_info" />
-      <remap from="actual_timestamp" to="$(arg left_namespace)/actual_timestamp" />
+      <remap from="/flir_boson" to="/flir_boson/left" />
       
       <param name="frame_id" type="str" value="$(arg left_frame_id)"/>
       <param name="ip_addr" type="str" value="$(arg left_ip)"/>
@@ -53,10 +50,7 @@
           name="right_camera_node"
           args="load flir_boson_ethernet/SyncCameraController nodelet_manager"
           output="screen">
-      <remap from="image_raw" to="$(arg right_namespace)/image_raw" />
-      <remap from="camera_info_url" to="$(arg right_namespace)/camera_info_url" />
-      <remap from="set_camera_info" to="$(arg right_namespace)/set_camera_info" />
-      <remap from="actual_timestamp" to="$(arg right_namespace)/actual_timestamp" />
+      <remap from="/flir_boson" to="/flir_boson/right" />
 
       <param name="frame_id" type="str" value="$(arg right_frame_id)"/>
       <param name="ip_addr" type="str" value="$(arg right_ip)"/>

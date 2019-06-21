@@ -18,6 +18,7 @@ BaseCameraController::~BaseCameraController()
 
 void BaseCameraController::onInit()
 {
+    std::cout << "NAME: " << getName() << std::endl;
     nh = getNodeHandle();
     pnh = getPrivateNodeHandle();
     
