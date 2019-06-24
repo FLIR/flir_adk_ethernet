@@ -25,6 +25,57 @@ std::string toLower(std::string s) {
     return newStr;
 }
 
+ImageFormat::ImageFormat(std::string format) {
+    _format = COLOR_8;
+    if(toLower(format) == "mono_8")
+        _format = MONO_8;
+    if(toLower(format) == "mono_16")
+        _format = MONO_16;
+    if(toLower(format) == "color_8")
+        _format = COLOR_8;
+    if(toLower(format) == "color_16")
+        _format = COLOR_16;
+}
+
+ImageFormat::ImageFormat(const ImageFormat& obj) : 
+    _format(obj._format) {}
+
+ImageFormat::~ImageFormat() {}
+
+int ImageFormat::getValue() {
+    return (int)_format;
+}
+
+int ImageFormat::getBytesPerPixel() {
+    switch(_format) {
+    case MONO_8:
+        return 1;
+    case MONO_16:
+        return 2;
+    case COLOR_8:
+        return 3;
+    case COLOR_16:
+        return 6;
+    }
+
+    return 3;
+}
+
+std::string ImageFormat::toString() {
+    switch(_format) {
+    case MONO_8:
+        return "MONO_8";
+    case MONO_16:
+        return "MONO_16";
+    case COLOR_8:
+        return "COLOR_8";
+    case COLOR_16:
+        return "COLOR_16";
+    default:
+        return "COLOR_8";
+    }
+}
+
 EthernetCamera::EthernetCamera(EthernetCameraInfo info, 
         std::shared_ptr<SystemWrapper> sys,
         ros::NodeHandle nh) :
@@ -33,7 +84,7 @@ EthernetCamera::EthernetCamera(EthernetCameraInfo info,
     _width(info.width),
     _height(info.height),
     _system(sys),
-    _selectedFormat(getPixelFormat(info.pixelFormat))
+    _selectedFormat(ImageFormat(info.pixelFormat))
 {
     _cameraInfo = std::shared_ptr<camera_info_manager::CameraInfoManager>(
         new camera_info_manager::CameraInfoManager(nh));
@@ -52,18 +103,6 @@ void EthernetCamera::agcBasicLinear(const Mat &input_16,
                                     const int &height,
                                     const int &width)
 {
-}
-
-PixelFormat EthernetCamera::getPixelFormat(string formatStr) {
-    if(toLower(formatStr) == "mono_8")
-        return MONO_8;
-    if(toLower(formatStr) == "mono_16")
-        return MONO_16;
-    if(toLower(formatStr) == "color_8")
-        return COLOR_8;
-    if(toLower(formatStr) == "color_16")
-        return COLOR_16;
-    return COLOR_8;
 }
 
 bool EthernetCamera::openCamera()
@@ -166,16 +205,7 @@ void EthernetCamera::createBuffer() {
 }
 
 int EthernetCamera::getPixelSize() {
-    switch(_selectedFormat) {
-    case MONO_8:
-        return 3;
-    case MONO_16:
-        return 3;
-    case COLOR_8:
-        return 3;
-    case COLOR_16:
-        return 6;
-    }
+    return _selectedFormat.getBytesPerPixel();
 }
 
 void EthernetCamera::initPixelFormat() {
@@ -183,7 +213,7 @@ void EthernetCamera::initPixelFormat() {
         INodeMap &nodeMap = _pCam->GetNodeMap();
         CEnumerationPtr pixelFormatNode = nodeMap.GetNode("PixelFormat");
 
-        pixelFormatNode->SetIntValue(_selectedFormat);
+        pixelFormatNode->SetIntValue(_selectedFormat.getValue());
     } catch(Spinnaker::Exception e) {
         ROS_ERROR("ERROR: %s", e.what());
     }
@@ -280,8 +310,10 @@ uint64_t EthernetCamera::getActualTimestamp() {
 std::string EthernetCamera::setPixelFormat(std::string format) {
     stopCapture();
 
-    _selectedFormat = getPixelFormat(format);
+    _selectedFormat = ImageFormat(format);
     initPixelFormat();
+
+    _imageHandler->setGrayscale(_selectedFormat.getValue() == MONO_8);
 
     auto oldAddress = _bufferStart;
     createBuffer();
@@ -289,24 +321,10 @@ std::string EthernetCamera::setPixelFormat(std::string format) {
     delete _bufferStart;
     _bufferStart = oldAddress;
 
+
     startCapture();
 
-    return formatToString(_selectedFormat);
-}
-
-std::string EthernetCamera::formatToString(PixelFormat format) {
-    switch(format) {
-    case MONO_8:
-        return "MONO_8";
-    case MONO_16:
-        return "MONO_16";
-    case COLOR_8:
-        return "COLOR_8";
-    case COLOR_16:
-        return "COLOR_16";
-    default:
-        return "COLOR_8";
-    }
+    return _selectedFormat.toString();
 }
 
 void EthernetCamera::performFFC() {

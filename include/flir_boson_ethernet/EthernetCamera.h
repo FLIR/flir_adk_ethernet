@@ -62,6 +62,20 @@ enum Polarity {
 
 };
 
+class ImageFormat {
+  public:
+    ImageFormat(std::string format);
+    ImageFormat(const ImageFormat& obj);
+    ~ImageFormat();
+
+    int getValue();
+    int getBytesPerPixel();
+    std::string toString();
+
+  private:
+    PixelFormat _format;
+};
+
 class EthernetCamera
 {
   public:
@@ -116,7 +130,7 @@ class EthernetCamera
     // Default Program options
     std::string _ipAddr, _cameraInfoPath;
     bool _zoomEnable;
-    PixelFormat _selectedFormat;
+    ImageFormat _selectedFormat;
 };
 
 }  // namespace flir_boson_ethernet
