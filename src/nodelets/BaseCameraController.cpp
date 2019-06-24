@@ -87,7 +87,7 @@ void BaseCameraController::publishImage(ros::Time timestamp) {
 
     auto thermalMat = _camera->getImageMatrix();
     _cvImage.image = thermalMat;
-    _cvImage.encoding = "rgb8";
+    _cvImage.encoding = _camera->getEncoding();
     _cvImage.header.stamp = timestamp;
     _cvImage.header.seq = _seq;
     _cvImage.header.frame_id = frame_id;

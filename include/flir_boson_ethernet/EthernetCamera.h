@@ -71,6 +71,8 @@ class ImageFormat {
     int getValue();
     int getBytesPerPixel();
     std::string toString();
+    int getMatType();
+    std::string getImageEncoding();
 
   private:
     PixelFormat _format;
@@ -98,6 +100,7 @@ class EthernetCamera
     void performFFC();
     void setAutoFFC(bool autoFFC);
     void setPolarity(Polarity pol);
+    std::string getEncoding();
 
   private:
     PixelFormat getPixelFormat(string formatStr);

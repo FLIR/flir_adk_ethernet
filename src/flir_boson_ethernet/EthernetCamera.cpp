@@ -61,6 +61,21 @@ int ImageFormat::getBytesPerPixel() {
     return 3;
 }
 
+int ImageFormat::getMatType() {
+    switch(_format) {
+    case MONO_8:
+        return CV_8UC1;
+    case MONO_16:
+        return CV_16UC1;
+    case COLOR_8:
+        return CV_8UC3;
+    case COLOR_16:
+        return CV_16UC3;
+    }
+
+    return CV_8UC3;
+}
+
 std::string ImageFormat::toString() {
     switch(_format) {
     case MONO_8:
@@ -73,6 +88,21 @@ std::string ImageFormat::toString() {
         return "COLOR_16";
     default:
         return "COLOR_8";
+    }
+}
+
+std::string ImageFormat::getImageEncoding() {
+    switch(_format) {
+    case MONO_8:
+        return "mono8";
+    case MONO_16:
+        return "mono16";
+    case COLOR_8:
+        return "rgb8";
+    case COLOR_16:
+        return "rgb16";
+    default:
+        return "rgb8";
     }
 }
 
@@ -262,7 +292,7 @@ void EthernetCamera::initOpenCVBuffers() {
     // Will be used or not depending on program arguments
     // OpenCV output buffer , BGR -> Three color spaces :
     // (640 - 640 - 640 : p11 p21 p31 .... / p12 p22 p32 ..../ p13 p23 p33 ...)
-    _thermalImageMat = Mat(_height, _width, CV_8UC3, 
+    _thermalImageMat = Mat(_height, _width, _selectedFormat.getMatType(), 
         reinterpret_cast<void *>(_bufferStart));
 }
 
@@ -321,6 +351,7 @@ std::string EthernetCamera::setPixelFormat(std::string format) {
     delete _bufferStart;
     _bufferStart = oldAddress;
 
+    initOpenCVBuffers();
 
     startCapture();
 
@@ -345,4 +376,8 @@ void EthernetCamera::startCapture() {
 
 void EthernetCamera::stopCapture() {
     _pCam->EndAcquisition();
+}
+
+std::string EthernetCamera::getEncoding() {
+    return _selectedFormat.getImageEncoding();
 }
