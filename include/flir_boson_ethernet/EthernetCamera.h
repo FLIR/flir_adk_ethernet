@@ -104,7 +104,7 @@ class EthernetCamera
 
   private:
     PixelFormat getPixelFormat(string formatStr);
-    void findMatchingCamera(CameraListWrapper camList, const unsigned int numCams);
+    bool findMatchingCamera(CameraListWrapper camList, const unsigned int numCams);
     bool setImageAcquisition();
     void initOpenCVBuffers();
     void setCameraInfo();

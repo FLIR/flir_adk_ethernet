@@ -114,6 +114,7 @@ EthernetCamera::EthernetCamera(EthernetCameraInfo info,
     _width(info.width),
     _height(info.height),
     _system(sys),
+    _bufferStart(nullptr),
     _selectedFormat(ImageFormat(info.pixelFormat))
 {
     _cameraInfo = std::shared_ptr<camera_info_manager::CameraInfoManager>(
@@ -121,7 +122,9 @@ EthernetCamera::EthernetCamera(EthernetCameraInfo info,
 }
 
 EthernetCamera::~EthernetCamera() {
-    delete _bufferStart;
+    if(_bufferStart) {
+        delete _bufferStart;
+    }
     closeCamera();
 }
 
@@ -147,9 +150,7 @@ bool EthernetCamera::openCamera()
         return false;
     }
 
-    findMatchingCamera(camList, numCameras);
-
-    if(!_pCam->IsValid()) {
+    if(!findMatchingCamera(camList, numCameras) || !_pCam->IsValid()) {
         ROS_ERROR("flir_boson_ethernet - ERROR : OPEN. No device matches ip_addr: %s", _ipAddr.c_str());
         return false;
     }
@@ -176,7 +177,7 @@ bool EthernetCamera::openCamera()
     return true;
 } 
 
-void EthernetCamera::findMatchingCamera(CameraListWrapper camList, const unsigned int numCams) {
+bool EthernetCamera::findMatchingCamera(CameraListWrapper camList, const unsigned int numCams) {
     gcstring deviceIPAddress = "0.0.0.0";
 
     for (unsigned int i = 0; i < numCams; i++)
@@ -193,9 +194,11 @@ void EthernetCamera::findMatchingCamera(CameraListWrapper camList, const unsigne
             CStringPtr modelName = nodeMapTLDevice.GetNode("DeviceModelName");
             ROS_INFO("Found matching camera %s", modelName->ToString().c_str());
             _pCam = std::make_shared<CameraWrapper>(cam);
-            return;
+            return true;
         }
     }
+
+    return false;
 }
 
 bool EthernetCamera::setImageInfo() {
@@ -310,7 +313,7 @@ void EthernetCamera::setCameraInfo() {
 
 bool EthernetCamera::closeCamera()
 {
-    if(_pCam != nullptr) {
+    if(_pCam) {
         unsetCameraEvents();
         stopCapture();
         _pCam->DeInit();
@@ -320,7 +323,11 @@ bool EthernetCamera::closeCamera()
 }
 
 void EthernetCamera::unsetCameraEvents() {
-    _pCam->UnregisterEvent(*_imageHandler);
+    try {
+        _pCam->UnregisterEvent(*_imageHandler);
+    } catch(Spinnaker::Exception e) {
+        // pass
+    }
 }
 
 cv::Mat EthernetCamera::getImageMatrix() {
@@ -375,7 +382,11 @@ void EthernetCamera::startCapture() {
 }
 
 void EthernetCamera::stopCapture() {
-    _pCam->EndAcquisition();
+    try {
+        _pCam->EndAcquisition();
+    } catch(Spinnaker::Exception e) {
+        // pass
+    }
 }
 
 std::string EthernetCamera::getEncoding() {
