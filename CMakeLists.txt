@@ -73,6 +73,7 @@ add_library(BosonCameraEthernet
   src/flir_boson_ethernet/EthernetCamera.cpp
   src/flir_boson_ethernet/ImageEventHandler.cpp
   src/flir_boson_ethernet/ImageFormat.cpp
+  src/flir_boson_ethernet/Util.cpp
   spinnaker_wrappers/CameraListWrapper.cpp
   spinnaker_wrappers/SystemWrapper.cpp
   spinnaker_wrappers/CameraWrapper.cpp

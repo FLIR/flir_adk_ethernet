@@ -1,13 +1,9 @@
+#include "flir_boson_ethernet/Util.h"
 #include "flir_boson_ethernet/ImageFormat.h"
 
 using namespace cv;
 using namespace flir_boson_ethernet;
 
-std::string toLower(std::string s) {
-    auto newStr = s;
-    std::transform(newStr.begin(), newStr.end(), newStr.begin(), ::tolower);
-    return newStr;
-}
 
 ImageFormat::ImageFormat(std::string format) {
     _format = PixelFormat_RGB8;

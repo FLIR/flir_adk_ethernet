@@ -1,23 +1,8 @@
+#include "flir_boson_ethernet/Util.h"
 #include "flir_boson_ethernet/EthernetCamera.h"
 
 using namespace cv;
 using namespace flir_boson_ethernet;
-
-gcstring GetDottedAddress( int64_t value )
-{
-    // Helper function for formatting IP Address into the following format
-    // x.x.x.x
-    unsigned int inputValue = static_cast<unsigned int>( value );
-    ostringstream convertValue;
-    convertValue << ((inputValue & 0xFF000000) >> 24);
-    convertValue << ".";
-    convertValue << ((inputValue & 0x00FF0000) >> 16);
-    convertValue << ".";
-    convertValue << ((inputValue & 0x0000FF00) >> 8);
-    convertValue << ".";
-    convertValue << (inputValue & 0x000000FF);
-    return convertValue.str().c_str();
-}
 
 EthernetCamera::EthernetCamera(EthernetCameraInfo info, 
         std::shared_ptr<SystemWrapper> sys,
@@ -112,6 +97,25 @@ bool EthernetCamera::findMatchingCamera(CameraListWrapper camList, const unsigne
     }
 
     return false;
+}
+
+bool ipMatches(string ip, CameraWrapper cam) {
+    INodeMap &nodeMapTLDevice = cam.GetTLDeviceNodeMap();
+
+    CIntegerPtr ptrIPAddress = nodeMapTLDevice.GetNode("GevDeviceIPAddress");
+    if (IsAvailable(ptrIPAddress) && IsReadable(ptrIPAddress)) {
+        return ip == GetDottedAddress(ptrIPAddress->GetValue());
+    }
+    return false;    
+}
+
+bool camTypeMatches(string camType, CameraWrapper cam) {
+    INodeMap &nodeMapTLDevice = cam.GetTLDeviceNodeMap();
+    CStringPtr modelName = nodeMapTLDevice.GetNode("DeviceModelName");
+    if (IsAvailable(modelName) && IsReadable(modelName)) {
+        auto found = toLower(modelName->ToString().c_str());
+    }
+    
 }
 
 bool EthernetCamera::setImageInfo() {
