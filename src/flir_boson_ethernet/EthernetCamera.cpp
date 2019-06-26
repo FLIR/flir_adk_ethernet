@@ -11,6 +11,7 @@ EthernetCamera::EthernetCamera(EthernetCameraInfo info,
     _cameraInfoPath(info.camInfoPath),
     _width(info.width),
     _height(info.height),
+    _camType(info.camType),
     _system(sys),
     _bufferStart(nullptr),
     _selectedFormat(ImageFormat(info.pixelFormat))
@@ -84,11 +85,9 @@ bool EthernetCamera::findMatchingCamera(CameraListWrapper camList, const unsigne
         CameraWrapper cam = camList.GetByIndex(i);
         INodeMap &nodeMapTLDevice = cam.GetTLDeviceNodeMap();
 
-        CIntegerPtr ptrIPAddress = nodeMapTLDevice.GetNode("GevDeviceIPAddress");
-        if (IsAvailable(ptrIPAddress) && IsReadable(ptrIPAddress)) {
-            deviceIPAddress = GetDottedAddress(ptrIPAddress->GetValue());
-        }
-        if(deviceIPAddress == _ipAddr) {
+        if((!_ipAddr.empty() && ipMatches(_ipAddr, nodeMapTLDevice)) ||
+           (_ipAddr.empty() && camTypeMatches(_camType, nodeMapTLDevice)))
+        {
             CStringPtr modelName = nodeMapTLDevice.GetNode("DeviceModelName");
             ROS_INFO("Found matching camera %s", modelName->ToString().c_str());
             _pCam = std::make_shared<CameraWrapper>(cam);
@@ -99,9 +98,7 @@ bool EthernetCamera::findMatchingCamera(CameraListWrapper camList, const unsigne
     return false;
 }
 
-bool ipMatches(string ip, CameraWrapper cam) {
-    INodeMap &nodeMapTLDevice = cam.GetTLDeviceNodeMap();
-
+bool EthernetCamera::ipMatches(string ip, INodeMap& nodeMapTLDevice) {
     CIntegerPtr ptrIPAddress = nodeMapTLDevice.GetNode("GevDeviceIPAddress");
     if (IsAvailable(ptrIPAddress) && IsReadable(ptrIPAddress)) {
         return ip == GetDottedAddress(ptrIPAddress->GetValue());
@@ -109,13 +106,14 @@ bool ipMatches(string ip, CameraWrapper cam) {
     return false;    
 }
 
-bool camTypeMatches(string camType, CameraWrapper cam) {
-    INodeMap &nodeMapTLDevice = cam.GetTLDeviceNodeMap();
+bool EthernetCamera::camTypeMatches(string camType, INodeMap& nodeMapTLDevice) {
     CStringPtr modelName = nodeMapTLDevice.GetNode("DeviceModelName");
     if (IsAvailable(modelName) && IsReadable(modelName)) {
-        auto found = toLower(modelName->ToString().c_str());
+        auto found = toLower(modelName->ToString().c_str()).find(_camType);
+        return found != std::string::npos;
     }
     
+    return false;
 }
 
 bool EthernetCamera::setImageInfo() {

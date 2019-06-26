@@ -45,7 +45,7 @@ namespace flir_boson_ethernet
 {
 
 struct EthernetCameraInfo {
-    string ip, camInfoPath, pixelFormat;
+    string ip, camInfoPath, pixelFormat, camType;
     int width, height;
 };
 
@@ -90,6 +90,8 @@ class EthernetCamera
     void setWidthHeight(INodeMap& nodeMap);
     void initPixelFormat();
     int getPixelSize();
+    bool ipMatches(string ip, INodeMap& nodeMapTLDevice);
+    bool camTypeMatches(string camType, INodeMap& nodeMapTLDevice);
     std::string formatToString(PixelFormatEnums format);
 
     void stopCapture();
@@ -109,6 +111,7 @@ class EthernetCamera
     std::string _ipAddr, _cameraInfoPath;
     bool _zoomEnable;
     ImageFormat _selectedFormat;
+    std::string _camType;
 };
 
 }  // namespace flir_boson_ethernet

@@ -29,10 +29,11 @@ void BaseCameraController::onInit()
 
     bool exit = false;
 
-    std::string ip, cameraInfoStr, formatStr;
+    std::string ip, cameraInfoStr, formatStr, camType;
 
     pnh.param<std::string>("frame_id", frame_id, "boson_camera");
     pnh.param<std::string>("ip_addr", ip, "");
+    pnh.param<std::string>("camera_type", camType, "");
     pnh.param<std::string>("camera_info_url", cameraInfoStr, "");
     pnh.param<std::string>("video_format", formatStr, "COLOR_8");
 
@@ -48,6 +49,7 @@ void BaseCameraController::onInit()
     info.width = 800;
     info.height = 600;
     info.pixelFormat = formatStr;
+    info.camType = camType;
     auto sys = std::make_shared<SystemWrapper>(
         SystemWrapper(System::GetInstance()));
 

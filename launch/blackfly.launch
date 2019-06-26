@@ -5,6 +5,7 @@
 
   <!-- the linux file descriptor location for the camera -->
   <arg name="ip_addr" default="169.254.87.157"/>
+  <arg name="camera_type" default="boson" />
     
   <!-- valid values are 30.0 or 60.0 for Bosons -->
   <arg name="frame_rate" default="60.0"/>
@@ -29,7 +30,8 @@
     <!-- <remap from="image_raw" to="left/image_raw" /> -->
     <!-- <remap from="~ip_addr" to="~right_ip" /> -->
     <param name="frame_id" type="str" value="$(arg frame_id)"/>
-    <param name="ip_addr" type="str" value="$(arg ip_addr)"/>
+    <!-- <param name="ip_addr" type="str" value="$(arg ip_addr)"/> -->
+    <param name="camera_type" type="str" value="$(arg camera_type)"/>
     <param name="frame_rate" type="double" value="$(arg frame_rate)"/>
     <param name="video_format" type="str" value="$(arg video_format)"/>
     <param name="zoom_enable" type="bool" value="$(arg zoom_enable)"/>
