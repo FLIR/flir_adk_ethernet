@@ -2,7 +2,7 @@
 
 using namespace flir_boson_ethernet;
 
-const char *GetDottedAddress( int64_t value )
+const char *flir_boson_ethernet::GetDottedAddress( int64_t value )
 {
     // Helper function for formatting IP Address into the following format
     // x.x.x.x
@@ -18,7 +18,7 @@ const char *GetDottedAddress( int64_t value )
     return convertValue.str().c_str();
 }
 
-std::string toLower(std::string s) {
+std::string flir_boson_ethernet::toLower(std::string s) {
     auto newStr = s;
     std::transform(newStr.begin(), newStr.end(), newStr.begin(), ::tolower);
     return newStr;

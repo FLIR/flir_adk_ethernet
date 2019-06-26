@@ -10,7 +10,7 @@
   <arg name="frame_rate" default="60.0"/>
 
   <!-- valid values are RAW16 or YUV -->
-  <arg name="video_format" default="COLOR_16"/>
+  <arg name="video_format" default="COLOR_8"/>
 
   <!-- valid values are TRUE or FALSE -->
   <arg name="zoom_enable" default="FALSE"/>
