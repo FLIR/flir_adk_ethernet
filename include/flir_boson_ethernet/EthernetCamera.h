@@ -46,13 +46,6 @@ using namespace std;
 namespace flir_boson_ethernet
 {
 
-enum PixelFormat {
-  MONO_8 = PixelFormat_Mono8,
-  COLOR_8 = PixelFormat_BayerRG8,
-  MONO_16 = PixelFormat_Mono16,
-  COLOR_16 = PixelFormat_BayerRG16
-};
-
 struct EthernetCameraInfo {
     string ip, camInfoPath, pixelFormat;
     int width, height;
@@ -68,14 +61,16 @@ class ImageFormat {
     ImageFormat(const ImageFormat& obj);
     ~ImageFormat();
 
-    int getValue();
+    int getValue(CEnumerationPtr nodePtr);
+    gcstring getNodeName();
     int getBytesPerPixel();
     std::string toString();
     int getMatType();
     std::string getImageEncoding();
+    PixelFormatEnums getFormat();
 
   private:
-    PixelFormat _format;
+    PixelFormatEnums _format;
 };
 
 class EthernetCamera
@@ -103,7 +98,7 @@ class EthernetCamera
     std::string getEncoding();
 
   private:
-    PixelFormat getPixelFormat(string formatStr);
+    PixelFormatEnums getPixelFormat(string formatStr);
     bool findMatchingCamera(CameraListWrapper camList, const unsigned int numCams);
     bool setImageAcquisition();
     void initOpenCVBuffers();
@@ -115,7 +110,7 @@ class EthernetCamera
     void setWidthHeight(INodeMap& nodeMap);
     void initPixelFormat();
     int getPixelSize();
-    std::string formatToString(PixelFormat format);
+    std::string formatToString(PixelFormatEnums format);
 
     void stopCapture();
     void startCapture();

@@ -26,15 +26,15 @@ std::string toLower(std::string s) {
 }
 
 ImageFormat::ImageFormat(std::string format) {
-    _format = COLOR_8;
+    _format = PixelFormat_BayerRG8;
     if(toLower(format) == "mono_8")
-        _format = MONO_8;
+        _format = PixelFormat_Mono8;
     if(toLower(format) == "mono_16")
-        _format = MONO_16;
+        _format = PixelFormat_Mono16;
     if(toLower(format) == "color_8")
-        _format = COLOR_8;
+        _format = PixelFormat_BayerRG8;
     if(toLower(format) == "color_16")
-        _format = COLOR_16;
+        _format = PixelFormat_BayerRG16;
 }
 
 ImageFormat::ImageFormat(const ImageFormat& obj) : 
@@ -42,19 +42,39 @@ ImageFormat::ImageFormat(const ImageFormat& obj) :
 
 ImageFormat::~ImageFormat() {}
 
-int ImageFormat::getValue() {
-    return (int)_format;
+int ImageFormat::getValue(CEnumerationPtr nodePtr) {
+    gcstring strValue = getNodeName();
+
+    CEnumEntryPtr formatEntry = nodePtr->GetEntryByName(strValue);
+    if (IsAvailable(formatEntry) && IsReadable(formatEntry)) {
+        return formatEntry->GetValue();
+    }
+
+    return -1;
+}
+
+gcstring ImageFormat::getNodeName() {
+    switch(_format) {
+    case PixelFormat_Mono8:
+        return "Mono8";
+    case PixelFormat_Mono16:
+        return "Mono16";
+    case PixelFormat_BayerRG8:
+        return "BayerRG8";
+    case PixelFormat_BayerRG16:
+        return "BayerRG16";
+    }
 }
 
 int ImageFormat::getBytesPerPixel() {
     switch(_format) {
-    case MONO_8:
+    case PixelFormat_Mono8:
         return 1;
-    case MONO_16:
+    case PixelFormat_Mono16:
         return 2;
-    case COLOR_8:
+    case PixelFormat_BayerRG8:
         return 3;
-    case COLOR_16:
+    case PixelFormat_BayerRG16:
         return 6;
     }
 
@@ -63,13 +83,13 @@ int ImageFormat::getBytesPerPixel() {
 
 int ImageFormat::getMatType() {
     switch(_format) {
-    case MONO_8:
+    case PixelFormat_Mono8:
         return CV_8UC1;
-    case MONO_16:
+    case PixelFormat_Mono16:
         return CV_16UC1;
-    case COLOR_8:
+    case PixelFormat_BayerRG8:
         return CV_8UC3;
-    case COLOR_16:
+    case PixelFormat_BayerRG16:
         return CV_16UC3;
     }
 
@@ -78,13 +98,13 @@ int ImageFormat::getMatType() {
 
 std::string ImageFormat::toString() {
     switch(_format) {
-    case MONO_8:
+    case PixelFormat_Mono8:
         return "MONO_8";
-    case MONO_16:
+    case PixelFormat_Mono16:
         return "MONO_16";
-    case COLOR_8:
+    case PixelFormat_BayerRG8:
         return "COLOR_8";
-    case COLOR_16:
+    case PixelFormat_BayerRG16:
         return "COLOR_16";
     default:
         return "COLOR_8";
@@ -93,17 +113,21 @@ std::string ImageFormat::toString() {
 
 std::string ImageFormat::getImageEncoding() {
     switch(_format) {
-    case MONO_8:
+    case PixelFormat_Mono8:
         return "mono8";
-    case MONO_16:
+    case PixelFormat_Mono16:
         return "mono16";
-    case COLOR_8:
+    case PixelFormat_BayerRG8:
         return "rgb8";
-    case COLOR_16:
+    case PixelFormat_BayerRG16:
         return "rgb16";
     default:
         return "rgb8";
     }
+}
+
+PixelFormatEnums ImageFormat::getFormat() {
+    return _format;
 }
 
 EthernetCamera::EthernetCamera(EthernetCameraInfo info, 
@@ -246,7 +270,7 @@ void EthernetCamera::initPixelFormat() {
         INodeMap &nodeMap = _pCam->GetNodeMap();
         CEnumerationPtr pixelFormatNode = nodeMap.GetNode("PixelFormat");
 
-        pixelFormatNode->SetIntValue(_selectedFormat.getValue());
+        pixelFormatNode->SetIntValue(_selectedFormat.getValue(pixelFormatNode));
     } catch(Spinnaker::Exception e) {
         ROS_ERROR("ERROR: %s", e.what());
     }
@@ -350,7 +374,8 @@ std::string EthernetCamera::setPixelFormat(std::string format) {
     _selectedFormat = ImageFormat(format);
     initPixelFormat();
 
-    _imageHandler->setGrayscale(_selectedFormat.getValue() == MONO_8);
+    _imageHandler->setGrayscale(
+        _selectedFormat.getFormat() == PixelFormat_Mono8);
 
     auto oldAddress = _bufferStart;
     createBuffer();
