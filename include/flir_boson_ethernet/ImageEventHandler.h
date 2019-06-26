@@ -33,11 +33,12 @@ class ImageEventHandler : public ImageEvent {
   public:
     // The constructor retrieves the serial number and initializes the image 
     // counter to 0.
-    ImageEventHandler(std::shared_ptr<CameraWrapper> pCam);
+    ImageEventHandler(std::shared_ptr<CameraWrapper> pCam, 
+      PixelFormatEnums format);
     ImageEventHandler(const ImageEventHandler& handler);
     ~ImageEventHandler();
 
-    void setGrayscale(bool gray);
+    void setPixelFormat(PixelFormatEnums format);
 
     void Init();
 
@@ -52,11 +53,11 @@ class ImageEventHandler : public ImageEvent {
 
   private:
     std::shared_ptr<CameraWrapper> _pCam;
+    PixelFormatEnums _format;
     string m_deviceSerialNumber;
     ImagePtr m_resultImage;
     // uint8_t *m_imageBuffer;
     std::mutex m_mutex;
-    bool m_grayscale = false;
 
     std::chrono::_V2::system_clock::time_point startTime;
     uint64_t m_lastTimeStamp;

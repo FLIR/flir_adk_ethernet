@@ -26,15 +26,15 @@ std::string toLower(std::string s) {
 }
 
 ImageFormat::ImageFormat(std::string format) {
-    _format = PixelFormat_BayerRG8;
+    _format = PixelFormat_RGB8;
     if(toLower(format) == "mono_8")
         _format = PixelFormat_Mono8;
     if(toLower(format) == "mono_16")
         _format = PixelFormat_Mono16;
     if(toLower(format) == "color_8")
-        _format = PixelFormat_BayerRG8;
+        _format = PixelFormat_RGB8;
     if(toLower(format) == "color_16")
-        _format = PixelFormat_BayerRG16;
+        _format = PixelFormat_RGB16;
 }
 
 ImageFormat::ImageFormat(const ImageFormat& obj) : 
@@ -59,9 +59,9 @@ gcstring ImageFormat::getNodeName() {
         return "Mono8";
     case PixelFormat_Mono16:
         return "Mono16";
-    case PixelFormat_BayerRG8:
+    case PixelFormat_RGB8:
         return "BayerRG8";
-    case PixelFormat_BayerRG16:
+    case PixelFormat_RGB16:
         return "BayerRG16";
     }
 }
@@ -72,9 +72,9 @@ int ImageFormat::getBytesPerPixel() {
         return 1;
     case PixelFormat_Mono16:
         return 2;
-    case PixelFormat_BayerRG8:
+    case PixelFormat_RGB8:
         return 3;
-    case PixelFormat_BayerRG16:
+    case PixelFormat_RGB16:
         return 6;
     }
 
@@ -87,9 +87,9 @@ int ImageFormat::getMatType() {
         return CV_8UC1;
     case PixelFormat_Mono16:
         return CV_16UC1;
-    case PixelFormat_BayerRG8:
+    case PixelFormat_RGB8:
         return CV_8UC3;
-    case PixelFormat_BayerRG16:
+    case PixelFormat_RGB16:
         return CV_16UC3;
     }
 
@@ -102,9 +102,9 @@ std::string ImageFormat::toString() {
         return "MONO_8";
     case PixelFormat_Mono16:
         return "MONO_16";
-    case PixelFormat_BayerRG8:
+    case PixelFormat_RGB8:
         return "COLOR_8";
-    case PixelFormat_BayerRG16:
+    case PixelFormat_RGB16:
         return "COLOR_16";
     default:
         return "COLOR_8";
@@ -117,9 +117,9 @@ std::string ImageFormat::getImageEncoding() {
         return "mono8";
     case PixelFormat_Mono16:
         return "mono16";
-    case PixelFormat_BayerRG8:
+    case PixelFormat_RGB8:
         return "rgb8";
-    case PixelFormat_BayerRG16:
+    case PixelFormat_RGB16:
         return "rgb16";
     default:
         return "rgb8";
@@ -194,9 +194,12 @@ bool EthernetCamera::openCamera()
     }
 
     _imageHandler->Init();
+    std::cout << "INIT IMAGE HANDLER" << std::endl;
 
     initOpenCVBuffers();
+    std::cout << "OPENCV BUFFERS" << std::endl;
     setCameraInfo();
+    std::cout << "SET CAMERA INFO" << std::endl;
 
     return true;
 } 
@@ -278,7 +281,7 @@ void EthernetCamera::initPixelFormat() {
 
 void EthernetCamera::setCameraEvents() {
     _imageHandler = std::make_shared<ImageEventHandler>(
-        ImageEventHandler(_pCam));
+        ImageEventHandler(_pCam, _selectedFormat.getFormat()));
     _pCam->RegisterEvent(*_imageHandler);
 }
 
@@ -374,8 +377,7 @@ std::string EthernetCamera::setPixelFormat(std::string format) {
     _selectedFormat = ImageFormat(format);
     initPixelFormat();
 
-    _imageHandler->setGrayscale(
-        _selectedFormat.getFormat() == PixelFormat_Mono8);
+    _imageHandler->setPixelFormat(_selectedFormat.getFormat());
 
     auto oldAddress = _bufferStart;
     createBuffer();

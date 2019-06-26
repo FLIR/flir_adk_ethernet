@@ -2,8 +2,10 @@
 
 using namespace flir_boson_ethernet;
 
-ImageEventHandler::ImageEventHandler(std::shared_ptr<CameraWrapper> pCam) :
-    _pCam(pCam)
+ImageEventHandler::ImageEventHandler(std::shared_ptr<CameraWrapper> pCam,
+    PixelFormatEnums format) :
+    _pCam(pCam),
+    _format(format)
 {
     // Retrieve device serial number
     INodeMap & nodeMap = pCam->GetTLDeviceNodeMap();
@@ -19,7 +21,7 @@ ImageEventHandler::ImageEventHandler(std::shared_ptr<CameraWrapper> pCam) :
 }
 
 ImageEventHandler::ImageEventHandler(const ImageEventHandler& handler) :
-    ImageEventHandler(handler._pCam)
+    ImageEventHandler(handler._pCam, handler._format)
 {
 
 }
@@ -44,9 +46,8 @@ void ImageEventHandler::OnImageEvent(ImagePtr image) {
     if (image->IsIncomplete()) {
         return;
     }
-    auto format = m_grayscale ? PixelFormat_Mono8 : PixelFormat_RGB8;
     m_mutex.lock();
-    m_resultImage = image->Convert(format, HQ_LINEAR);
+    m_resultImage = image->Convert(_format, HQ_LINEAR);
     m_lastTimeStamp = image->GetTimeStamp();
     m_mutex.unlock();
 
@@ -73,6 +74,6 @@ uint64_t ImageEventHandler::GetCaptureTime() {
     return m_lastTimeStamp;
 }
 
-void ImageEventHandler::setGrayscale(bool gray) {
-    m_grayscale = gray;
+void ImageEventHandler::setPixelFormat(PixelFormatEnums format) {
+    _format = format;
 }
