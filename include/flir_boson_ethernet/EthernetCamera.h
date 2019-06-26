@@ -33,10 +33,8 @@
 #include <spinnaker/SpinGenApi/SpinnakerGenApi.h>
 
 #include "flir_boson_ethernet/ImageEventHandler.h"
+#include "flir_boson_ethernet/ImageFormat.h"
 #include "../spinnaker_wrappers/SystemWrapper.h"
-
-#define RG8_PIXEL_FORMAT 17301513
-#define BPP8_FORMAT 3
 
 using namespace Spinnaker;
 using namespace Spinnaker::GenApi;
@@ -53,24 +51,6 @@ struct EthernetCameraInfo {
 
 enum Polarity {
 
-};
-
-class ImageFormat {
-  public:
-    ImageFormat(std::string format);
-    ImageFormat(const ImageFormat& obj);
-    ~ImageFormat();
-
-    int getValue(CEnumerationPtr nodePtr);
-    gcstring getNodeName();
-    int getBytesPerPixel();
-    std::string toString();
-    int getMatType();
-    std::string getImageEncoding();
-    PixelFormatEnums getFormat();
-
-  private:
-    PixelFormatEnums _format;
 };
 
 class EthernetCamera
