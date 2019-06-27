@@ -5,7 +5,7 @@
 
   <!-- the linux file descriptor location for the camera -->
   <arg name="ip_addr" default="169.254.87.157"/>
-  <arg name="camera_type" default="blackfly" />
+  <arg name="camera_type" default="boson" />
     
   <!-- valid values are 30.0 or 60.0 for Bosons -->
   <arg name="frame_rate" default="60.0"/>

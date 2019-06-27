@@ -2,7 +2,9 @@
 #define FLIR_BOSON_ETHERNET_ETHERNETCAMERA_H
 
 // C++ Includes
+#include <iostream>
 #include <string>
+#include <locale>
 
 // Linux system includes
 #include <fcntl.h>
@@ -31,10 +33,8 @@
 #include <spinnaker/SpinGenApi/SpinnakerGenApi.h>
 
 #include "flir_boson_ethernet/ImageEventHandler.h"
+#include "flir_boson_ethernet/ImageFormat.h"
 #include "../spinnaker_wrappers/SystemWrapper.h"
-
-#define RG8_PIXEL_FORMAT 17301513
-#define BPP8_FORMAT 3
 
 using namespace Spinnaker;
 using namespace Spinnaker::GenApi;
@@ -45,8 +45,12 @@ namespace flir_boson_ethernet
 {
 
 struct EthernetCameraInfo {
-    string ip, camInfoPath;
+    string ip, camInfoPath, pixelFormat, camType;
     int width, height;
+};
+
+enum Polarity {
+
 };
 
 class EthernetCamera
@@ -67,16 +71,31 @@ class EthernetCamera
     sensor_msgs::CameraInfo getCameraInfo();
     uint64_t getActualTimestamp();
 
+    std::string setPixelFormat(std::string format);
+    void performFFC();
+    void setAutoFFC(bool autoFFC);
+    void setPolarity(Polarity pol);
+    std::string getEncoding();
+
   private:
-    void findMatchingCamera(CameraListWrapper camList, const unsigned int numCams);
+    PixelFormatEnums getPixelFormat(string formatStr);
+    bool findMatchingCamera(CameraListWrapper camList, const unsigned int numCams);
     bool setImageAcquisition();
     void initOpenCVBuffers();
     void setCameraInfo();
     void setCameraEvents();
     void unsetCameraEvents();
     bool setImageInfo();
+    void createBuffer();
     void setWidthHeight(INodeMap& nodeMap);
-    void setCameraPixelFormat();
+    void initPixelFormat();
+    int getPixelSize();
+    bool ipMatches(string ip, INodeMap& nodeMapTLDevice);
+    bool camTypeMatches(string camType, INodeMap& nodeMapTLDevice);
+    std::string formatToString(PixelFormatEnums format);
+
+    void stopCapture();
+    void startCapture();
 
     std::shared_ptr<camera_info_manager::CameraInfoManager> _cameraInfo;
     int32_t _width, _height, _imageSize;
@@ -91,6 +110,8 @@ class EthernetCamera
     // Default Program options
     std::string _ipAddr, _cameraInfoPath;
     bool _zoomEnable;
+    ImageFormat _selectedFormat;
+    std::string _camType;
 };
 
 }  // namespace flir_boson_ethernet

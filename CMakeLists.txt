@@ -65,12 +65,15 @@ target_link_libraries(${PROJECT_NAME}_node
 FILE(GLOB SpinLibs /usr/lib/libSpin*.so)
 
 add_library(BosonCameraEthernet
+  src/nodelets/BaseCameraController.cpp
   src/nodelets/CameraController.cpp
   src/nodelets/SyncCameraController.cpp
   src/nodelets/TimeSynchronizer.cpp
   src/nodelets/TimeDifference.cpp
   src/flir_boson_ethernet/EthernetCamera.cpp
   src/flir_boson_ethernet/ImageEventHandler.cpp
+  src/flir_boson_ethernet/ImageFormat.cpp
+  src/flir_boson_ethernet/Util.cpp
   spinnaker_wrappers/CameraListWrapper.cpp
   spinnaker_wrappers/SystemWrapper.cpp
   spinnaker_wrappers/CameraWrapper.cpp
@@ -113,11 +116,12 @@ install(FILES nodelet_plugins.xml
 if (CATKIN_ENABLE_TESTING)
   catkin_add_gtest(${PROJECT_NAME}-test 
     test/test_flir_boson_ethernet.cpp
-    test/stringCompare.cpp
   )
   target_link_libraries(${PROJECT_NAME}-test 
     ${catkin_LIBRARIES}
+    BosonCameraEthernet
   )
+
 endif()
 
 ## Add folders to be run by python nosetests
