@@ -4,10 +4,8 @@
   <arg name="frame_id" default="boson_camera"/>
 
   <!-- the linux file descriptor location for the camera -->
-  <arg name="left_ip" default="169.254.87.157"/>
   <arg name="left_type" default="blackfly" />
   <!-- <arg name="right_ip" default="169.254.94.215"/> -->
-  <arg name="right_ip" default="169.254.82.142"/>
   <arg name="right_type" default="boson" />
 
   <arg name="left_namespace" default="left" />
@@ -43,9 +41,9 @@
           output="screen">
       <remap from="/$(arg namespace)" to="/$(arg namespace)/left" />
       <remap from="pixel_format" to="left/pixel_format" />
+      <remap from="auto_ffc" to="left/auto_ffc" />
 
       <param name="frame_id" type="str" value="$(arg frame_id)"/>
-      <!-- <param name="ip_addr" type="str" value="$(arg left_ip)"/> -->
       <param name="camera_type" type="str" value="$(arg left_type)" />
       <param name="frame_rate" type="double" value="$(arg frame_rate)"/>
       <param name="video_mode" type="str" value="$(arg video_mode)"/>
@@ -60,9 +58,9 @@
           output="screen">
       <remap from="/$(arg namespace)" to="/$(arg namespace)/right" />
       <remap from="pixel_format" to="right/pixel_format" />
+      <remap from="auto_ffc" to="right/auto_ffc" />
 
       <param name="frame_id" type="str" value="$(arg frame_id)"/>
-      <!-- <param name="ip_addr" type="str" value="$(arg right_ip)"/> -->
       <param name="camera_type" type="str" value="$(arg right_type)" />
       <param name="frame_rate" type="double" value="$(arg frame_rate)"/>
       <param name="video_mode" type="str" value="$(arg video_mode)"/>

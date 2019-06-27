@@ -284,8 +284,17 @@ void EthernetCamera::performFFC() {
 
 }
 
-void EthernetCamera::setAutoFFC(bool autoFFC) {
+std::string EthernetCamera::setAutoFFC(bool autoFFC) {
+    INodeMap &nodeMap = _pCam->GetNodeMap();
+    CEnumerationPtr ffcNode = nodeMap.GetNode("BosonFfcMode");
+    if (IsAvailable(ffcNode) && IsReadable(ffcNode)) {
+        gcstring nodeValName = autoFFC ? "Auto" : "Manual"; 
+        int64_t nodeVal = ffcNode->GetEntryByName(nodeValName)->GetValue();
+        ffcNode->SetIntValue(nodeVal);
+        return nodeValName.c_str();
+    }
 
+    return "";
 }
 
 void EthernetCamera::setPolarity(Polarity pol) {

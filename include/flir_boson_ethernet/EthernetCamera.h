@@ -73,7 +73,7 @@ class EthernetCamera
 
     std::string setPixelFormat(std::string format);
     void performFFC();
-    void setAutoFFC(bool autoFFC);
+    std::string setAutoFFC(bool autoFFC);
     void setPolarity(Polarity pol);
     std::string getEncoding();
 

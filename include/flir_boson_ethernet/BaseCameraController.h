@@ -24,6 +24,7 @@
 #include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
 
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/Image.h>
@@ -50,6 +51,7 @@ class BaseCameraController : public nodelet::Nodelet
     void publishImage(ros::Time timestamp);
     virtual void setupCommandListeners();
     void setPixelFormat(const std_msgs::StringConstPtr& msg);
+    void setAutoFFC(const std_msgs::BoolConstPtr& msg);
 
     ros::NodeHandle nh, pnh;
     uint64_t _seq = 0;
@@ -60,6 +62,7 @@ class BaseCameraController : public nodelet::Nodelet
     std::string frame_id, video_mode_str;
 
     ros::Subscriber _pixelFormatListener;
+    ros::Subscriber _autoFFCListener;
 };
 
 }

@@ -32,7 +32,7 @@ void BaseCameraController::onInit()
     std::string ip, cameraInfoStr, formatStr, camType;
 
     pnh.param<std::string>("frame_id", frame_id, "boson_camera");
-    pnh.param<std::string>("ip_addr", ip, "");
+    // pnh.param<std::string>("ip_addr", ip, "");
     pnh.param<std::string>("camera_type", camType, "");
     pnh.param<std::string>("camera_info_url", cameraInfoStr, "");
     pnh.param<std::string>("video_format", formatStr, "COLOR_8");
@@ -76,6 +76,9 @@ void BaseCameraController::setupExtraPubSub() {
 void BaseCameraController::setupCommandListeners() {
     _pixelFormatListener = nh.subscribe<std_msgs::String>("pixel_format", 10,
         boost::bind(&BaseCameraController::setPixelFormat, this, _1));
+
+    _autoFFCListener = nh.subscribe<std_msgs::Bool>("auto_ffc", 10,
+        boost::bind(&BaseCameraController::setAutoFFC, this, _1));
 }
 
 void BaseCameraController::setPixelFormat(const std_msgs::StringConstPtr& msg) {
@@ -83,6 +86,15 @@ void BaseCameraController::setPixelFormat(const std_msgs::StringConstPtr& msg) {
     ROS_INFO("%s - Changed format to %s.", getName().c_str(), format.c_str());
 }
 
+void BaseCameraController::setAutoFFC(const std_msgs::BoolConstPtr& msg) {
+    std::cout << "AUTO FFC" << std::endl;
+    auto ffcMode = _camera->setAutoFFC(msg->data);
+    if(ffcMode.empty()) {
+        ROS_INFO("Cannot set FFC mode");
+        return;
+    }
+    ROS_INFO("%s - Changed FFC mode to %s.", getName().c_str(), ffcMode.c_str());
+}
 
 void BaseCameraController::publishImage(ros::Time timestamp) {
         sensor_msgs::CameraInfoPtr
