@@ -22,7 +22,7 @@ TEST(ImageEventTests, ConstructImageHandler) {
     // EXPECT_CALL(camera, )
 
     auto camPtr = std::make_shared<CameraWrapper>(camera);
-    ImageEventHandler handler = ImageEventHandler(camPtr);
+    ImageEventHandler handler = ImageEventHandler(camPtr, PixelFormat_RGB8);
 }
 
 int main(int argc, char **argv) {

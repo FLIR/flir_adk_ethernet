@@ -42,6 +42,7 @@ void BaseCameraController::onInit()
     ROS_INFO("flir_boson_ethernet - Got camera_info_url: %s.", 
         cameraInfoStr.c_str());
     ROS_INFO("flir_boson_ethernet - Got video_format: %s.", formatStr.c_str());
+    ROS_INFO("flir_boson_ethernet - Got camera_type: %s.", camType.c_str());
 
     EthernetCameraInfo info;
     info.ip = ip;
