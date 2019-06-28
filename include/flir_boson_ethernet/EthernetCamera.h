@@ -32,6 +32,7 @@
 #include <spinnaker/Spinnaker.h>
 #include <spinnaker/SpinGenApi/SpinnakerGenApi.h>
 
+// Local Includes
 #include "flir_boson_ethernet/ImageEventHandler.h"
 #include "flir_boson_ethernet/ImageFormat.h"
 #include "../spinnaker_wrappers/SystemWrapper.h"
@@ -44,6 +45,7 @@ using namespace std;
 namespace flir_boson_ethernet
 {
 
+// configuration parameters for an ethernet camera
 struct EthernetCameraInfo {
     string ip, camInfoPath, pixelFormat, camType;
     int width, height;
@@ -53,6 +55,8 @@ enum Polarity {
 
 };
 
+// Class for interacting with any type of ethernet camera (Boson or Blackfly)
+// have been tested so far
 class EthernetCamera
 {
   public:
@@ -60,6 +64,10 @@ class EthernetCamera
       std::shared_ptr<SystemWrapper> sys, ros::NodeHandle);
     ~EthernetCamera();
 
+    // AGC Sample ONE: Linear from min to max.
+    // Input is a MATRIX (height x width) of 16bits. (OpenCV mat)
+    // Output is a MATRIX (height x width) of 8 bits (OpenCV mat)
+    // unimplemented
     void agcBasicLinear(const cv::Mat& input_16,
                     cv::Mat* output_8,
                     const int& height,
@@ -67,31 +75,52 @@ class EthernetCamera
     bool openCamera();
     bool closeCamera();
 
+    // gets the openCV image matrix
     cv::Mat getImageMatrix();
+    
+    // gets the camera info formatted as a ROS sensor message
     sensor_msgs::CameraInfo getCameraInfo();
+
+    // gets the camera-reported frame timestamp (distinct from the ROS reported one)
     uint64_t getActualTimestamp();
 
+    // sets the pixel format allowed values: mono_8, mono_16, color_8, color_16
     std::string setPixelFormat(std::string format);
-    void performFFC();
+
+    // activates FFC shutter (only works with Boson)
+    std::string performFFC();
+
+    // sets auto FFC to Auto (true) or Manual (false) (only works with Boson)
     std::string setAutoFFC(bool autoFFC);
     void setPolarity(Polarity pol);
+    // gets encoding for image conversion
     std::string getEncoding();
 
   private:
     PixelFormatEnums getPixelFormat(string formatStr);
+
+    // open camera helpers
     bool findMatchingCamera(CameraListWrapper camList, const unsigned int numCams);
+    void initPixelFormat();
+    bool setImageInfo();
+    void setCameraEvents();
     bool setImageAcquisition();
     void initOpenCVBuffers();
     void setCameraInfo();
-    void setCameraEvents();
+
+    // cleans up camera events
     void unsetCameraEvents();
-    bool setImageInfo();
+
+    // creates image buffer that backs the openCV matrix
     void createBuffer();
+
+    // sets width and height to user-defined or default values
     void setWidthHeight(INodeMap& nodeMap);
-    void initPixelFormat();
     int getPixelSize();
     bool ipMatches(string ip, INodeMap& nodeMapTLDevice);
     bool camTypeMatches(string camType, INodeMap& nodeMapTLDevice);
+
+    // gets the pixel format as a string e.g. color_8, mono_16
     std::string formatToString(PixelFormatEnums format);
 
     void stopCapture();

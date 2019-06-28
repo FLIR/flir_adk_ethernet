@@ -79,6 +79,9 @@ void BaseCameraController::setupCommandListeners() {
 
     _autoFFCListener = nh.subscribe<std_msgs::Bool>("auto_ffc", 10,
         boost::bind(&BaseCameraController::setAutoFFC, this, _1));
+
+    _ffcListener = nh.subscribe<std_msgs::Empty>("ffc", 10, 
+        boost::bind(&BaseCameraController::executeFFC, this));
 }
 
 void BaseCameraController::setPixelFormat(const std_msgs::StringConstPtr& msg) {
@@ -87,13 +90,21 @@ void BaseCameraController::setPixelFormat(const std_msgs::StringConstPtr& msg) {
 }
 
 void BaseCameraController::setAutoFFC(const std_msgs::BoolConstPtr& msg) {
-    std::cout << "AUTO FFC" << std::endl;
-    auto ffcMode = _camera->setAutoFFC(msg->data);
+    auto ffcMode = _camera->setAutoFFC((bool)msg->data);
     if(ffcMode.empty()) {
-        ROS_INFO("Cannot set FFC mode");
+        ROS_INFO("%s - Cannot set FFC mode", getName().c_str());
         return;
     }
     ROS_INFO("%s - Changed FFC mode to %s.", getName().c_str(), ffcMode.c_str());
+}
+
+void BaseCameraController::executeFFC() {
+    auto ffc = _camera->performFFC();
+    if(ffc.empty()) {
+        ROS_INFO("%s - Cannot execute FFC", getName().c_str());
+        return;
+    }
+    ROS_INFO("%s - FFC executed", getName().c_str());
 }
 
 void BaseCameraController::publishImage(ros::Time timestamp) {

@@ -42,6 +42,7 @@
       <remap from="/$(arg namespace)" to="/$(arg namespace)/left" />
       <remap from="pixel_format" to="left/pixel_format" />
       <remap from="auto_ffc" to="left/auto_ffc" />
+      <remap from="ffc" to="left/ffc" />
 
       <param name="frame_id" type="str" value="$(arg frame_id)"/>
       <param name="camera_type" type="str" value="$(arg left_type)" />
@@ -59,6 +60,7 @@
       <remap from="/$(arg namespace)" to="/$(arg namespace)/right" />
       <remap from="pixel_format" to="right/pixel_format" />
       <remap from="auto_ffc" to="right/auto_ffc" />
+      <remap from="ffc" to="right/ffc" />
 
       <param name="frame_id" type="str" value="$(arg frame_id)"/>
       <param name="camera_type" type="str" value="$(arg right_type)" />

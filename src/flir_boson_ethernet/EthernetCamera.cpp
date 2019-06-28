@@ -27,14 +27,12 @@ EthernetCamera::~EthernetCamera() {
     closeCamera();
 }
 
-// AGC Sample ONE: Linear from min to max.
-// Input is a MATRIX (height x width) of 16bits. (OpenCV mat)
-// Output is a MATRIX (height x width) of 8 bits (OpenCV mat)
 void EthernetCamera::agcBasicLinear(const Mat &input_16,
                                     Mat *output_8,
                                     const int &height,
                                     const int &width)
 {
+    // unimplemented for now
 }
 
 bool EthernetCamera::openCamera()
@@ -163,7 +161,7 @@ void EthernetCamera::initPixelFormat() {
 
         pixelFormatNode->SetIntValue(_selectedFormat.getValue(pixelFormatNode));
     } catch(Spinnaker::Exception e) {
-        ROS_ERROR("ERROR: %s", e.what());
+        ROS_INFO("Unable to set pixel format to: %s", _selectedFormat.toString());
     }
 }
 
@@ -280,8 +278,15 @@ std::string EthernetCamera::setPixelFormat(std::string format) {
     return _selectedFormat.toString();
 }
 
-void EthernetCamera::performFFC() {
+std::string EthernetCamera::performFFC() {
+    INodeMap &nodeMap = _pCam->GetNodeMap();
+    auto ffcNode = nodeMap.GetNode("BosonRunFfc");
+    if (IsAvailable(ffcNode) && IsReadable(ffcNode)) {
+        // ffcNode->Execute();
+        return "FFC";
+    }
 
+    return "";
 }
 
 std::string EthernetCamera::setAutoFFC(bool autoFFC) {
