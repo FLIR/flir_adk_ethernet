@@ -40,7 +40,7 @@ ImageInfo ImageEventHandler::GetImageInfo() {
                 m_resultImage->GetBufferSize()};
 }
 
-int framesPerSecond = 0;
+// int framesPerSecond = 0;
 void ImageEventHandler::OnImageEvent(ImagePtr image) {
     // Check image retrieval status
     if (image->IsIncomplete()) {
@@ -51,13 +51,16 @@ void ImageEventHandler::OnImageEvent(ImagePtr image) {
     m_lastTimeStamp = image->GetTimeStamp();
     m_mutex.unlock();
 
-    framesPerSecond++;
-    if(std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() 
-        - startTime).count() >= 1000) {
-        startTime = Clock::now();
-        std::cout << "FPS: " << framesPerSecond << std::endl;
-        framesPerSecond = 0;
-    }
+    // optional: uncomment to print out actual capture rate of camera
+    // this was useful to debug bandwidth issues for multiple high-resoultion
+    // cameras
+    // framesPerSecond++;
+    // if(std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() 
+    //     - startTime).count() >= 1000) {
+    //     startTime = Clock::now();
+    //     std::cout << "FPS: " << framesPerSecond << std::endl;
+    //     framesPerSecond = 0;
+    // }
 }
 
 void *ImageEventHandler::GetImageData() {

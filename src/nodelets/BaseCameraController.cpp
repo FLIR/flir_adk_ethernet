@@ -12,7 +12,6 @@ BaseCameraController::BaseCameraController() : _cvImage()
 BaseCameraController::~BaseCameraController()
 {
     if(_camera) {
-        _camera->closeCamera();
         delete _camera;
     }
 }

@@ -25,6 +25,7 @@ EthernetCamera::~EthernetCamera() {
         delete _bufferStart;
     }
     closeCamera();
+    _pCam.reset();
 }
 
 void EthernetCamera::agcBasicLinear(const Mat &input_16,
