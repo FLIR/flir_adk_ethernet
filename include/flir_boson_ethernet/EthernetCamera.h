@@ -48,7 +48,8 @@ namespace flir_boson_ethernet
 // configuration parameters for an ethernet camera
 struct EthernetCameraInfo {
     string ip, camInfoPath, pixelFormat, camType;
-    int width, height;
+    int width = 0;
+    int height = 0;
 };
 
 enum Polarity {

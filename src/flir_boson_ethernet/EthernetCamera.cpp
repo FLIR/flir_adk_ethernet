@@ -143,6 +143,13 @@ void EthernetCamera::setWidthHeight(INodeMap& nodeMap) {
 
     _width = min(_width, maxWidth);
     _height = min(_height, maxHeight);
+
+    if(_width == 0) {
+        _width = maxWidth;
+    }
+    if(_height == 0) {
+        _height = maxHeight;
+    }
 }
 
 void EthernetCamera::createBuffer() {
@@ -161,7 +168,7 @@ void EthernetCamera::initPixelFormat() {
 
         pixelFormatNode->SetIntValue(_selectedFormat.getValue(pixelFormatNode));
     } catch(Spinnaker::Exception e) {
-        ROS_INFO("Unable to set pixel format to: %s", _selectedFormat.toString());
+        ROS_INFO("Unable to set pixel format to: %s", _selectedFormat.toString().c_str());
     }
 }
 
@@ -204,10 +211,6 @@ bool EthernetCamera::setImageAcquisition() {
 }
 
 void EthernetCamera::initOpenCVBuffers() {
-    // Declarations for Zoom representation
-    // Will be used or not depending on program arguments
-    // OpenCV output buffer , BGR -> Three color spaces :
-    // (640 - 640 - 640 : p11 p21 p31 .... / p12 p22 p32 ..../ p13 p23 p33 ...)
     _thermalImageMat = Mat(_height, _width, _selectedFormat.getMatType(), 
         reinterpret_cast<void *>(_bufferStart));
 }
@@ -224,8 +227,7 @@ void EthernetCamera::setCameraInfo() {
     }
 }
 
-bool EthernetCamera::closeCamera()
-{
+bool EthernetCamera::closeCamera() {
     if(_pCam) {
         unsetCameraEvents();
         stopCapture();
@@ -239,12 +241,15 @@ void EthernetCamera::unsetCameraEvents() {
     try {
         _pCam->UnregisterEvent(*_imageHandler);
     } catch(Spinnaker::Exception e) {
-        // pass
+        // if there's an error - the event is already unregistered, 
+        // or the camera is invalid (no need to unset)
     }
 }
 
 cv::Mat EthernetCamera::getImageMatrix() {
     auto data = _imageHandler->GetImageData();
+
+    // copy the image data to _bufferStart, which backs _thermalImageMat
     memcpy(_bufferStart, data, _imageSize);
     return _thermalImageMat;
 }
@@ -260,21 +265,26 @@ uint64_t EthernetCamera::getActualTimestamp() {
 std::string EthernetCamera::setPixelFormat(std::string format) {
     stopCapture();
 
+    // set this pixel format and associated properties
     _selectedFormat = ImageFormat(format);
     initPixelFormat();
 
+    // set image handler pixel format to ensure the conversions are correct
     _imageHandler->setPixelFormat(_selectedFormat.getFormat());
 
+    // replace the buffer due to the change in pixel size
     auto oldAddress = _bufferStart;
     createBuffer();
     memcpy(oldAddress, _bufferStart, _imageSize);
     delete _bufferStart;
     _bufferStart = oldAddress;
 
+    // reset the openCV matrix
     initOpenCVBuffers();
 
     startCapture();
 
+    // notify caller which format is active
     return _selectedFormat.toString();
 }
 

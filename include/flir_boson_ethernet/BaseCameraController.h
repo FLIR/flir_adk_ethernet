@@ -40,6 +40,7 @@ using namespace std;
 namespace flir_boson_ethernet
 {
 
+// abstract class nodelet for controlling an ethernet camera
 class BaseCameraController : public nodelet::Nodelet
 {
   public:
@@ -47,11 +48,17 @@ class BaseCameraController : public nodelet::Nodelet
     virtual ~BaseCameraController();
 
   protected:
+    // required for nodelet - handles initialization
     virtual void onInit();
+    // sets up publishers and subscribers beyond the minimal ones
     virtual void setupExtraPubSub();
+    // abstract method - handles how to trigger frames get published to topic
     virtual void setupFramePublish() = 0;
-    void publishImage(ros::Time timestamp);
+    // sets up subscribers for command and control
     virtual void setupCommandListeners();
+    // publishes frame to topic
+    void publishImage(ros::Time timestamp);
+    
 
     // command listeners
     void setPixelFormat(const std_msgs::StringConstPtr& msg);

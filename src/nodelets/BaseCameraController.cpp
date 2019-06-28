@@ -1,4 +1,5 @@
 #include <pluginlib/class_list_macros.h>
+#include "flir_boson_ethernet/Util.h"
 #include "flir_boson_ethernet/BaseCameraController.h"
 
 using namespace cv;
@@ -30,12 +31,15 @@ void BaseCameraController::onInit()
     bool exit = false;
 
     std::string ip, cameraInfoStr, formatStr, camType;
+    int width, height;
 
     pnh.param<std::string>("frame_id", frame_id, "boson_camera");
-    // pnh.param<std::string>("ip_addr", ip, "");
+    pnh.param<std::string>("ip_addr", ip, "");
     pnh.param<std::string>("camera_type", camType, "");
     pnh.param<std::string>("camera_info_url", cameraInfoStr, "");
     pnh.param<std::string>("video_format", formatStr, "COLOR_8");
+    pnh.param<int>("width", width, 0);
+    pnh.param<int>("height", height, 0);
 
     ROS_INFO("flir_boson_ethernet - Got frame_id: %s.", frame_id.c_str());
     ROS_INFO("flir_boson_ethernet - Got IP: %s.", ip.c_str());
@@ -43,14 +47,17 @@ void BaseCameraController::onInit()
         cameraInfoStr.c_str());
     ROS_INFO("flir_boson_ethernet - Got video_format: %s.", formatStr.c_str());
     ROS_INFO("flir_boson_ethernet - Got camera_type: %s.", camType.c_str());
+    ROS_INFO("flir_boson_ethernet - Got width: %d.", width);
+    ROS_INFO("flir_boson_ethernet - Got height: %d.", height);
 
     EthernetCameraInfo info;
     info.ip = ip;
     info.camInfoPath = cameraInfoStr;
-    info.width = 800;
-    info.height = 600;
     info.pixelFormat = formatStr;
     info.camType = camType;
+    info.width = width;
+    info.height = height;
+
     auto sys = std::make_shared<SystemWrapper>(
         SystemWrapper(System::GetInstance()));
 

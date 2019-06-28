@@ -12,6 +12,7 @@ namespace flir_boson_ethernet {
 
 const char *GetDottedAddress(int64_t value);
 std::string toLower(std::string s);
+bool tryConvertStrInt(std::string s, int *i);
 
 }
 

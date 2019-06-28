@@ -23,3 +23,12 @@ std::string flir_boson_ethernet::toLower(std::string s) {
     std::transform(newStr.begin(), newStr.end(), newStr.begin(), ::tolower);
     return newStr;
 }
+
+bool flir_boson_ethernet::tryConvertStrInt(std::string s, int *i) {
+    std::stringstream converter;
+
+    converter << s;
+    converter >> *i;
+
+    return !converter.fail();
+}
