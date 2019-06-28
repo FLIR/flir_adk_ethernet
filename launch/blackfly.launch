@@ -5,7 +5,7 @@
   <!-- prefix for all topics published by this launcher -->
   <arg name="namespace" default="flir_boson"/>
   <!-- frame ID for identifying source when looking at image topic -->
-  <arg name="frame_id" default="boson_camera"/>
+  <arg name="frame_id" default="blackfly_camera"/>
   <!-- camera type notifies the application to get the first camera whose
   name contains "blackfly" -->
   <arg name="camera_type" default="blackfly" />
@@ -13,12 +13,13 @@
   <!-- topic frame rate - limited by the max frame rate of the camera -->
   <arg name="frame_rate" default="60.0"/>
 
-  <!-- valid values are MONO_8, MONO_16, COLOR_8, COLOR_16 for blackfly -->
+  <!-- valid values are MONO_8, MONO_16, or COLOR_8 for blackfly -->
   <arg name="video_format" default="COLOR_8"/>
 
   <!-- location of the camera calibration file -->
   <arg name="camera_info_url" default="package://flir_boson_ethernet/example_calibrations/BlackFlyS.yaml"/>
 
+  <!-- node launcher -->
   <node pkg="flir_boson_ethernet" 
         type="flir_boson_ethernet_node" 
         name="flir_boson_ethernet_node" 
