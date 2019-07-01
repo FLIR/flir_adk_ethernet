@@ -15,7 +15,7 @@ using namespace std;
 
 namespace flir_boson_ethernet
 {
-
+// class for controlling single camera synchronized with other camera(s)
 class SyncCameraController : public BaseCameraController
 {
   public:

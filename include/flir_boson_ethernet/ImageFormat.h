@@ -32,19 +32,27 @@ using namespace std;
 
 namespace flir_boson_ethernet
 {
-
+// class for managing properties assosicated with pixel formats 
+// (color, mono, 8 and 16 bit)
 class ImageFormat {
   public:
     ImageFormat(std::string format);
     ImageFormat(const ImageFormat& obj);
     ~ImageFormat();
 
+    // gets the integer value for setting the node
     int getValue(CEnumerationPtr nodePtr);
+    // gets the node name for setting the node
     gcstring getNodeName();
+    // gets bytes per pixel for sizing the image buffer
     int getBytesPerPixel();
+    // returns the string to present to the user
     std::string toString();
+    // gets the OpenCV integer value
     int getMatType();
+    // gets the ROS image encoding 
     std::string getImageEncoding();
+    // returns the Spinnaker format enum
     PixelFormatEnums getFormat();
 
   private:

@@ -21,6 +21,7 @@ void SyncCameraController::setupExtraPubSub() {
 }
 
 void SyncCameraController::setupFramePublish() {
+    // listen to image_sync to get indicator to publish image
     _sub = nh.subscribe<std_msgs::Time>("image_sync", 1, 
         boost::bind(&SyncCameraController::publishImage, this, _1));
 }
@@ -29,6 +30,7 @@ void SyncCameraController::publishImage(const std_msgs::Time::ConstPtr& message)
 {
     BaseCameraController::publishImage(message->data);
 
+    // publish the camera-reported timestamp
     uint64_t actualCaptureTime = _camera->getActualTimestamp();
     MultiTimeHeader timeHeader;
     timeHeader.header.frame_id = frame_id;

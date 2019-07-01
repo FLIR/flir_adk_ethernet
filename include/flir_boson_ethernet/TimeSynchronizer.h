@@ -23,7 +23,7 @@ using namespace std;
 
 namespace flir_boson_ethernet 
 {
-
+// nodelet for syncing camera captures - for use with the SyncCameraController
 class TimeSynchronizer : public nodelet::Nodelet
 {
   public:

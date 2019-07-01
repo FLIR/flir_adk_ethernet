@@ -30,6 +30,7 @@ using namespace std;
 namespace flir_boson_ethernet
 {
 
+// class for controlling a single camera independently
 class CameraController : public BaseCameraController
 {
   public:
@@ -42,7 +43,6 @@ class CameraController : public BaseCameraController
 
     ros::Timer capture_timer;
 
-    // Default Program options
     float _frameRate;
     bool zoom_enable;
     SensorTypes sensor_type;
