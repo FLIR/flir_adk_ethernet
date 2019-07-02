@@ -20,7 +20,7 @@ using namespace std;
 
 namespace flir_boson_ethernet
 {
-
+// nodelet for getting actual time difference between synced cameras
 class TimeDifference : public nodelet::Nodelet {
   public:
     TimeDifference();

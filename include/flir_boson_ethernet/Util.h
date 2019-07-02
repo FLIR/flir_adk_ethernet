@@ -1,3 +1,5 @@
+// file for utility functions used across application
+
 #ifndef FLIR_BOSON_ETHERNET_UTIL_H
 #define FLIR_BOSON_ETHERNET_UTIL_H
 

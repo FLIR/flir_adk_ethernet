@@ -69,8 +69,6 @@ then
     topicNamespace="$topicNamespace/$subNamespace"
 fi
 
-echo "$command: $commandParam"
-
 case "$command" in 
     autoFFC)
         rostopic pub -1 "$topicNamespace/auto_ffc" std_msgs/Bool "data: $commandParam"
@@ -79,6 +77,6 @@ case "$command" in
         rostopic pub -1 "$topicNamespace/pixel_format" std_msgs/String "$commandParam"
         ;;
     *)
-        echo "Error: command '$command' not recognized"
+        echo -e "\nError: command '$command' not recognized\n"
         ;;
 esac

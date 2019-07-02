@@ -30,7 +30,7 @@ using namespace std;
 namespace flir_boson_ethernet
 {
 
-// class for controlling a single camera independently
+// nodelet for controlling a single camera independently
 class CameraController : public BaseCameraController
 {
   public:
