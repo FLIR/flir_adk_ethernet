@@ -1,0 +1,84 @@
+#!/bin/bash
+
+usageMsg="$(cat <<EOF
+    \nusage: sendCommand <command> <command param> [args]
+    \n
+    \nCommands:
+    \nautoFFC <setting>
+    \n\tset the auto FFC setting on Boson. Valid values are "true" or "false"
+    \npixelFormat <setting>
+    \n\tset the pixel format. Valid values are "mono_8" and "mono_16" for Boson and, additionally, "color_8" for BlackFly
+    \n
+    \nOptions:
+    \n-n <namespace> DEFAULT flir_boson
+    \n\tSpecifies a namespace for the topic
+    \n-s <sub-namespace>
+    \n\tSpecifies a sub-namespace for the topic. Typically left or right
+    \n\te.g. topic is /flir_boson/left/pixel_format then run sendCommand 
+    \n\tpixelFormat mono_8 -n flir_boson -s left
+    \n
+EOF
+)"
+
+command=""
+commandParam=""
+namespace="flir_boson"
+subNamespace=""
+
+while (( "$#" )); do
+  case "$1" in
+    -n)
+      namespace=$2
+      shift 2
+      ;;
+    -s)
+      subNamespace=$2
+      shift 2
+      ;;
+    -h|--help)
+      echo -e $usageMsg
+      exit 0
+      ;;
+    --) # end argument parsing
+      shift
+      break
+      ;;
+    -*|--*=) # unsupported flags
+      echo "Error: Unsupported flag $1" >&2
+      echo -e $usageMsg
+      exit 1
+      ;;
+    *) # preserve positional arguments
+      command=$1
+      commandParam=$2
+      shift 2
+      ;;
+  esac
+done
+
+if [ -z $command ] || [ -z $commandParam ]
+then
+    echo "Error: must specify command and command parameter" >&2
+    echo -e $usageMsg
+    exit 1
+fi
+
+topicNamespace="/$namespace"
+if [ -n $subNamespace ]
+then
+    topicNamespace="$topicNamespace/$subNamespace"
+fi
+
+echo "$command: $commandParam"
+
+case "$command" in 
+    autoFFC)
+        rostopic pub -1 "$topicNamespace/auto_ffc" std_msgs/Bool "data: $commandParam"
+        ;;
+    pixelFormat)
+        rostopic pub -1 "$topicNamespace/pixel_format" std_msgs/String "$commandParam"
+        ;;
+    *)
+        echo "Error: command '$command' not recognized"
+        ;;
+esac
