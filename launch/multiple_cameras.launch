@@ -50,6 +50,8 @@
       <remap from="pixel_format" to="left/pixel_format" />
       <remap from="auto_ffc" to="left/auto_ffc" />
       <remap from="ffc" to="left/ffc" />
+      <remap from="set_node" to="left/set_node" />
+      <remap from="get_node" to="left/get_node" />
 
       <param name="frame_id" type="str" value="$(arg blackfly_frame_id)"/>
       <param name="camera_type" type="str" value="$(arg left_type)" />
@@ -70,6 +72,8 @@
       <remap from="pixel_format" to="right/pixel_format" />
       <remap from="auto_ffc" to="right/auto_ffc" />
       <remap from="ffc" to="right/ffc" />
+      <remap from="set_node" to="right/set_node" />
+      <remap from="get_node" to="right/get_node" />
 
       <param name="frame_id" type="str" value="$(arg boson_frame_id)"/>
       <param name="camera_type" type="str" value="$(arg right_type)" />

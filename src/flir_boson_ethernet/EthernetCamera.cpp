@@ -326,6 +326,8 @@ std::string EthernetCamera::getNodeValue(std::string nodeName) {
 }
 
 bool EthernetCamera::setNodeValue(std::string nodeName, std::string value) {
+    stopCapture();
+    
     INodeMap &nodeMap = _pCam->GetNodeMap();
     CNodePtr node = nodeMap.GetNode(nodeName.c_str());
 
@@ -365,8 +367,10 @@ bool EthernetCamera::setNodeValue(std::string nodeName, std::string value) {
             }
         }
     } catch(Spinnaker::Exception e) {
-        ROS_ERROR("Error: %s", e.what());
+        ROS_ERROR(e.what());
     }
+        
+    startCapture();
 
     return false;
 }

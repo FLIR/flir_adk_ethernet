@@ -88,6 +88,12 @@ void BaseCameraController::setupCommandListeners() {
 
     _ffcListener = nh.subscribe<std_msgs::Empty>("ffc", 10, 
         boost::bind(&BaseCameraController::executeFFC, this));
+
+    _setNodeListener = nh.subscribe<diagnostic_msgs::KeyValue>("set_node", 10,
+        boost::bind(&BaseCameraController::setNode, this, _1));
+
+    _getNodeListener = nh.subscribe<std_msgs::String>("get_node", 10,
+        boost::bind(&BaseCameraController::getNode, this, _1));
 }
 
 void BaseCameraController::setPixelFormat(const std_msgs::StringConstPtr& msg) {
@@ -111,6 +117,26 @@ void BaseCameraController::executeFFC() {
         return;
     }
     ROS_INFO("%s - FFC executed", getName().c_str());
+}
+
+void BaseCameraController::setNode(const diagnostic_msgs::KeyValueConstPtr& msg) {
+    std::string nodeName = msg->key;
+    std::string value = msg->value;
+    if(_camera->setNodeValue(nodeName, value)) {
+        ROS_INFO("Successfully set node %s", nodeName.c_str());
+    } else {
+        ROS_ERROR("Unable tp set node %s to value %s", nodeName.c_str(), value.c_str());
+    }
+}
+
+void BaseCameraController::getNode(const std_msgs::StringConstPtr& msg) {
+    std::string result = _camera->getNodeValue(msg->data);
+    if(result.empty()) {
+        ROS_ERROR("Could not get value for node: %s", msg->data);
+        return;
+    }
+
+    ROS_INFO("Value for node %s is: %s", msg->data, result.c_str());
 }
 
 void BaseCameraController::publishImage(ros::Time timestamp) {
