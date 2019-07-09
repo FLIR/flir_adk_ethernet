@@ -94,6 +94,10 @@ class EthernetCamera
     // sets auto FFC to Auto (true) or Manual (false) (only works with Boson)
     std::string setAutoFFC(bool autoFFC);
     void setPolarity(Polarity pol);
+
+    std::string getNodeValue(std::string nodeName);
+    bool setNodeValue(std::string nodeName, std::string value);
+
     // gets encoding for image conversion
     std::string getEncoding();
 
@@ -126,6 +130,13 @@ class EthernetCamera
 
     void stopCapture();
     void startCapture();
+
+    bool setStringNode(CNodePtr node, std::string value);
+    bool setIntNode(CNodePtr node, int value);
+    bool setFloatNode(CNodePtr node, float value);
+    bool setBoolNode(CNodePtr node, bool value);
+    bool setEnumNode(CNodePtr node, std::string value);
+    bool setCommandNode(CNodePtr node);
 
     std::shared_ptr<camera_info_manager::CameraInfoManager> _cameraInfo;
     int32_t _width, _height, _imageSize;

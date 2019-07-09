@@ -313,6 +313,99 @@ std::string EthernetCamera::setAutoFFC(bool autoFFC) {
     return "";
 }
 
+std::string EthernetCamera::getNodeValue(std::string nodeName) {
+    INodeMap &nodeMap = _pCam->GetNodeMap();
+    CNodePtr node = nodeMap.GetNode(nodeName.c_str());
+
+    if(IsAvailable(node) && IsReadable(node)) {
+        CValuePtr valueNode = static_cast<CValuePtr>(node);
+        return valueNode->ToString().c_str();
+    }
+
+    return "";
+}
+
+bool EthernetCamera::setNodeValue(std::string nodeName, std::string value) {
+    INodeMap &nodeMap = _pCam->GetNodeMap();
+    CNodePtr node = nodeMap.GetNode(nodeName.c_str());
+
+    try {
+        if(IsAvailable(node) && IsWritable(node)) {
+            switch (node->GetPrincipalInterfaceType())
+            {
+            case intfIString:
+                return setStringNode(node, value);
+            case intfIInteger:
+            {
+                int *intVal;
+                if(tryConvertStrInt(value, intVal)) {
+                    return setIntNode(node, *intVal);
+                }
+                return false;
+            }
+            case intfIFloat:
+            {
+                float *floatValue;
+                // pass for now
+                return true;
+            }
+            case intfIBoolean:
+            {
+                bool boolValue = (toLower(value) == "true");
+                return setBoolNode(node, boolValue);
+            }
+            case intfIEnumeration:
+                return setEnumNode(node, value);
+            case intfICommand:
+                return setCommandNode(node);
+            default:
+                break;
+            }
+        }
+    } catch(Spinnaker::Exception e) {
+        ROS_ERROR("Error: %s", e.what());
+    }
+
+    return false;
+}
+
+bool EthernetCamera::setStringNode(CNodePtr node, std::string value) {
+    CStringPtr stringNode = static_cast<CStringPtr>(node);
+    stringNode->SetValue(value.c_str());
+    return true;
+}
+
+bool EthernetCamera::setIntNode(CNodePtr node, int value) {
+    CIntegerPtr intNode = static_cast<CIntegerPtr>(node);
+    intNode->SetValue(value);
+    return true;
+}
+
+bool EthernetCamera::setFloatNode(CNodePtr node, float value) {
+    CFloatPtr floatNode = static_cast<CFloatPtr>(node);
+    floatNode->SetValue(value);
+    return true;
+}
+
+bool EthernetCamera::setBoolNode(CNodePtr node, bool value) {
+    CBooleanPtr boolNode = static_cast<CBooleanPtr>(node);
+    boolNode->SetValue(value);
+    return true;
+}
+
+bool EthernetCamera::setEnumNode(CNodePtr node, std::string value) {
+    CEnumerationPtr enumNode = static_cast<CEnumerationPtr>(node);
+    int64_t nodeValue = enumNode->GetEntryByName(value.c_str())->GetValue();
+    enumNode->SetIntValue(nodeValue);
+    return true;
+}
+
+bool EthernetCamera::setCommandNode(CNodePtr node) {
+    CCommandPtr commNode = static_cast<CCommandPtr>(node);
+    commNode->Execute();
+    return true;
+}
+
 void EthernetCamera::setPolarity(Polarity pol) {
 
 }
