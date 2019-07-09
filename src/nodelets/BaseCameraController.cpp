@@ -136,7 +136,7 @@ void BaseCameraController::getNode(const std_msgs::StringConstPtr& msg) {
         return;
     }
 
-    ROS_INFO("Value for node %s is: %s", msg->data, result.c_str());
+    ROS_INFO("Value for node %s is: %s", msg->data.c_str(), result.c_str());
 }
 
 void BaseCameraController::publishImage(ros::Time timestamp) {

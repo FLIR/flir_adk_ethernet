@@ -56,13 +56,12 @@ while (( "$#" )); do
     nodeMap)
       command="nodeMap"
       commandParam=$2
-      commandValue=$3
-      if [ -z $commandValue ]
+      shift 2
+      if [[ "$1" != "-"* ]]
       then
-        echo "Error: must specify node name and value for nodeMap" >&2
-        exit 1
+        commandValue=$1
+        shift 1
       fi
-      shift 3
       ;;
     *) # preserve positional arguments
       command=$1
@@ -96,7 +95,12 @@ case "$command" in
         rostopic pub -1 "$topicNamespace/ffc" std_msgs/Empty "{}"
         ;;
     nodeMap)
-        rostopic pub -1 "$topicNamespace/set_node" diagnostic_msgs/KeyValue "key: '$commandParam' value: \'$commandValue\'"
+        if [ -z $commandValue ]
+        then
+          rostopic pub -1 "$topicNamespace/get_node" std_msgs/String "$commandParam" 
+        else
+          rostopic pub -1 "$topicNamespace/set_node" diagnostic_msgs/KeyValue "{key: '$commandParam', value: \'$commandValue\'}"
+        fi
         ;;
     *)
         echo -e "\nError: command '$command' not recognized\n"

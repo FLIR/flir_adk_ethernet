@@ -120,10 +120,13 @@ class EthernetCamera
     void createBuffer();
 
     // sets width and height to user-defined or default values
-    void setWidthHeight(INodeMap& nodeMap);
+    void setWidthHeight();
+    void setCenterROI(int width, int height);
     int getPixelSize();
     bool ipMatches(string ip, INodeMap& nodeMapTLDevice);
     bool camTypeMatches(string camType, INodeMap& nodeMapTLDevice);
+
+    void setROI(int xOffset, int yOffset, int width, int height);
 
     // gets the pixel format as a string e.g. color_8, mono_16
     std::string formatToString(PixelFormatEnums format);
