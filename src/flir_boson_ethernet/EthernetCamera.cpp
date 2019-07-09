@@ -291,9 +291,9 @@ std::string EthernetCamera::setPixelFormat(std::string format) {
 
 std::string EthernetCamera::performFFC() {
     INodeMap &nodeMap = _pCam->GetNodeMap();
-    auto ffcNode = nodeMap.GetNode("BosonRunFfc");
-    if (IsAvailable(ffcNode) && IsReadable(ffcNode)) {
-        // ffcNode->Execute();
+    CCommandPtr ffcNode = nodeMap.GetNode("BosonRunFfc");
+    if (IsAvailable(ffcNode) && IsWritable(ffcNode)) {
+        ffcNode->Execute();
         return "FFC";
     }
 

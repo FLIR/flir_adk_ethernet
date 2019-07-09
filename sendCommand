@@ -22,6 +22,7 @@ EOF
 
 command=""
 commandParam=""
+commandValue=""
 namespace="flir_boson"
 subNamespace=""
 
@@ -48,6 +49,21 @@ while (( "$#" )); do
       echo -e $usageMsg
       exit 1
       ;;
+    ffc)
+      command="ffc"
+      shift 1
+      ;;
+    nodeMap)
+      command="nodeMap"
+      commandParam=$2
+      commandValue=$3
+      if [ -z $commandValue ]
+      then
+        echo "Error: must specify node name and value for nodeMap" >&2
+        exit 1
+      fi
+      shift 3
+      ;;
     *) # preserve positional arguments
       command=$1
       commandParam=$2
@@ -56,7 +72,7 @@ while (( "$#" )); do
   esac
 done
 
-if [ -z $command ] || [ -z $commandParam ]
+if [[ $command != "ffc" && (-z $command || -z $commandParam) ]]
 then
     echo "Error: must specify command and command parameter" >&2
     echo -e $usageMsg
@@ -64,7 +80,8 @@ then
 fi
 
 topicNamespace="/$namespace"
-if [ -n $subNamespace ]
+echo $namespace
+if [ ! -z $subNamespace ]
 then
     topicNamespace="$topicNamespace/$subNamespace"
 fi
@@ -75,6 +92,12 @@ case "$command" in
         ;;
     pixelFormat)
         rostopic pub -1 "$topicNamespace/pixel_format" std_msgs/String "$commandParam"
+        ;;
+    ffc)
+        rostopic pub -1 "$topicNamespace/ffc" std_msgs/Empty "{}"
+        ;;
+    nodeMap)
+
         ;;
     *)
         echo -e "\nError: command '$command' not recognized\n"

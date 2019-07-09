@@ -17,9 +17,7 @@ const unsigned int CameraListWrapper::GetSize() {
 }
 
 void CameraListWrapper::Clear() {
-    std::cout << "CLEARING" << std::endl;
     _camList.Clear();
-    std::cout << "CLEARED" << std::endl;
 }
 
 CameraWrapper CameraListWrapper::GetByIndex(unsigned int i) {
