@@ -346,8 +346,10 @@ bool EthernetCamera::setNodeValue(std::string nodeName, std::string value) {
             case intfIFloat:
             {
                 float *floatValue;
-                // pass for now
-                return true;
+                if(tryConvertStrFloat(value, floatValue)) {
+                    return setFloatNode(node, *floatValue);
+                }
+                return false;
             }
             case intfIBoolean:
             {

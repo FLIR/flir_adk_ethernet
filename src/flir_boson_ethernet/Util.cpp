@@ -32,3 +32,10 @@ bool flir_boson_ethernet::tryConvertStrInt(std::string s, int *i) {
 
     return !converter.fail();
 }
+
+bool flir_boson_ethernet::tryConvertStrFloat(std::string s, float *f) {
+    std::stringstream converter;
+    converter << s;
+    converter >> *f;
+    return !converter.fail();
+}
