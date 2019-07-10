@@ -39,3 +39,8 @@ bool flir_boson_ethernet::tryConvertStrFloat(std::string s, float *f) {
     converter >> *f;
     return !converter.fail();
 }
+
+int flir_boson_ethernet::roundToEven(int n) {
+    n /= 2;
+    return n * 2;
+}

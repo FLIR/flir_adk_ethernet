@@ -119,6 +119,7 @@ bool EthernetCamera::camTypeMatches(string camType, INodeMap& nodeMapTLDevice) {
 
 bool EthernetCamera::setImageInfo() {
     try {
+        // setBinning();
         setROI(_xOffset, _yOffset, _width, _height);
 
         return true;
@@ -128,9 +129,28 @@ bool EthernetCamera::setImageInfo() {
     }
 }
 
+void EthernetCamera::setBinning() {
+    INodeMap &nodeMap = _pCam->GetNodeMap();
+    CIntegerPtr hNode = nodeMap.GetNode("BinningHorizontal");
+    CIntegerPtr vNode = nodeMap.GetNode("BinningVertical");
+    hNode->SetValue(1);
+    vNode->SetValue(1);
+}
+
 void EthernetCamera::createBuffer() {
     _imageSize = _height * _width * getPixelSize();
     _bufferStart = new uint8_t[_imageSize];
+}
+
+void EthernetCamera::resetBuffer() {
+    // auto oldAddress = _bufferStart;
+    delete [] _bufferStart;
+    createBuffer();
+    // std::cout << _imageSize << std::endl;
+    // memcpy(oldAddress, _bufferStart, _imageSize);
+    // delete _bufferStart;
+    // _bufferStart = oldAddress;
+    initOpenCVBuffers();
 }
 
 int EthernetCamera::getPixelSize() {
@@ -168,44 +188,61 @@ bool EthernetCamera::setCenterROI(int width, int height) {
 }
 
 bool EthernetCamera::setROI(int xOffset, int yOffset, int width, int height) {
-    _xOffset = xOffset;
-    _yOffset = yOffset;
-    _width = width;
-    _height = height;
+    // spinnaker needs offsets to be even
+    xOffset = roundToEven(xOffset);
+    yOffset = roundToEven(yOffset);
+    INodeMap& nodeMap = _pCam->GetNodeMap();
+
+    CIntegerPtr maxWidthNode = nodeMap.GetNode("WidthMax");
+    CIntegerPtr maxHeightNode = nodeMap.GetNode("HeightMax");
+    int maxWidth = maxWidthNode->GetValue();
+    int maxHeight = maxHeightNode->GetValue();
+
+    width = min(width, maxWidth - xOffset);
+    height = min(height, maxHeight - yOffset);
+
+    if(width == 0) {
+        width = maxWidth - xOffset;
+    }
+    if(height == 0) {
+        height = maxHeight - yOffset;
+    }
+
+    CIntegerPtr widthNode = nodeMap.GetNode("Width");
+    CIntegerPtr heightNode = nodeMap.GetNode("Height");
+    CIntegerPtr xOffNode = nodeMap.GetNode("OffsetX");
+    CIntegerPtr yOffNode = nodeMap.GetNode("OffsetY");
 
     try {
-        INodeMap& nodeMap = _pCam->GetNodeMap();
-        CIntegerPtr maxWidthNode = nodeMap.GetNode("WidthMax");
-        CIntegerPtr maxHeightNode = nodeMap.GetNode("HeightMax");
-        int maxWidth = maxWidthNode->GetValue();
-        int maxHeight = maxHeightNode->GetValue();
+        widthNode->SetValue(width);
+        heightNode->SetValue(height);
+        xOffNode->SetValue(xOffset);
+        yOffNode->SetValue(yOffset);
 
-        _width = min(width, maxWidth - xOffset);
-        _height = min(height, maxHeight - yOffset);
+        _xOffset = xOffset;
+        _yOffset = yOffset;
+        _width = width;
+        _height = height;
 
-        if(_width == 0) {
-            _width = maxWidth - _xOffset;
+
+        if(!_bufferStart) {
+            createBuffer();
+        } else {
+            resetBuffer();
         }
-        if(_height == 0) {
-            _height = maxHeight - _yOffset;
-        }
 
-        createBuffer();
-        
-        CIntegerPtr xOffNode = nodeMap.GetNode("OffsetX");
-        CIntegerPtr yOffNode = nodeMap.GetNode("OffsetY");
-        CIntegerPtr widthNode = nodeMap.GetNode("Width");
-        CIntegerPtr heightNode = nodeMap.GetNode("Height");
-
-        xOffNode->SetValue(_xOffset);
-        yOffNode->SetValue(_yOffset);
-        widthNode->SetValue(_width);
-        heightNode->SetValue(_height);
-
-        ROS_INFO("Camera info - Width: %d, Height: %d, X Offset %d, Y Offset %d",
+        ROS_INFO("Camera info - Width: %d, Height: %d, X Offset: %d, Y Offset: %d",
             _width, _height, _xOffset, _yOffset);
+        return true;
     } catch (Spinnaker::Exception e) {
         ROS_ERROR(e.what());
+
+        widthNode->SetValue(_width);
+        heightNode->SetValue(_height);
+        xOffNode->SetValue(_xOffset);
+        yOffNode->SetValue(_yOffset);
+
+        return false;
     }
 }
 
@@ -310,11 +347,7 @@ std::string EthernetCamera::setPixelFormat(std::string format) {
     _imageHandler->setPixelFormat(_selectedFormat.getFormat());
 
     // replace the buffer due to the change in pixel size
-    auto oldAddress = _bufferStart;
-    createBuffer();
-    memcpy(oldAddress, _bufferStart, _imageSize);
-    delete _bufferStart;
-    _bufferStart = oldAddress;
+    resetBuffer();
 
     // reset the openCV matrix
     initOpenCVBuffers();
@@ -456,7 +489,7 @@ void EthernetCamera::stopCapture() {
     try {
         _pCam->EndAcquisition();
     } catch(Spinnaker::Exception e) {
-        // pass
+        ROS_ERROR(e.what());
     }
 }
 

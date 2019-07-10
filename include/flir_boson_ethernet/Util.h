@@ -16,6 +16,7 @@ const char *GetDottedAddress(int64_t value);
 std::string toLower(std::string s);
 bool tryConvertStrInt(std::string s, int *i);
 bool tryConvertStrFloat(std::string s, float *f);
+int roundToEven(int n);
 
 }
 

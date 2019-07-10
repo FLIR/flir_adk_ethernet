@@ -116,6 +116,7 @@ class EthernetCamera
     // open camera helpers
     bool findMatchingCamera(CameraListWrapper camList, const unsigned int numCams);
     void initPixelFormat();
+    void setBinning();
     bool setImageInfo();
     void setCameraEvents();
     bool setImageAcquisition();
@@ -127,6 +128,7 @@ class EthernetCamera
 
     // creates image buffer that backs the openCV matrix
     void createBuffer();
+    void resetBuffer();
 
     int getPixelSize();
     bool ipMatches(string ip, INodeMap& nodeMapTLDevice);
