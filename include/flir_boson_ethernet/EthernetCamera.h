@@ -50,6 +50,8 @@ struct EthernetCameraInfo {
     string ip, camInfoPath, pixelFormat, camType;
     int width = 0;
     int height = 0;
+    int xOffset = 0;
+    int yOffset = 0;
 };
 
 enum Polarity {
@@ -100,6 +102,10 @@ class EthernetCamera
 
     // gets encoding for image conversion
     std::string getEncoding();
+    
+    // sets ROI of camera view
+    void setROI(int xOffset, int yOffset, int width, int height);
+    void setCenterROI(int width, int height);
 
   private:
     PixelFormatEnums getPixelFormat(string formatStr);
@@ -119,14 +125,9 @@ class EthernetCamera
     // creates image buffer that backs the openCV matrix
     void createBuffer();
 
-    // sets width and height to user-defined or default values
-    void setWidthHeight();
-    void setCenterROI(int width, int height);
     int getPixelSize();
     bool ipMatches(string ip, INodeMap& nodeMapTLDevice);
     bool camTypeMatches(string camType, INodeMap& nodeMapTLDevice);
-
-    void setROI(int xOffset, int yOffset, int width, int height);
 
     // gets the pixel format as a string e.g. color_8, mono_16
     std::string formatToString(PixelFormatEnums format);
@@ -142,7 +143,7 @@ class EthernetCamera
     bool setCommandNode(CNodePtr node);
 
     std::shared_ptr<camera_info_manager::CameraInfoManager> _cameraInfo;
-    int32_t _width, _height, _imageSize;
+    int32_t _width, _height, _xOffset, _yOffset, _imageSize;
     int32_t _frame = 0;                // First frame number enumeration
     uint8_t *_bufferStart;
     std::shared_ptr<CameraWrapper> _pCam;

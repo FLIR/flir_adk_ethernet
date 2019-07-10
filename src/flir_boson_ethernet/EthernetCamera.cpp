@@ -11,6 +11,8 @@ EthernetCamera::EthernetCamera(EthernetCameraInfo info,
     _cameraInfoPath(info.camInfoPath),
     _width(info.width),
     _height(info.height),
+    _xOffset(info.xOffset),
+    _yOffset(info.yOffset),
     _camType(info.camType),
     _system(sys),
     _bufferStart(nullptr),
@@ -117,39 +119,13 @@ bool EthernetCamera::camTypeMatches(string camType, INodeMap& nodeMapTLDevice) {
 
 bool EthernetCamera::setImageInfo() {
     try {
-        setCenterROI(_width, _height);
-        createBuffer();
+        setROI(_xOffset, _yOffset, _width, _height);
 
         return true;
     } catch(Spinnaker::Exception e) {
         ROS_ERROR("flir_boson_ethernet - ERROR : %s", e.what());
         return false;
     }
-}
-
-void EthernetCamera::setWidthHeight() {
-    INodeMap &nodeMap = _pCam->GetNodeMap();
-    CIntegerPtr maxWidthNode = nodeMap.GetNode("WidthMax");
-    CIntegerPtr maxHeightNode = nodeMap.GetNode("HeightMax");
-    int maxWidth = maxWidthNode->GetValue();
-    int maxHeight = maxHeightNode->GetValue();
-
-    _width = min(_width, maxWidth);
-    _height = min(_height, maxHeight);
-
-    if(_width == 0) {
-        _width = maxWidth;
-    }
-    if(_height == 0) {
-        _height = maxHeight;
-    }
-
-    CIntegerPtr widthNode = nodeMap.GetNode("Width");
-    widthNode->SetValue(_width);
-    CIntegerPtr heightNode = nodeMap.GetNode("Height");
-    heightNode->SetValue(_height);
-
-    ROS_INFO("Camera info - Width: %d, Height: %d", _width, _height);
 }
 
 void EthernetCamera::createBuffer() {
@@ -179,12 +155,24 @@ void EthernetCamera::setCenterROI(int width, int height) {
     int maxWidth = maxWidthNode->GetValue();
     int maxHeight = maxHeightNode->GetValue();
 
+    if(width == 0) {
+        width = maxWidth;
+    }
+    if(height == 0) {
+        height = maxHeight;
+    }
+
     int xOffset = max(0, (maxWidth - width) / 2);
     int yOffset = max(0, (maxHeight - height) / 2);
     setROI(xOffset, yOffset, width, height);
 }
 
 void EthernetCamera::setROI(int xOffset, int yOffset, int width, int height) {
+    _xOffset = xOffset;
+    _yOffset = yOffset;
+    _width = width;
+    _height = height;
+    
     INodeMap& nodeMap = _pCam->GetNodeMap();
     CIntegerPtr maxWidthNode = nodeMap.GetNode("WidthMax");
     CIntegerPtr maxHeightNode = nodeMap.GetNode("HeightMax");
@@ -193,14 +181,28 @@ void EthernetCamera::setROI(int xOffset, int yOffset, int width, int height) {
 
     _width = min(width, maxWidth - xOffset);
     _height = min(height, maxHeight - yOffset);
-    setWidthHeight();
+
+    if(_width == 0) {
+        _width = maxWidth - _xOffset;
+    }
+    if(_height == 0) {
+        _height = maxHeight - _yOffset;
+    }
 
     createBuffer();
     
     CIntegerPtr xOffNode = nodeMap.GetNode("OffsetX");
     CIntegerPtr yOffNode = nodeMap.GetNode("OffsetY");
-    xOffNode->SetValue(xOffset);
-    yOffNode->SetValue(yOffset);
+    CIntegerPtr widthNode = nodeMap.GetNode("Width");
+    CIntegerPtr heightNode = nodeMap.GetNode("Height");
+
+    xOffNode->SetValue(_xOffset);
+    yOffNode->SetValue(_yOffset);
+    widthNode->SetValue(_width);
+    heightNode->SetValue(_height);
+
+    ROS_INFO("Camera info - Width: %d, Height: %d, X Offset %d, Y Offset %d",
+        _width, _height, _xOffset, _yOffset);
 }
 
 void EthernetCamera::setCameraEvents() {
