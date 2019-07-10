@@ -30,6 +30,7 @@
 #include <std_msgs/Empty.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/Image.h>
+#include <sensor_msgs/RegionOfInterest.h>
 #include <diagnostic_msgs/KeyValue.h>
 
 #include "flir_boson_ethernet/SharedTypes.h"
@@ -67,6 +68,8 @@ class BaseCameraController : public nodelet::Nodelet
     void executeFFC();
     void setNode(const diagnostic_msgs::KeyValueConstPtr& msg);
     void getNode(const std_msgs::StringConstPtr& msg);
+    void setROI(const sensor_msgs::RegionOfInterestConstPtr msg);
+    void setCenterROI(const sensor_msgs::RegionOfInterestConstPtr msg);
 
     ros::NodeHandle nh, pnh;
     uint64_t _seq = 0;
@@ -81,6 +84,8 @@ class BaseCameraController : public nodelet::Nodelet
     ros::Subscriber _ffcListener;
     ros::Subscriber _setNodeListener;
     ros::Subscriber _getNodeListener;
+    ros::Subscriber _setROIListener;
+    ros::Subscriber _setCenterROIListener;
 };
 
 }

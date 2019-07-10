@@ -78,6 +78,9 @@ class EthernetCamera
     bool openCamera();
     bool closeCamera();
 
+    void stopCapture();
+    void startCapture();
+
     // gets the openCV image matrix
     cv::Mat getImageMatrix();
     
@@ -104,8 +107,8 @@ class EthernetCamera
     std::string getEncoding();
     
     // sets ROI of camera view
-    void setROI(int xOffset, int yOffset, int width, int height);
-    void setCenterROI(int width, int height);
+    bool setROI(int xOffset, int yOffset, int width, int height);
+    bool setCenterROI(int width, int height);
 
   private:
     PixelFormatEnums getPixelFormat(string formatStr);
@@ -131,9 +134,6 @@ class EthernetCamera
 
     // gets the pixel format as a string e.g. color_8, mono_16
     std::string formatToString(PixelFormatEnums format);
-
-    void stopCapture();
-    void startCapture();
 
     bool setStringNode(CNodePtr node, std::string value);
     bool setIntNode(CNodePtr node, int value);

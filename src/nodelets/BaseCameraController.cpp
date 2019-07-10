@@ -100,6 +100,12 @@ void BaseCameraController::setupCommandListeners() {
 
     _getNodeListener = nh.subscribe<std_msgs::String>("get_node", 10,
         boost::bind(&BaseCameraController::getNode, this, _1));
+
+    _setROIListener = nh.subscribe<sensor_msgs::RegionOfInterest>("set_roi", 10,
+        boost::bind(&BaseCameraController::setROI, this, _1));
+
+    _getNodeListener = nh.subscribe<sensor_msgs::RegionOfInterest>("set_center_roi", 10,
+        boost::bind(&BaseCameraController::setCenterROI, this, _1));
 }
 
 void BaseCameraController::setPixelFormat(const std_msgs::StringConstPtr& msg) {
@@ -138,12 +144,34 @@ void BaseCameraController::setNode(const diagnostic_msgs::KeyValueConstPtr& msg)
 void BaseCameraController::getNode(const std_msgs::StringConstPtr& msg) {
     std::string result = _camera->getNodeValue(msg->data);
     if(result.empty()) {
-        ROS_ERROR("Could not get value for node: %s", msg->data);
+        ROS_ERROR("Could not get value for node: %s", msg->data.c_str());
         return;
     }
 
     ROS_INFO("Value for node %s is: %s", msg->data.c_str(), result.c_str());
 }
+
+void BaseCameraController::setROI(const sensor_msgs::RegionOfInterestConstPtr msg) {
+    int width = msg->width;
+    int height = msg->height;
+    int xOffset = msg->x_offset;
+    int yOffset = msg->y_offset;
+
+    _camera->stopCapture();
+    _camera->setROI(xOffset, yOffset, width, height);
+    _camera->startCapture();
+}
+
+void BaseCameraController::setCenterROI(const sensor_msgs::RegionOfInterestConstPtr msg) {
+    int width = msg->width;
+    int height = msg->height;
+
+    _camera->stopCapture();
+    _camera->setCenterROI(width, height);
+    _camera->startCapture();
+}
+
+
 
 void BaseCameraController::publishImage(ros::Time timestamp) {
         sensor_msgs::CameraInfoPtr
