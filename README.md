@@ -74,6 +74,12 @@ You should see 3 image panes appear: left, right and disparity
 * height (int, optional)
 
     Height of the output image
+* xOffset (int, optional)
+
+    Horizontal offset from left for the viewing window
+* yOffset (int, optional)
+
+    Vertical offset from top for the viewing window
 
 ### Subscribed topics
 In order to control the camera(s) during operation, they subscribe to topics where the user can send messages. Note: when using these with sub-namespaced nodes e.g. flir_boson_ethernet/left, then the topic will be under the sub-namespace
@@ -83,6 +89,20 @@ In order to control the camera(s) during operation, they subscribe to topics whe
 * auto_ffc (bool)
 
     Sets Boson auto FFC on or off
+* ffc (command - no additional parameters)
+
+    Triggers Boson shutter
+* set_node (key value pair)
+
+    Sets Spinnaker node map to specified value. Warning: this is unstable. Any change to image size or format may result in a fatal error due to buffer sizes not resizing. Use set_roi or set_center_roi to change image size
+* set_roi (region of interest)
+
+    Sets region of interest for the viewing window. Specify x_offset, y_offset, width and height
+* set_center_roi (region of interest)
+
+    Sets region of interest to center of the max viewing window. Specify only width and height
+
+
 
 ### sendCommand script
 Included is a script that makes sending commands to the camera easier. Run sendCommand.

@@ -94,6 +94,12 @@ case "$command" in
     ffc)
         rostopic pub -1 "$topicNamespace/ffc" std_msgs/Empty "{}"
         ;;
+    setROI)
+        rostopic pub -1 "$topicNamespace/set_roi" sensor_msgs/RegionOfInterest "{$commandParam}"
+        ;;
+    setCenterROI)
+        rostopic pub -1 "$topicNamespace/set_center_roi" sensor_msgs/RegionOfInterest "{$commandParam}"
+        ;;
     nodeMap)
         if [ -z $commandValue ]
         then
