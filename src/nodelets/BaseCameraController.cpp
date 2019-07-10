@@ -30,7 +30,7 @@ void BaseCameraController::onInit()
     bool exit = false;
 
     std::string ip, cameraInfoStr, formatStr, camType;
-    int width, height;
+    int width, height, xOffset, yOffset;
 
     pnh.param<std::string>("frame_id", frame_id, "boson_camera");
     pnh.param<std::string>("ip_addr", ip, "");
@@ -39,6 +39,8 @@ void BaseCameraController::onInit()
     pnh.param<std::string>("video_format", formatStr, "COLOR_8");
     pnh.param<int>("width", width, 0);
     pnh.param<int>("height", height, 0);
+    pnh.param<int>("xOffset", xOffset, 0);
+    pnh.param<int>("yOffset", yOffset, 0);
 
     ROS_INFO("flir_boson_ethernet - Got frame_id: %s.", frame_id.c_str());
     ROS_INFO("flir_boson_ethernet - Got IP: %s.", ip.c_str());
@@ -48,6 +50,8 @@ void BaseCameraController::onInit()
     ROS_INFO("flir_boson_ethernet - Got camera_type: %s.", camType.c_str());
     ROS_INFO("flir_boson_ethernet - Got width: %d.", width);
     ROS_INFO("flir_boson_ethernet - Got height: %d.", height);
+    ROS_INFO("flir_boson_ethernet - Got xOffset: %d.", xOffset);
+    ROS_INFO("flir_boson_ethernet - Got yOffset: %d.", yOffset);
 
     EthernetCameraInfo info;
     info.ip = ip;
@@ -56,6 +60,8 @@ void BaseCameraController::onInit()
     info.camType = camType;
     info.width = width;
     info.height = height;
+    info.xOffset = xOffset;
+    info.yOffset = yOffset;
 
     auto sys = std::make_shared<SystemWrapper>(
         SystemWrapper(System::GetInstance()));
