@@ -78,5 +78,7 @@ uint64_t ImageEventHandler::GetCaptureTime() {
 }
 
 void ImageEventHandler::setPixelFormat(PixelFormatEnums format) {
+    m_mutex.lock();
     _format = format;
+    m_mutex.unlock();
 }

@@ -175,20 +175,25 @@ void BaseCameraController::setCenterROI(const sensor_msgs::RegionOfInterestConst
 
 
 void BaseCameraController::publishImage(ros::Time timestamp) {
-        sensor_msgs::CameraInfoPtr
+    sensor_msgs::CameraInfoPtr
         ci(new sensor_msgs::CameraInfo(_camera->getCameraInfo()));
 
-    auto thermalMat = _camera->getImageMatrix();
-    _cvImage.image = thermalMat;
-    _cvImage.encoding = _camera->getEncoding();
-    _cvImage.header.stamp = timestamp;
-    _cvImage.header.seq = _seq;
-    _cvImage.header.frame_id = frame_id;
+    try {
+        auto thermalMat = _camera->getImageMatrix();
+        _cvImage.image = thermalMat;
+        _cvImage.encoding = _camera->getEncoding();
+        _cvImage.header.stamp = timestamp;
+        _cvImage.header.seq = _seq;
+        _cvImage.header.frame_id = frame_id;
 
-    auto publishedImage = _cvImage.toImageMsg();
+        auto publishedImage = _cvImage.toImageMsg();
 
-    ci->header.stamp = publishedImage->header.stamp;
-    _imagePublisher.publish(publishedImage, ci);
+        ci->header.stamp = publishedImage->header.stamp;
+        _imagePublisher.publish(publishedImage, ci);
 
-    _seq++;
+        _seq++;
+    } catch(exception e) {
+        // just don't publish this frame
+        std::cout << "Publish exception" << std::endl;
+    }
 }
