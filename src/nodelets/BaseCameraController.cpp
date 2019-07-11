@@ -98,14 +98,14 @@ void BaseCameraController::setupCommandListeners() {
     _setNodeListener = nh.subscribe<diagnostic_msgs::KeyValue>("set_node", 10,
         boost::bind(&BaseCameraController::setNode, this, _1));
 
-    _getNodeListener = nh.subscribe<std_msgs::String>("get_node", 10,
-        boost::bind(&BaseCameraController::getNode, this, _1));
-
     _setROIListener = nh.subscribe<sensor_msgs::RegionOfInterest>("set_roi", 10,
         boost::bind(&BaseCameraController::setROI, this, _1));
 
-    _getNodeListener = nh.subscribe<sensor_msgs::RegionOfInterest>("set_center_roi", 10,
+    _setCenterROIListener = nh.subscribe<sensor_msgs::RegionOfInterest>("set_center_roi", 10,
         boost::bind(&BaseCameraController::setCenterROI, this, _1));
+
+    _getNodeService = nh.advertiseService<GetNode::Request, GetNode::Response>
+        ("get_node", boost::bind(&BaseCameraController::getNode, this, _1, _2));
 }
 
 void BaseCameraController::setPixelFormat(const std_msgs::StringConstPtr& msg) {
@@ -141,14 +141,15 @@ void BaseCameraController::setNode(const diagnostic_msgs::KeyValueConstPtr& msg)
     }
 }
 
-void BaseCameraController::getNode(const std_msgs::StringConstPtr& msg) {
-    std::string result = _camera->getNodeValue(msg->data);
+bool BaseCameraController::getNode(GetNode::Request &req, GetNode::Response &res) {
+    std::string result = _camera->getNodeValue(req.nodeName);
     if(result.empty()) {
-        ROS_ERROR("Could not get value for node: %s", msg->data.c_str());
-        return;
+        res.value = "Node: " + req.nodeName + "does not exist or is not readable";
+        return false;
     }
 
-    ROS_INFO("Value for node %s is: %s", msg->data.c_str(), result.c_str());
+    res.value = result;
+    return true;
 }
 
 void BaseCameraController::setROI(const sensor_msgs::RegionOfInterestConstPtr msg) {

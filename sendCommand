@@ -103,7 +103,7 @@ case "$command" in
     nodeMap)
         if [ -z $commandValue ]
         then
-          rostopic pub -1 "$topicNamespace/get_node" std_msgs/String "$commandParam" 
+          rosservice call "$topicNamespace/get_node" "$commandParam" 
         else
           rostopic pub -1 "$topicNamespace/set_node" diagnostic_msgs/KeyValue "{key: '$commandParam', value: \'$commandValue\'}"
         fi

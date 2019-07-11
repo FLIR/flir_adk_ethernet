@@ -20,6 +20,7 @@
 // ROS Includes
 #include <ros/ros.h>
 #include <nodelet/nodelet.h>
+#include <ros/node_handle.h>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
@@ -32,6 +33,9 @@
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/RegionOfInterest.h>
 #include <diagnostic_msgs/KeyValue.h>
+
+// services
+#include <flir_boson_ethernet/GetNode.h>
 
 #include "flir_boson_ethernet/SharedTypes.h"
 #include "flir_boson_ethernet/EthernetCamera.h"
@@ -67,9 +71,10 @@ class BaseCameraController : public nodelet::Nodelet
     void setAutoFFC(const std_msgs::BoolConstPtr& msg);
     void executeFFC();
     void setNode(const diagnostic_msgs::KeyValueConstPtr& msg);
-    void getNode(const std_msgs::StringConstPtr& msg);
     void setROI(const sensor_msgs::RegionOfInterestConstPtr msg);
     void setCenterROI(const sensor_msgs::RegionOfInterestConstPtr msg);
+    
+    bool getNode(GetNode::Request &req, GetNode::Response &res);
 
     ros::NodeHandle nh, pnh;
     uint64_t _seq = 0;
@@ -83,9 +88,10 @@ class BaseCameraController : public nodelet::Nodelet
     ros::Subscriber _autoFFCListener;
     ros::Subscriber _ffcListener;
     ros::Subscriber _setNodeListener;
-    ros::Subscriber _getNodeListener;
     ros::Subscriber _setROIListener;
     ros::Subscriber _setCenterROIListener;
+    
+    ros::ServiceServer _getNodeService;
 };
 
 }

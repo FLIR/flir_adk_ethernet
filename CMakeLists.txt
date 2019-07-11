@@ -26,6 +26,11 @@ add_message_files(
   MultiTimeHeader.msg
 )
 
+add_service_files(
+  FILES
+  GetNode.srv
+)
+
 generate_messages(
   DEPENDENCIES
   std_msgs

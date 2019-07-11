@@ -49,60 +49,46 @@ roslaunch flir_boson_ethernet sync_camera.launch
 ```
 You should see 3 image panes appear: left, right and disparity
 ### Parameters
-* frame_id (string)
-
+* frame_id (string)     
     Identifier for publishing frames. Specific to the device
-* camera_type (string, accepted values: blackfly, boson)
-
+* camera_type (string, accepted values: blackfly, boson)        
     Which type of camera to which to connect. Only to be used if there is a single camera of this type connected
-* ip_addr (string)
-
+* ip_addr (string)      
     IP address of the camera to which to connect. Takes precedence over camera_type for connection. In the form e.g. 169.254.87.157
-* frame_rate (float)
-
+* frame_rate (float)        
     Publish rate of frames from the camera. Does not affect the actual capture rate of the cameras
-
-* video_format (string accepted values: MONO_8, MONO_16, COLOR_8)
-
+* video_format (string accepted values: MONO_8, MONO_16, COLOR_8)       
     Pixel type for the image. Choices are mono 8 and 16 bit and 8 bit color. Note: Boson cannot change to COLOR_8 format
-* camera_info_url (string)
-
+* camera_info_url (string)      
     Path to camera info file. This information will be published to the camera_info topic
-* width (int, optional)
-
+* width (int, optional)     
     Width of the output image
-* height (int, optional)
-
+* height (int, optional)        
     Height of the output image
-* xOffset (int, optional)
-
+* xOffset (int, optional)       
     Horizontal offset from left for the viewing window
-* yOffset (int, optional)
-
+* yOffset (int, optional)   
     Vertical offset from top for the viewing window
 
 ### Subscribed topics
-In order to control the camera(s) during operation, they subscribe to topics where the user can send messages. Note: when using these with sub-namespaced nodes e.g. flir_boson_ethernet/left, then the topic will be under the sub-namespace
-* pixel_format (string, accepted values: MONO_8, MONO_16, COLOR_8)
-
+In order to control the camera(s) during operation, the nodes subscribe to topics where the user can send messages. Note: when using these with sub-namespaced nodes e.g. flir_boson_ethernet/left, then the topic will be under the sub-namespace
+* pixel_format (string, accepted values: MONO_8, MONO_16, COLOR_8)      
     Same as video_format parameter
-* auto_ffc (bool)
-
+* auto_ffc (bool)   
     Sets Boson auto FFC on or off
-* ffc (command - no additional parameters)
-
+* ffc (command - no additional parameters)      
     Triggers Boson shutter
-* set_node (key value pair)
-
+* set_node (key value pair)     
     Sets Spinnaker node map to specified value. Warning: this is unstable. Any change to image size or format may result in a fatal error due to buffer sizes not resizing. Use set_roi or set_center_roi to change image size
-* set_roi (region of interest)
-
+* set_roi (region of interest)      
     Sets region of interest for the viewing window. Specify x_offset, y_offset, width and height
-* set_center_roi (region of interest)
-
+* set_center_roi (region of interest)       
     Sets region of interest to center of the max viewing window. Specify only width and height
 
-
+### Services
+The nodes advertise services so that user can query them for information
+* get_node (string)     
+    Gets value of the Spinnaker node specified
 
 ### sendCommand script
 Included is a script that makes sending commands to the camera easier. Run sendCommand.
@@ -117,14 +103,25 @@ set the auto FFC setting on Boson. Valid values are "true" or "false"
 pixelFormat &lt;setting&gt;  
 set the pixel format. Valid values are "mono_8" and "mono_16" for Boson and, additionally, "color_8" for BlackFly
 
+ffc         
+trigger shutter in Boson camera
+
+nodeMap &lt;node name&gt; [value]       
+get or set node value. To get node value, only specify the node name. To set, specify the value to set. As mentioned above, this can cause unstable behavior. Do not change node values that would change the buffer size of the image (width, height, pixel format)
+
+setROI &lt;setting&gt;      
+sets the viewing window within the entire scene of the camera view. Setting must be in the form e.g. "x_offset: 10, y_offset: 20, width: 400, height: 300"
+
+setCenterROI &lt;setting&gt;        
+sets the viewing window to be centered within the camera view. Setting must be in the form e.g. "width: 400, height: 300"
+
+
 Options:
 
--n &lt;namespace&gt; DEFAULT flir_boson
-
+-n &lt;namespace&gt; DEFAULT flir_boson     
 Specifies a namespace for the topic
 
--s &lt;sub-namespace&gt;
-
-Specifies a sub-namespace for the topic. Typically left or right
-e.g. topic is /flir_boson/left/pixel_format then run sendCommand 
-pixelFormat mono_8 -n flir_boson -s left
+-s &lt;sub-namespace&gt;        
+Specifies a sub-namespace for the topic. Typically left or right    
+e.g. topic is /flir_boson/left/pixel_format then run:   
+sendCommand pixelFormat mono_8 -n flir_boson -s left
