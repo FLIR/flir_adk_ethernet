@@ -143,13 +143,8 @@ void EthernetCamera::createBuffer() {
 }
 
 void EthernetCamera::resetBuffer() {
-    // auto oldAddress = _bufferStart;
     delete [] _bufferStart;
     createBuffer();
-    // std::cout << _imageSize << std::endl;
-    // memcpy(oldAddress, _bufferStart, _imageSize);
-    // delete _bufferStart;
-    // _bufferStart = oldAddress;
     initOpenCVBuffers();
 }
 
@@ -214,16 +209,20 @@ bool EthernetCamera::setROI(int xOffset, int yOffset, int width, int height) {
     CIntegerPtr yOffNode = nodeMap.GetNode("OffsetY");
 
     try {
-        widthNode->SetValue(width);
-        heightNode->SetValue(height);
+        // give it temporary small value to ensure offsets don't overflow
+        // size limits
+        widthNode->SetValue(8);
+        heightNode->SetValue(8);
+
         xOffNode->SetValue(xOffset);
         yOffNode->SetValue(yOffset);
+        widthNode->SetValue(width);
+        heightNode->SetValue(height);
 
         _xOffset = xOffset;
         _yOffset = yOffset;
         _width = width;
         _height = height;
-
 
         if(!_bufferStart) {
             createBuffer();
@@ -237,10 +236,13 @@ bool EthernetCamera::setROI(int xOffset, int yOffset, int width, int height) {
     } catch (Spinnaker::Exception e) {
         ROS_ERROR(e.what());
 
-        widthNode->SetValue(_width);
-        heightNode->SetValue(_height);
+        widthNode->SetValue(8);
+        heightNode->SetValue(8);
+
         xOffNode->SetValue(_xOffset);
         yOffNode->SetValue(_yOffset);
+        widthNode->SetValue(_width);
+        heightNode->SetValue(_height);
 
         return false;
     }
@@ -321,10 +323,12 @@ void EthernetCamera::unsetCameraEvents() {
 }
 
 cv::Mat EthernetCamera::getImageMatrix() {
-    auto data = _imageHandler->GetImageData();
+    if(_isStreaming) {
+        auto data = _imageHandler->GetImageData();
 
-    // copy the image data to _bufferStart, which backs _thermalImageMat
-    memcpy(_bufferStart, data, _imageSize);
+        // copy the image data to _bufferStart, which backs _thermalImageMat
+        memcpy(_bufferStart, data, _imageSize);
+    }
     return _thermalImageMat;
 }
 
@@ -395,6 +399,9 @@ std::string EthernetCamera::getNodeValue(std::string nodeName) {
 }
 
 bool EthernetCamera::setNodeValue(std::string nodeName, std::string value) {
+    bool result = false;
+    stopCapture();
+
     INodeMap &nodeMap = _pCam->GetNodeMap();
     CNodePtr node = nodeMap.GetNode(nodeName.c_str());
 
@@ -403,32 +410,36 @@ bool EthernetCamera::setNodeValue(std::string nodeName, std::string value) {
             switch (node->GetPrincipalInterfaceType())
             {
             case intfIString:
-                return setStringNode(node, value);
+                result = setStringNode(node, value);
+                break;
             case intfIInteger:
             {
                 int *intVal;
                 if(tryConvertStrInt(value, intVal)) {
-                    return setIntNode(node, *intVal);
+                    result = setIntNode(node, *intVal);
                 }
-                return false;
+                break;
             }
             case intfIFloat:
             {
                 float *floatValue;
                 if(tryConvertStrFloat(value, floatValue)) {
-                    return setFloatNode(node, *floatValue);
+                    result = setFloatNode(node, *floatValue);
                 }
-                return false;
+                break;
             }
             case intfIBoolean:
             {
                 bool boolValue = (toLower(value) == "true");
-                return setBoolNode(node, boolValue);
+                result = setBoolNode(node, boolValue);
+                break;
             }
             case intfIEnumeration:
-                return setEnumNode(node, value);
+                result = setEnumNode(node, value);
+                break;
             case intfICommand:
-                return setCommandNode(node);
+                result = setCommandNode(node);
+                break;
             default:
                 break;
             }
@@ -436,8 +447,9 @@ bool EthernetCamera::setNodeValue(std::string nodeName, std::string value) {
     } catch(Spinnaker::Exception e) {
         ROS_ERROR(e.what());
     }
-        
-    return false;
+    
+    startCapture();
+    return result;
 }
 
 bool EthernetCamera::setStringNode(CNodePtr node, std::string value) {
@@ -483,10 +495,12 @@ void EthernetCamera::setPolarity(Polarity pol) {
 
 void EthernetCamera::startCapture() {
     _pCam->BeginAcquisition();
+    _isStreaming = true;
 }
 
 void EthernetCamera::stopCapture() {
     try {
+        _isStreaming = false;
         _pCam->EndAcquisition();
     } catch(Spinnaker::Exception e) {
         ROS_ERROR(e.what());

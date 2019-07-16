@@ -19,6 +19,9 @@
   <!-- location of the camera calibration file -->
   <arg name="camera_info_url" default="package://flir_boson_ethernet/example_calibrations/BlackFlyS.yaml"/>
 
+  <arg name="width" default="2048" />
+  <arg name="height" default="1536" />
+  
   <!-- node launcher -->
   <node pkg="flir_boson_ethernet" 
         type="flir_boson_ethernet_node" 
@@ -32,6 +35,8 @@
     <param name="frame_rate" type="double" value="$(arg frame_rate)"/>
     <param name="video_format" type="str" value="$(arg video_format)"/>
     <param name="camera_info_url" type="str" value="$(arg camera_info_url)"/>
+    <param name="width" type="int" value="$(arg width)"/>
+    <param name="height" type="int" value="$(arg height)"/>
   </node>
 
   <!-- Optional: built-in image view opens window to view the streaming feed -->

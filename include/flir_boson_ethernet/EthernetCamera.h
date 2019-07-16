@@ -159,6 +159,7 @@ class EthernetCamera
     bool _zoomEnable;
     ImageFormat _selectedFormat;
     std::string _camType;
+    bool _isStreaming = false;
 };
 
 }  // namespace flir_boson_ethernet
