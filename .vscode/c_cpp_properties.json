@@ -10,8 +10,8 @@
                 "/opt/ros/kinetic/include",
                 "~/catkin_ws/src/boson_camera/include",
                 "~/catkin_ws/src/image_pipeline/depth_image_proc/include",
-                "~/catkin_ws/src/flir_boson_ethernet/include",
-                "~/catkin_ws/src/flir_boson_usb/include",
+                "~/catkin_ws/src/flir_adk_ethernet/include",
+                "~/catkin_ws/src/flir_adk_usb/include",
                 "~/catkin_ws/src/image_pipeline/image_proc/include",
                 "~/catkin_ws/src/image_pipeline/stereo_image_proc/include",
                 "/usr/include/**"

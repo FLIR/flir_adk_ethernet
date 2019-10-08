@@ -11,7 +11,7 @@ using namespace Spinnaker;
 using namespace Spinnaker::GenApi;
 using namespace Spinnaker::GenICam;
 
-namespace flir_boson_ethernet 
+namespace flir_adk_ethernet 
 {
 
 class SystemWrapper {

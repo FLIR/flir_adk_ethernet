@@ -11,14 +11,14 @@
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
-#include <flir_boson_ethernet/MultiTimeHeader.h>
+#include <flir_adk_ethernet/MultiTimeHeader.h>
 
 
 #define NUM_READINGS 60
 
 using namespace std;
 
-namespace flir_boson_ethernet
+namespace flir_adk_ethernet
 {
 // nodelet for getting actual time difference between synced cameras
 class TimeDifference : public nodelet::Nodelet {

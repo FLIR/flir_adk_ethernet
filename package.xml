@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>flir_boson_ethernet</name>
+  <name>flir_adk_ethernet</name>
   <version>0.1.0</version>
-  <description>The flir_boson_ethernet package</description>
+  <description>The flir_adk_ethernet package</description>
 
   <maintainer email="adhurjaty@novacoast.com">adhurjaty</maintainer>
 

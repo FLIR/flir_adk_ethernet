@@ -1,6 +1,6 @@
 #include "SystemWrapper.h"
 
-using namespace flir_boson_ethernet;
+using namespace flir_adk_ethernet;
 
 SystemWrapper::SystemWrapper(SystemPtr sys) : _sys(sys) {}
 

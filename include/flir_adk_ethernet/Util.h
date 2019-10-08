@@ -1,7 +1,7 @@
 // file for utility functions used across application
 
-#ifndef FLIR_BOSON_ETHERNET_UTIL_H
-#define FLIR_BOSON_ETHERNET_UTIL_H
+#ifndef FLIR_ADK_ETHERNET_UTIL_H
+#define FLIR_ADK_ETHERNET_UTIL_H
 
 #include <iostream>
 #include <string>
@@ -10,7 +10,7 @@
 
 using namespace std;
 
-namespace flir_boson_ethernet {
+namespace flir_adk_ethernet {
 
 const char *GetDottedAddress(int64_t value);
 std::string toLower(std::string s);

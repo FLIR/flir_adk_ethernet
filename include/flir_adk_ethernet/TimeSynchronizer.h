@@ -1,5 +1,5 @@
-#ifndef FLIR_BOSON_ETHERNET_TIMESYNCHRONIZER_H
-#define FLIR_BOSON_ETHERNET_TIMESYNCHRONIZER_H
+#ifndef FLIR_ADK_ETHERNET_TIMESYNCHRONIZER_H
+#define FLIR_ADK_ETHERNET_TIMESYNCHRONIZER_H
 
 // C++ Includes
 #include <string>
@@ -21,7 +21,7 @@
 
 using namespace std;
 
-namespace flir_boson_ethernet 
+namespace flir_adk_ethernet 
 {
 // nodelet for syncing camera captures - for use with the SyncCameraController
 class TimeSynchronizer : public nodelet::Nodelet

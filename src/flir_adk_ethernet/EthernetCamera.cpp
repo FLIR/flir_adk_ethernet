@@ -1,8 +1,8 @@
-#include "flir_boson_ethernet/Util.h"
-#include "flir_boson_ethernet/EthernetCamera.h"
+#include "flir_adk_ethernet/Util.h"
+#include "flir_adk_ethernet/EthernetCamera.h"
 
 using namespace cv;
-using namespace flir_boson_ethernet;
+using namespace flir_adk_ethernet;
 
 EthernetCamera::EthernetCamera(EthernetCameraInfo info, 
         std::shared_ptr<SystemWrapper> sys,
@@ -44,28 +44,28 @@ bool EthernetCamera::openCamera()
     const unsigned int numCameras = camList.GetSize();
 
     if(numCameras == 0) {
-        ROS_ERROR("flir_boson_ethernet - ERROR : NO_CAMERAS. No cameras found");
+        ROS_ERROR("flir_adk_ethernet - ERROR : NO_CAMERAS. No cameras found");
         camList.Clear();
         _system->ReleaseInstance();
         return false;
     }
 
     if(!findMatchingCamera(camList, numCameras) || !_pCam->IsValid()) {
-        ROS_ERROR("flir_boson_ethernet - ERROR : OPEN. No device matches ip_addr: %s", _ipAddr.c_str());
+        ROS_ERROR("flir_adk_ethernet - ERROR : OPEN. No device matches ip_addr: %s", _ipAddr.c_str());
         return false;
     }
     _pCam->Init();
     initPixelFormat();
 
     if(!setImageInfo()) {
-        ROS_ERROR("flir_boson_ethernet - ERROR : GET_CONFIGURATION. Cannot get image for setting dimensions");
+        ROS_ERROR("flir_adk_ethernet - ERROR : GET_CONFIGURATION. Cannot get image for setting dimensions");
         return false;
     }
     setCameraEvents();
 
     if (!setImageAcquisition())
     {
-        ROS_ERROR("flir_boson_ethernet - ERROR : CAMERA_ACQUISITION. Cannot set image acquisition.");
+        ROS_ERROR("flir_adk_ethernet - ERROR : CAMERA_ACQUISITION. Cannot set image acquisition.");
         return false;
     }
 
@@ -124,7 +124,7 @@ bool EthernetCamera::setImageInfo() {
 
         return true;
     } catch(Spinnaker::Exception e) {
-        ROS_ERROR("flir_boson_ethernet - ERROR : %s", e.what());
+        ROS_ERROR("flir_adk_ethernet - ERROR : %s", e.what());
         return false;
     }
 }
@@ -299,7 +299,7 @@ void EthernetCamera::setCameraInfo() {
     if (_cameraInfo->validateURL(_cameraInfoPath)) {
         _cameraInfo->loadCameraInfo(_cameraInfoPath);
     } else {
-        ROS_INFO("flir_boson_ethernet - camera_info_url could not be validated. Publishing with unconfigured camera.");
+        ROS_INFO("flir_adk_ethernet - camera_info_url could not be validated. Publishing with unconfigured camera.");
     }
 }
 

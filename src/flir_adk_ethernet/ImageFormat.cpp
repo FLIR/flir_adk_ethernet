@@ -1,8 +1,8 @@
-#include "flir_boson_ethernet/Util.h"
-#include "flir_boson_ethernet/ImageFormat.h"
+#include "flir_adk_ethernet/Util.h"
+#include "flir_adk_ethernet/ImageFormat.h"
 
 using namespace cv;
-using namespace flir_boson_ethernet;
+using namespace flir_adk_ethernet;
 
 
 ImageFormat::ImageFormat(std::string format) {

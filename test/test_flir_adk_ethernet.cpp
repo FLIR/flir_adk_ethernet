@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "mocks/MockCamera.h"
-#include "flir_boson_ethernet/ImageEventHandler.h"
+#include "flir_adk_ethernet/ImageEventHandler.h"
 #include <string>
 
 using std::string;
 using ::testing::Return;
 using ::testing::ReturnRef;
 using ::testing::_;
-using namespace flir_boson_ethernet;
+using namespace flir_adk_ethernet;
 
 
 // ImageEvent tests

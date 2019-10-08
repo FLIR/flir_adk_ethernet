@@ -1,5 +1,5 @@
-#ifndef FLIR_BOSON_ETHERNET_CAMERACONTROLLER_H
-#define FLIR_BOSON_ETHERNET_CAMERACONTROLLER_H
+#ifndef FLIR_ADK_ETHERNET_CAMERACONTROLLER_H
+#define FLIR_ADK_ETHERNET_CAMERACONTROLLER_H
 
 // C++ Includes
 #include <string>
@@ -20,14 +20,14 @@
 // ROS Includes
 #include <ros/ros.h>
 
-#include "flir_boson_ethernet/BaseCameraController.h"
+#include "flir_adk_ethernet/BaseCameraController.h"
 
 using namespace Spinnaker;
 using namespace Spinnaker::GenApi;
 using namespace Spinnaker::GenICam;
 using namespace std;
 
-namespace flir_boson_ethernet
+namespace flir_adk_ethernet
 {
 
 // nodelet for controlling a single camera independently
@@ -49,6 +49,6 @@ class CameraController : public BaseCameraController
     Encoding _videoMode;
 };
 
-}  // namespace flir_boson_ethernet
+}  // namespace flir_adk_ethernet
 
-#endif  // FLIR_BOSON_ETHERNET_BOSONCAMERA_H
+#endif  

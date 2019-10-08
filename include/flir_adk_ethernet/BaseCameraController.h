@@ -1,5 +1,5 @@
-#ifndef FLIR_BOSON_ETHERNET_BASECAMERACONTROLLER_H
-#define FLIR_BOSON_ETHERNET_BASECAMERACONTROLLER_H
+#ifndef FLIR_ADK_ETHERNET_BASECAMERACONTROLLER_H
+#define FLIR_ADK_ETHERNET_BASECAMERACONTROLLER_H
 
 // C++ Includes
 #include <string>
@@ -35,15 +35,15 @@
 #include <diagnostic_msgs/KeyValue.h>
 
 // services
-#include <flir_boson_ethernet/GetNode.h>
+#include <flir_adk_ethernet/GetNode.h>
 
-#include "flir_boson_ethernet/SharedTypes.h"
-#include "flir_boson_ethernet/EthernetCamera.h"
-#include <flir_boson_ethernet/MultiTimeHeader.h>
+#include "flir_adk_ethernet/SharedTypes.h"
+#include "flir_adk_ethernet/EthernetCamera.h"
+#include <flir_adk_ethernet/MultiTimeHeader.h>
 
 using namespace std;
 
-namespace flir_boson_ethernet
+namespace flir_adk_ethernet
 {
 
 // abstract class nodelet for controlling an ethernet camera

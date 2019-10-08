@@ -10,12 +10,12 @@ usageMsg="$(cat <<EOF
     \n\tset the pixel format. Valid values are "mono_8" and "mono_16" for Boson and, additionally, "color_8" for BlackFly
     \n
     \nOptions:
-    \n-n <namespace> DEFAULT flir_boson
+    \n-n <namespace> DEFAULT flir_adk
     \n\tSpecifies a namespace for the topic
     \n-s <sub-namespace>
     \n\tSpecifies a sub-namespace for the topic. Typically left or right
-    \n\te.g. topic is /flir_boson/left/pixel_format then run sendCommand 
-    \n\tpixelFormat mono_8 -n flir_boson -s left
+    \n\te.g. topic is /flir_adk/left/pixel_format then run sendCommand 
+    \n\tpixelFormat mono_8 -n flir_adk -s left
     \n
 EOF
 )"
@@ -23,7 +23,7 @@ EOF
 command=""
 commandParam=""
 commandValue=""
-namespace="flir_boson"
+namespace="flir_adk"
 subNamespace=""
 
 while (( "$#" )); do

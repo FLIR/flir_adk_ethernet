@@ -1,5 +1,5 @@
-#ifndef FLIR_BOSON_ETHERNET_ETHERNETCAMERA_H
-#define FLIR_BOSON_ETHERNET_ETHERNETCAMERA_H
+#ifndef FLIR_ADK_ETHERNET_ETHERNETCAMERA_H
+#define FLIR_ADK_ETHERNET_ETHERNETCAMERA_H
 
 // C++ Includes
 #include <iostream>
@@ -33,8 +33,8 @@
 #include <spinnaker/SpinGenApi/SpinnakerGenApi.h>
 
 // Local Includes
-#include "flir_boson_ethernet/ImageEventHandler.h"
-#include "flir_boson_ethernet/ImageFormat.h"
+#include "flir_adk_ethernet/ImageEventHandler.h"
+#include "flir_adk_ethernet/ImageFormat.h"
 #include "../spinnaker_wrappers/SystemWrapper.h"
 
 using namespace Spinnaker;
@@ -42,7 +42,7 @@ using namespace Spinnaker::GenApi;
 using namespace Spinnaker::GenICam;
 using namespace std;
 
-namespace flir_boson_ethernet
+namespace flir_adk_ethernet
 {
 
 // configuration parameters for an ethernet camera
@@ -162,6 +162,6 @@ class EthernetCamera
     bool _isStreaming = false;
 };
 
-}  // namespace flir_boson_ethernet
+}  // namespace flir_adk_ethernet
 
 #endif

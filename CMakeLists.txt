@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(flir_boson_ethernet)
+project(flir_adk_ethernet)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
@@ -54,7 +54,7 @@ include_directories(
 )
 
 add_executable(${PROJECT_NAME}_node
-  src/flir_boson_ethernet_node.cpp
+  src/flir_adk_ethernet_node.cpp
 )
 
 add_dependencies(${PROJECT_NAME}_node
@@ -75,10 +75,10 @@ add_library(BosonCameraEthernet
   src/nodelets/SyncCameraController.cpp
   src/nodelets/TimeSynchronizer.cpp
   src/nodelets/TimeDifference.cpp
-  src/flir_boson_ethernet/EthernetCamera.cpp
-  src/flir_boson_ethernet/ImageEventHandler.cpp
-  src/flir_boson_ethernet/ImageFormat.cpp
-  src/flir_boson_ethernet/Util.cpp
+  src/flir_adk_ethernet/EthernetCamera.cpp
+  src/flir_adk_ethernet/ImageEventHandler.cpp
+  src/flir_adk_ethernet/ImageFormat.cpp
+  src/flir_adk_ethernet/Util.cpp
   spinnaker_wrappers/CameraListWrapper.cpp
   spinnaker_wrappers/SystemWrapper.cpp
   spinnaker_wrappers/CameraWrapper.cpp
@@ -120,7 +120,7 @@ install(FILES nodelet_plugins.xml
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
   catkin_add_gtest(${PROJECT_NAME}-test 
-    test/test_flir_boson_ethernet.cpp
+    test/test_flir_adk_ethernet.cpp
   )
   target_link_libraries(${PROJECT_NAME}-test 
     ${catkin_LIBRARIES}

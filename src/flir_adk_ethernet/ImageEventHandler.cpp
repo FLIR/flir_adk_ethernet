@@ -1,6 +1,6 @@
-#include "flir_boson_ethernet/ImageEventHandler.h"
+#include "flir_adk_ethernet/ImageEventHandler.h"
 
-using namespace flir_boson_ethernet;
+using namespace flir_adk_ethernet;
 
 ImageEventHandler::ImageEventHandler(std::shared_ptr<CameraWrapper> pCam,
     PixelFormatEnums format) :

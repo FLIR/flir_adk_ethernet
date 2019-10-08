@@ -1,8 +1,8 @@
-#include "flir_boson_ethernet/Util.h"
+#include "flir_adk_ethernet/Util.h"
 
-using namespace flir_boson_ethernet;
+using namespace flir_adk_ethernet;
 
-const char *flir_boson_ethernet::GetDottedAddress( int64_t value )
+const char *flir_adk_ethernet::GetDottedAddress( int64_t value )
 {
     // Helper function for formatting IP Address into the following format
     // x.x.x.x
@@ -18,13 +18,13 @@ const char *flir_boson_ethernet::GetDottedAddress( int64_t value )
     return convertValue.str().c_str();
 }
 
-std::string flir_boson_ethernet::toLower(std::string s) {
+std::string flir_adk_ethernet::toLower(std::string s) {
     auto newStr = s;
     std::transform(newStr.begin(), newStr.end(), newStr.begin(), ::tolower);
     return newStr;
 }
 
-bool flir_boson_ethernet::tryConvertStrInt(std::string s, int *i) {
+bool flir_adk_ethernet::tryConvertStrInt(std::string s, int *i) {
     std::stringstream converter;
 
     converter << s;
@@ -33,14 +33,14 @@ bool flir_boson_ethernet::tryConvertStrInt(std::string s, int *i) {
     return !converter.fail();
 }
 
-bool flir_boson_ethernet::tryConvertStrFloat(std::string s, float *f) {
+bool flir_adk_ethernet::tryConvertStrFloat(std::string s, float *f) {
     std::stringstream converter;
     converter << s;
     converter >> *f;
     return !converter.fail();
 }
 
-int flir_boson_ethernet::roundToEven(int n) {
+int flir_adk_ethernet::roundToEven(int n) {
     n /= 2;
     return n * 2;
 }

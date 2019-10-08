@@ -1,9 +1,9 @@
 #include <pluginlib/class_list_macros.h>
-#include "flir_boson_ethernet/Util.h"
-#include "flir_boson_ethernet/BaseCameraController.h"
+#include "flir_adk_ethernet/Util.h"
+#include "flir_adk_ethernet/BaseCameraController.h"
 
 using namespace cv;
-using namespace flir_boson_ethernet;
+using namespace flir_adk_ethernet;
 
 BaseCameraController::BaseCameraController() : _cvImage()
 {
@@ -42,16 +42,16 @@ void BaseCameraController::onInit()
     pnh.param<int>("xOffset", xOffset, 0);
     pnh.param<int>("yOffset", yOffset, 0);
 
-    ROS_INFO("flir_boson_ethernet - Got frame_id: %s.", frame_id.c_str());
-    ROS_INFO("flir_boson_ethernet - Got IP: %s.", ip.c_str());
-    ROS_INFO("flir_boson_ethernet - Got camera_info_url: %s.", 
+    ROS_INFO("flir_adk_ethernet - Got frame_id: %s.", frame_id.c_str());
+    ROS_INFO("flir_adk_ethernet - Got IP: %s.", ip.c_str());
+    ROS_INFO("flir_adk_ethernet - Got camera_info_url: %s.", 
         cameraInfoStr.c_str());
-    ROS_INFO("flir_boson_ethernet - Got video_format: %s.", formatStr.c_str());
-    ROS_INFO("flir_boson_ethernet - Got camera_type: %s.", camType.c_str());
-    ROS_INFO("flir_boson_ethernet - Got width: %d.", width);
-    ROS_INFO("flir_boson_ethernet - Got height: %d.", height);
-    ROS_INFO("flir_boson_ethernet - Got xOffset: %d.", xOffset);
-    ROS_INFO("flir_boson_ethernet - Got yOffset: %d.", yOffset);
+    ROS_INFO("flir_adk_ethernet - Got video_format: %s.", formatStr.c_str());
+    ROS_INFO("flir_adk_ethernet - Got camera_type: %s.", camType.c_str());
+    ROS_INFO("flir_adk_ethernet - Got width: %d.", width);
+    ROS_INFO("flir_adk_ethernet - Got height: %d.", height);
+    ROS_INFO("flir_adk_ethernet - Got xOffset: %d.", xOffset);
+    ROS_INFO("flir_adk_ethernet - Got yOffset: %d.", yOffset);
 
     EthernetCameraInfo info;
     info.ip = ip;

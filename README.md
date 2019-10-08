@@ -1,4 +1,4 @@
-# flir_boson_ethernet
+# flir_adk_ethernet
 
 Drivers for running FLIR ethernet interface cameras (BlackFly and Boson)
 
@@ -26,17 +26,17 @@ source devel/setup.sh
 ### Single camera
 Connect a BlackFly camera and run
 ```bash
-roslaunch flir_boson_ethernet blackfly.launch
+roslaunch flir_adk_ethernet blackfly.launch
 ```
 If you have a Boson, run
 ```bash
-roslaunch flir_boson_ethernet boson.launch
+roslaunch flir_adk_ethernet boson.launch
 ```
 These examples include an image viewer. You should see window pop up with the streaming video displayed.
 
 If you want to demo a Boson and a BlackFly running concurrently, run
 ```bash
-roslaunch flir_boson_ethernet multiple_cameras.launch
+roslaunch flir_adk_ethernet multiple_cameras.launch
 ```
 If you want a demo of stereo vision, connect 2 BlackFlys. Get their IP addresses and modify launch/sync_camera.launch lines 11 and 12. For example, if the left IP address is 169.254.87.157 and the right is 169.254.82.142. Change the lines to:
 ```xml
@@ -45,7 +45,7 @@ If you want a demo of stereo vision, connect 2 BlackFlys. Get their IP addresses
 ```
 Next run the node:
 ```bash
-roslaunch flir_boson_ethernet sync_camera.launch
+roslaunch flir_adk_ethernet sync_camera.launch
 ```
 You should see 3 image panes appear: left, right and disparity
 ### Parameters
@@ -71,7 +71,7 @@ You should see 3 image panes appear: left, right and disparity
     Vertical offset from top for the viewing window
 
 ### Subscribed topics
-In order to control the camera(s) during operation, the nodes subscribe to topics where the user can send messages. Note: when using these with sub-namespaced nodes e.g. flir_boson_ethernet/left, then the topic will be under the sub-namespace
+In order to control the camera(s) during operation, the nodes subscribe to topics where the user can send messages. Note: when using these with sub-namespaced nodes e.g. flir_adk_ethernet/left, then the topic will be under the sub-namespace
 * pixel_format (string, accepted values: MONO_8, MONO_16, COLOR_8)      
     Same as video_format parameter
 * auto_ffc (bool)   
@@ -118,10 +118,10 @@ sets the viewing window to be centered within the camera view. Setting must be i
 
 Options:
 
--n &lt;namespace&gt; DEFAULT flir_boson     
+-n &lt;namespace&gt; DEFAULT flir_adk     
 Specifies a namespace for the topic
 
 -s &lt;sub-namespace&gt;        
 Specifies a sub-namespace for the topic. Typically left or right    
-e.g. topic is /flir_boson/left/pixel_format then run:   
-sendCommand pixelFormat mono_8 -n flir_boson -s left
+e.g. topic is /flir_adk/left/pixel_format then run:   
+sendCommand pixelFormat mono_8 -n flir_adk -s left

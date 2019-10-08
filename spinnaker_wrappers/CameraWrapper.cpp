@@ -1,6 +1,6 @@
 #include "CameraWrapper.h"
 
-using namespace flir_boson_ethernet;
+using namespace flir_adk_ethernet;
 
 CameraWrapper::CameraWrapper() {}
 CameraWrapper::CameraWrapper(CameraPtr cam) : _cam(cam) {}

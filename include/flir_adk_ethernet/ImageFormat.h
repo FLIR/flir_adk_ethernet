@@ -1,5 +1,5 @@
-#ifndef FLIR_BOSON_ETHERNET_IMAGEFORMAT_H
-#define FLIR_BOSON_ETHERNET_IMAGEFORMAT_H
+#ifndef FLIR_ADK_ETHERNET_IMAGEFORMAT_H
+#define FLIR_ADK_ETHERNET_IMAGEFORMAT_H
 
 // C++ Includes
 #include <iostream>
@@ -30,7 +30,7 @@ using namespace Spinnaker::GenApi;
 using namespace Spinnaker::GenICam;
 using namespace std;
 
-namespace flir_boson_ethernet
+namespace flir_adk_ethernet
 {
 // class for managing properties assosicated with pixel formats 
 // (color, mono, 8 and 16 bit)

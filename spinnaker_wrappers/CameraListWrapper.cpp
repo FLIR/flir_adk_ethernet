@@ -1,6 +1,6 @@
 #include "CameraListWrapper.h"
 
-using namespace flir_boson_ethernet;
+using namespace flir_adk_ethernet;
 
 CameraListWrapper::CameraListWrapper(CameraList camList) : _camList(camList) {}
 

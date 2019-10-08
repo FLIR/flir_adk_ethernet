@@ -15,7 +15,7 @@ int main(int argc, char** argv)
   nodelet::V_string nargv;
   std::string nodelet_name = ros::this_node::getName();
 
-  nodelet.load(nodelet_name, "flir_boson_ethernet/CameraController", remap, nargv);
+  nodelet.load(nodelet_name, "flir_adk_ethernet/CameraController", remap, nargv);
   ros::spin();
   return 0;
 }

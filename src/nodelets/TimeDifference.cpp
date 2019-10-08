@@ -1,9 +1,9 @@
 #include <pluginlib/class_list_macros.h>
-#include "flir_boson_ethernet/TimeDifference.h"
+#include "flir_adk_ethernet/TimeDifference.h"
 
-PLUGINLIB_EXPORT_CLASS(flir_boson_ethernet::TimeDifference, nodelet::Nodelet)
+PLUGINLIB_EXPORT_CLASS(flir_adk_ethernet::TimeDifference, nodelet::Nodelet)
 
-using namespace flir_boson_ethernet;
+using namespace flir_adk_ethernet;
 
 TimeDifference::TimeDifference() {
     

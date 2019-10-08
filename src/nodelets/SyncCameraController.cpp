@@ -1,10 +1,10 @@
 #include <pluginlib/class_list_macros.h>
-#include "flir_boson_ethernet/SyncCameraController.h"
+#include "flir_adk_ethernet/SyncCameraController.h"
 
-PLUGINLIB_EXPORT_CLASS(flir_boson_ethernet::SyncCameraController, nodelet::Nodelet)
+PLUGINLIB_EXPORT_CLASS(flir_adk_ethernet::SyncCameraController, nodelet::Nodelet)
 
 using namespace cv;
-using namespace flir_boson_ethernet;
+using namespace flir_adk_ethernet;
 
 SyncCameraController::SyncCameraController() : BaseCameraController()
 {
@@ -16,7 +16,7 @@ SyncCameraController::~SyncCameraController()
 }
 
 void SyncCameraController::setupExtraPubSub() {
-    _timePublisher = nh.advertise<flir_boson_ethernet::MultiTimeHeader>(
+    _timePublisher = nh.advertise<flir_adk_ethernet::MultiTimeHeader>(
         "actual_timestamp", 1);
 }
 

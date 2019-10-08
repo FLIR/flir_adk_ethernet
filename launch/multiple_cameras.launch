@@ -2,7 +2,7 @@
 <!-- launch file for a a BlackFly camera and a Boson camera -->
 <launch>
   <!-- prefix for all topics published by this launcher -->
-  <arg name="namespace" default="flir_boson"/>
+  <arg name="namespace" default="flir_adk"/>
   <!-- frame ID for identifying source when looking at image topic -->
   <arg name="boson_frame_id" default="boson_camera"/>
   <arg name="blackfly_frame_id" default="blackfly_camera"/>
@@ -28,8 +28,8 @@
   <arg name="yOffset" default="468" />
 
   <!-- location of the camera calibration file -->
-  <arg name="camera_info_url" default="package://flir_boson_ethernet/example_calibrations/BlackFlyS.yaml"/>
-  <arg name="boson_info_url" default="package://flir_boson_ethernet/example_calibrations/Boson640.yaml"/>
+  <arg name="camera_info_url" default="package://flir_adk_ethernet/example_calibrations/BlackFlyS.yaml"/>
+  <arg name="boson_info_url" default="package://flir_adk_ethernet/example_calibrations/Boson640.yaml"/>
 
   <!-- group everything into the same namespace (necessary for the nodelet
   manager to work properly -->
@@ -44,7 +44,7 @@
     <node pkg="nodelet" 
           type="nodelet"
           name="left_camera_node"
-          args="load flir_boson_ethernet/CameraController nodelet_manager"
+          args="load flir_adk_ethernet/CameraController nodelet_manager"
           output="screen">
       <!-- remap all publishers to the 'left' sub-namespace -->
       <remap from="/$(arg namespace)" to="/$(arg namespace)/left" />
@@ -72,7 +72,7 @@
     <node pkg="nodelet" 
           type="nodelet"
           name="right_camera_node"
-          args="load flir_boson_ethernet/CameraController nodelet_manager"
+          args="load flir_adk_ethernet/CameraController nodelet_manager"
           output="screen">
       <remap from="/$(arg namespace)" to="/$(arg namespace)/right" />
       <remap from="pixel_format" to="right/pixel_format" />
@@ -97,13 +97,13 @@
         pkg="image_view"
         type="image_view"
         output="screen">
-    <remap from="image" to="flir_boson/left/image_raw" />
+    <remap from="image" to="flir_adk/left/image_raw" />
   </node>
   <node name="right_view"
         pkg="image_view"
         type="image_view"
         output="screen">
-    <remap from="image" to="flir_boson/right/image_raw" />
+    <remap from="image" to="flir_adk/right/image_raw" />
   </node>
 
 </launch>

@@ -1,5 +1,5 @@
-#ifndef FLIR_BOSON_ETHERNET_IMAGEEVENTHANDLER_H
-#define FLIR_BOSON_ETHERNET_IMAGEEVENTHANDLER_H
+#ifndef FLIR_ADK_ETHERNET_IMAGEEVENTHANDLER_H
+#define FLIR_ADK_ETHERNET_IMAGEEVENTHANDLER_H
 
 // C++ Includes
 #include <string>
@@ -23,7 +23,7 @@ using namespace Spinnaker::GenICam;
 
 typedef std::chrono::high_resolution_clock Clock;
 
-namespace flir_boson_ethernet {
+namespace flir_adk_ethernet {
 
 struct ImageInfo {
   int32_t width, height, size;

@@ -2,7 +2,7 @@
 <!-- launch file for a two synchronized BlackFly cameras -->
 <launch>
   <!-- prefix for all topics published by this launcher -->
-  <arg name="namespace" default="flir_boson"/>
+  <arg name="namespace" default="flir_adk"/>
   <!-- frame ID for identifying source when looking at image topic -->
   <arg name="left_frame_id" default="bf1"/>
   <arg name="right_frame_id" default="bf2"/>
@@ -18,7 +18,7 @@
   <arg name="video_format" default="COLOR_8"/>
 
   <!-- location of the camera calibration file -->
-  <arg name="camera_info_url" default="package://flir_boson_ethernet/example_calibrations/BlackFlyS.yaml"/>
+  <arg name="camera_info_url" default="package://flir_adk_ethernet/example_calibrations/BlackFlyS.yaml"/>
 
   <!-- sets width and height for BlackFly. Was having bandwidth issues
   running 2 cameras at once with full BlackFly resolution -->
@@ -40,7 +40,7 @@
     <node pkg="nodelet" 
           type="nodelet"
           name="left_camera_node"
-          args="load flir_boson_ethernet/SyncCameraController nodelet_manager"
+          args="load flir_adk_ethernet/SyncCameraController nodelet_manager"
           output="screen">
       <!-- remap all publishers to the 'left' sub-namespace -->
       <remap from="/$(arg namespace)" to="/$(arg namespace)/left" />
@@ -64,7 +64,7 @@
     <node pkg="nodelet" 
           type="nodelet"
           name="right_camera_node"
-          args="load flir_boson_ethernet/SyncCameraController nodelet_manager"
+          args="load flir_adk_ethernet/SyncCameraController nodelet_manager"
           output="screen">
       <remap from="/$(arg namespace)" to="/$(arg namespace)/right" />
       <remap from="auto_ffc" to="right/auto_ffc" />
@@ -87,7 +87,7 @@
     <node pkg="nodelet"
           type="nodelet"
           name="time_sync"
-          args="load flir_boson_ethernet/TimeSynchronizer nodelet_manager">
+          args="load flir_adk_ethernet/TimeSynchronizer nodelet_manager">
       <param name="frame_rate" type="double" value="$(arg frame_rate)"/>
     </node>
 
@@ -112,6 +112,6 @@
     <param name="approximate_sync" value="True" />
     <param name="queue_size" value="10" />
     <remap from="image" to="image_raw" />
-    <remap from="stereo" to="flir_boson" /> 
+    <remap from="stereo" to="flir_adk" /> 
   </node>
 </launch>

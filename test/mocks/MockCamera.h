@@ -2,7 +2,7 @@
 #include "../spinnaker_wrappers/CameraWrapper.h"
 #include "MockNodeMap.h"
 
-using namespace flir_boson_ethernet;
+using namespace flir_adk_ethernet;
 
 class MockCamera : public CameraWrapper {
   public:

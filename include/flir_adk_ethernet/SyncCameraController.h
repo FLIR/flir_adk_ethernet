@@ -1,5 +1,5 @@
-#ifndef FLIR_BOSON_ETHERNET_SYNCCAMERACONTROLLER_H
-#define FLIR_BOSON_ETHERNET_SYNCCAMERACONTROLLER_H
+#ifndef FLIR_ADK_ETHERNET_SYNCCAMERACONTROLLER_H
+#define FLIR_ADK_ETHERNET_SYNCCAMERACONTROLLER_H
 
 // C++ Includes
 #include <string>
@@ -8,12 +8,12 @@
 #include <ros/ros.h>
 #include <std_msgs/Time.h>
 
-#include "flir_boson_ethernet/BaseCameraController.h"
-#include <flir_boson_ethernet/MultiTimeHeader.h>
+#include "flir_adk_ethernet/BaseCameraController.h"
+#include <flir_adk_ethernet/MultiTimeHeader.h>
 
 using namespace std;
 
-namespace flir_boson_ethernet
+namespace flir_adk_ethernet
 {
 // class for controlling single camera synchronized with other camera(s)
 class SyncCameraController : public BaseCameraController
