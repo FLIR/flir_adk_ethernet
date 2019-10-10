@@ -1,3 +1,9 @@
+/******************************************************************************/
+/*                                                                            */
+/*  Copyright (C) 2018, FLIR Systems                                          */
+/*  All rights reserved.                                                      */
+/*                                                                            */
+/******************************************************************************/
 #ifndef FLIR_ADK_ETHERNET_IMAGEEVENTHANDLER_H
 #define FLIR_ADK_ETHERNET_IMAGEEVENTHANDLER_H
 

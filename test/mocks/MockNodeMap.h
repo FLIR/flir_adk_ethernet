@@ -1,3 +1,9 @@
+/******************************************************************************/
+/*                                                                            */
+/*  Copyright (C) 2018, FLIR Systems                                          */
+/*  All rights reserved.                                                      */
+/*                                                                            */
+/******************************************************************************/
 #include "gmock/gmock.h"
 #include <spinnaker/Spinnaker.h>
 #include <spinnaker/SpinGenApi/SpinnakerGenApi.h>

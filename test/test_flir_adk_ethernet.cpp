@@ -1,3 +1,9 @@
+/******************************************************************************/
+/*                                                                            */
+/*  Copyright (C) 2018, FLIR Systems                                          */
+/*  All rights reserved.                                                      */
+/*                                                                            */
+/******************************************************************************/
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "mocks/MockCamera.h"

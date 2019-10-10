@@ -3,3 +3,5 @@
 *.tests
 tests/build/
 run_tests.sh
+header.txt
+insert_header.py

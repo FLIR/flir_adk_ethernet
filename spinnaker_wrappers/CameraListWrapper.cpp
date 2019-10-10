@@ -1,3 +1,9 @@
+/******************************************************************************/
+/*                                                                            */
+/*  Copyright (C) 2018, FLIR Systems                                          */
+/*  All rights reserved.                                                      */
+/*                                                                            */
+/******************************************************************************/
 #include "CameraListWrapper.h"
 
 using namespace flir_adk_ethernet;

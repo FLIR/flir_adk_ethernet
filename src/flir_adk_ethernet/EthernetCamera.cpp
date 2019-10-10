@@ -1,3 +1,9 @@
+/******************************************************************************/
+/*                                                                            */
+/*  Copyright (C) 2018, FLIR Systems                                          */
+/*  All rights reserved.                                                      */
+/*                                                                            */
+/******************************************************************************/
 #include "flir_adk_ethernet/Util.h"
 #include "flir_adk_ethernet/EthernetCamera.h"
 

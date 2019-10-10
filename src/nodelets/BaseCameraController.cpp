@@ -1,3 +1,9 @@
+/******************************************************************************/
+/*                                                                            */
+/*  Copyright (C) 2018, FLIR Systems                                          */
+/*  All rights reserved.                                                      */
+/*                                                                            */
+/******************************************************************************/
 #include <pluginlib/class_list_macros.h>
 #include "flir_adk_ethernet/Util.h"
 #include "flir_adk_ethernet/BaseCameraController.h"
