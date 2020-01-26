@@ -1,11 +1,3 @@
-<!--
-/******************************************************************************/
-/*                                                                            */
-/*  Copyright (C) 2018, FLIR Systems                                          */
-/*  All rights reserved.                                                      */
-/*                                                                            */
-/******************************************************************************/
--->
 <?xml version="1.0"?>
 <library path="lib/libBosonCameraEthernet">
   <class name="flir_adk_ethernet/CameraController" type="flir_adk_ethernet::CameraController" base_class_type="nodelet::Nodelet">
