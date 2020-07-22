@@ -42,8 +42,8 @@ void ImageEventHandler::Init() {
 }
 
 ImageInfo ImageEventHandler::GetImageInfo() {
-    return ImageInfo {m_resultImage->GetWidth(), m_resultImage->GetHeight(),
-                m_resultImage->GetBufferSize()};
+    return ImageInfo {(int)m_resultImage->GetWidth(), (int)m_resultImage->GetHeight(),
+                (int)m_resultImage->GetBufferSize()};
 }
 
 // int framesPerSecond = 0;
