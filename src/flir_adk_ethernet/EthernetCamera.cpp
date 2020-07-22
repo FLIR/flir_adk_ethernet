@@ -240,7 +240,7 @@ bool EthernetCamera::setROI(int xOffset, int yOffset, int width, int height) {
             _width, _height, _xOffset, _yOffset);
         return true;
     } catch (Spinnaker::Exception e) {
-        ROS_ERROR(e.what());
+        ROS_ERROR("%s", e.what());
 
         widthNode->SetValue(8);
         heightNode->SetValue(8);
@@ -451,7 +451,7 @@ bool EthernetCamera::setNodeValue(std::string nodeName, std::string value) {
             }
         }
     } catch(Spinnaker::Exception e) {
-        ROS_ERROR(e.what());
+        ROS_ERROR("%s", e.what());
     }
     
     startCapture();
@@ -509,7 +509,7 @@ void EthernetCamera::stopCapture() {
         _isStreaming = false;
         _pCam->EndAcquisition();
     } catch(Spinnaker::Exception e) {
-        ROS_ERROR(e.what());
+        ROS_ERROR("%s", e.what());
     }
 }
 
