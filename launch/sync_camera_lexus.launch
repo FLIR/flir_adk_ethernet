@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!-- launch file for a two synchronized BlackFly cameras -->
+<launch>
+  <!-- prefix for all topics published by this launcher -->
+  <arg name="namespace" default="flir_adk"/>
+
+  <!-- IP addresses of the cameras boson left    blackfly right -->
+  <arg name="left_ip" default="169.254.151.192"/>
+  <arg name="right_ip" default="170.253.0.1"/>
+
+  <!-- topic frame rate - limited by the max frame rate of the camera -->
+  <arg name="frame_rate" default="20.0"/>
+
+
+  <!-- group everything into the same namespace (necessary for the nodelet
+  manager to work properly -->
+  <group ns="$(arg namespace)">
+    <!-- Nodelet manager coordinates the camera controlling nodelets -->
+    <node pkg="nodelet"
+          type="nodelet"
+          name="nodelet_manager"
+          args="manager"
+          output="screen"/>
+    <!-- camera controller nodelets use the SyncCameraController to sync frames -->
+    <node pkg="nodelet"
+          type="nodelet"
+          name="left_camera_node"
+          args="load flir_adk_ethernet/SyncCameraController nodelet_manager"
+          output="screen">
+      <!-- remap all publishers to the 'left' sub-namespace -->
+      <remap from="/$(arg namespace)" to="/$(arg namespace)/thermal" />
+      <!-- remap all subscribers to the 'left' sub-namespace
+      (except shared pixel_format and ROI listeners -->
+      <remap from="auto_ffc" to="left/auto_ffc" />
+      <remap from="ffc" to="left/ffc" />
+        <remap from="set_node" to="left/set_node" />
+      <remap from="get_node" to="left/get_node" />
+
+      <param name="frame_id" type="str" value="boson_camera"/>
+      <param name="camera_type" type="str" value="boson"/>
+      <param name="video_format" type="str" value="MONO_8"/>
+      <param name="ip_addr" type="str" value="$(arg left_ip)"/>
+      <param name="flip" type="bool" value="true"/>
+    </node>
+
+    <node pkg="nodelet"
+          type="nodelet"
+          name="right_camera_node"
+          args="load flir_adk_ethernet/SyncCameraController nodelet_manager"
+          output="screen">
+      <remap from="/$(arg namespace)" to="/$(arg namespace)/rgb_front_right" />
+      <remap from="auto_ffc" to="right/auto_ffc" />
+      <remap from="ffc" to="right/ffc" />
+      <remap from="set_node" to="right/set_node" />
+      <remap from="get_node" to="right/get_node" />
+
+      <param name="frame_id" type="str" value="blackfly_camera"/>
+      <param name="camera_type" type="str" value="blackfly"/>
+      <param name="video_format" type="str" value="COLOR_8"/>
+      <param name="ip_addr" type="str" value="$(arg right_ip)"/>
+      <param name="flip" type="bool" value="true"/>
+    </node>
+
+    <!-- time_sync notifies left and right nodelets to capture a frame at the
+    same time and sends a timestamp to publish to the image topics -->
+    <node pkg="nodelet"
+          type="nodelet"
+          name="time_sync"
+          args="load flir_adk_ethernet/TimeSynchronizer nodelet_manager">
+      <param name="frame_rate" type="double" value="$(arg frame_rate)"/>
+    </node>
+
+  </group>
+
+</launch>

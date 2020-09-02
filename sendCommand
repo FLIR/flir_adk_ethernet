@@ -1,0 +1,114 @@
+#!/bin/bash
+
+usageMsg="$(cat <<EOF
+    \nusage: sendCommand <command> <command param> [args]
+    \n
+    \nCommands:
+    \nautoFFC <setting>
+    \n\tset the auto FFC setting on Boson. Valid values are "true" or "false"
+    \npixelFormat <setting>
+    \n\tset the pixel format. Valid values are "mono_8" and "mono_16" for Boson and, additionally, "color_8" for BlackFly
+    \n
+    \nOptions:
+    \n-n <namespace> DEFAULT flir_adk
+    \n\tSpecifies a namespace for the topic
+    \n-s <sub-namespace>
+    \n\tSpecifies a sub-namespace for the topic. Typically left or right
+    \n\te.g. topic is /flir_adk/left/pixel_format then run sendCommand 
+    \n\tpixelFormat mono_8 -n flir_adk -s left
+    \n
+EOF
+)"
+
+command=""
+commandParam=""
+commandValue=""
+namespace="flir_adk"
+subNamespace=""
+
+while (( "$#" )); do
+  case "$1" in
+    -n)
+      namespace=$2
+      shift 2
+      ;;
+    -s)
+      subNamespace=$2
+      shift 2
+      ;;
+    -h|--help)
+      echo -e $usageMsg
+      exit 0
+      ;;
+    --) # end argument parsing
+      shift
+      break
+      ;;
+    -*|--*=) # unsupported flags
+      echo "Error: Unsupported flag $1" >&2
+      echo -e $usageMsg
+      exit 1
+      ;;
+    ffc)
+      command="ffc"
+      shift 1
+      ;;
+    nodeMap)
+      command="nodeMap"
+      commandParam=$2
+      shift 2
+      if [[ "$1" != "-"* ]]
+      then
+        commandValue=$1
+        shift 1
+      fi
+      ;;
+    *) # preserve positional arguments
+      command=$1
+      commandParam=$2
+      shift 2
+      ;;
+  esac
+done
+
+if [[ $command != "ffc" && (-z $command || -z $commandParam) ]]
+then
+    echo "Error: must specify command and command parameter" >&2
+    echo -e $usageMsg
+    exit 1
+fi
+
+topicNamespace="/$namespace"
+if [ ! -z $subNamespace ]
+then
+    topicNamespace="$topicNamespace/$subNamespace"
+fi
+
+case "$command" in 
+    autoFFC)
+        rostopic pub -1 "$topicNamespace/auto_ffc" std_msgs/Bool "data: $commandParam"
+        ;;
+    pixelFormat)
+        rostopic pub -1 "$topicNamespace/pixel_format" std_msgs/String "$commandParam"
+        ;;
+    ffc)
+        rostopic pub -1 "$topicNamespace/ffc" std_msgs/Empty "{}"
+        ;;
+    setROI)
+        rostopic pub -1 "$topicNamespace/set_roi" sensor_msgs/RegionOfInterest "{$commandParam}"
+        ;;
+    setCenterROI)
+        rostopic pub -1 "$topicNamespace/set_center_roi" sensor_msgs/RegionOfInterest "{$commandParam}"
+        ;;
+    nodeMap)
+        if [ -z $commandValue ]
+        then
+          rosservice call "$topicNamespace/get_node" "$commandParam" 
+        else
+          rostopic pub -1 "$topicNamespace/set_node" diagnostic_msgs/KeyValue "{key: '$commandParam', value: \'$commandValue\'}"
+        fi
+        ;;
+    *)
+        echo -e "\nError: command '$command' not recognized\n"
+        ;;
+esac

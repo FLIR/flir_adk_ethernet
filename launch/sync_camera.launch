@@ -1,0 +1,125 @@
+<!--
+/******************************************************************************/
+/*                                                                            */
+/*  Copyright (C) 2018, FLIR Systems                                          */
+/*  All rights reserved.                                                      */
+/*                                                                            */
+/******************************************************************************/
+-->
+<?xml version="1.0"?>
+<!-- launch file for a two synchronized BlackFly cameras -->
+<launch>
+  <!-- prefix for all topics published by this launcher -->
+  <arg name="namespace" default="flir_adk"/>
+  <!-- frame ID for identifying source when looking at image topic -->
+  <arg name="left_frame_id" default="bf1"/>
+  <arg name="right_frame_id" default="bf2"/>
+
+  <!-- IP addresses of the cameras -->
+  <arg name="left_ip" default="169.254.87.157"/>
+  <arg name="right_ip" default="169.254.82.142"/>
+    
+  <!-- topic frame rate - limited by the max frame rate of the camera -->
+  <arg name="frame_rate" default="60.0"/>
+
+  <!-- valid values are MONO_8, MONO_16, or COLOR_8 for blackfly -->
+  <arg name="video_format" default="COLOR_8"/>
+
+  <!-- location of the camera calibration file -->
+  <arg name="camera_info_url" default="package://flir_adk_ethernet/example_calibrations/BlackFlyS.yaml"/>
+
+  <!-- sets width and height for BlackFly. Was having bandwidth issues
+  running 2 cameras at once with full BlackFly resolution -->
+  <arg name="width" default="800" />
+  <arg name="height" default="600" />
+  <arg name="xOffset" default="624" />
+  <arg name="yOffset" default="468" />
+
+  <!-- group everything into the same namespace (necessary for the nodelet
+  manager to work properly -->
+  <group ns="$(arg namespace)">
+    <!-- Nodelet manager coordinates the camera controlling nodelets -->
+    <node pkg="nodelet" 
+          type="nodelet"
+          name="nodelet_manager"
+          args="manager"
+          output="screen"/>
+    <!-- camera controller nodelets use the SyncCameraController to sync frames -->
+    <node pkg="nodelet" 
+          type="nodelet"
+          name="left_camera_node"
+          args="load flir_adk_ethernet/SyncCameraController nodelet_manager"
+          output="screen">
+      <!-- remap all publishers to the 'left' sub-namespace -->
+      <remap from="/$(arg namespace)" to="/$(arg namespace)/left" />
+      <!-- remap all subscribers to the 'left' sub-namespace 
+      (except shared pixel_format and ROI listeners -->
+      <remap from="auto_ffc" to="left/auto_ffc" />
+      <remap from="ffc" to="left/ffc" />
+        <remap from="set_node" to="left/set_node" />
+      <remap from="get_node" to="left/get_node" />
+      
+      <param name="frame_id" type="str" value="$(arg left_frame_id)"/>
+      <param name="ip_addr" type="str" value="$(arg left_ip)"/>
+      <param name="camera_info_url" type="str" value="$(arg camera_info_url)"/>
+      <param name="video_format" type="str" value="$(arg video_format)"/>
+      <param name="width" type="int" value="$(arg width)" />
+      <param name="height" type="int" value="$(arg height)" />
+      <param name="xOffset" type="int" value="$(arg xOffset)" />
+      <param name="yOffset" type="int" value="$(arg yOffset)" />
+    </node>
+
+    <node pkg="nodelet" 
+          type="nodelet"
+          name="right_camera_node"
+          args="load flir_adk_ethernet/SyncCameraController nodelet_manager"
+          output="screen">
+      <remap from="/$(arg namespace)" to="/$(arg namespace)/right" />
+      <remap from="auto_ffc" to="right/auto_ffc" />
+      <remap from="ffc" to="right/ffc" />
+      <remap from="set_node" to="right/set_node" />
+      <remap from="get_node" to="right/get_node" />
+
+      <param name="frame_id" type="str" value="$(arg right_frame_id)"/>
+      <param name="ip_addr" type="str" value="$(arg right_ip)"/>
+      <param name="camera_info_url" type="str" value="$(arg camera_info_url)"/>
+      <param name="video_format" type="str" value="$(arg video_format)"/>
+      <param name="width" type="int" value="$(arg width)" />
+      <param name="height" type="int" value="$(arg height)" />
+      <param name="xOffset" type="int" value="$(arg xOffset)" />
+      <param name="yOffset" type="int" value="$(arg yOffset)" />
+    </node>
+
+    <!-- time_sync notifies left and right nodelets to capture a frame at the
+    same time and sends a timestamp to publish to the image topics -->
+    <node pkg="nodelet"
+          type="nodelet"
+          name="time_sync"
+          args="load flir_adk_ethernet/TimeSynchronizer nodelet_manager">
+      <param name="frame_rate" type="double" value="$(arg frame_rate)"/>
+    </node>
+
+    <!-- Optional: create disparity feed from the left and right feeds -->
+    <node pkg="nodelet"
+          type="nodelet"
+          name="stereo_proc"
+          args="load stereo_image_proc/disparity nodelet_manager">
+      <remap from="left/image_rect" to="left/image_raw" />
+      <remap from="right/image_rect" to="right/image_raw" />
+      <param name="approximate_sync" value="True" />
+      <param name="queue_size" value="10" />
+    </node>
+
+  </group>
+
+    <!-- Optional: show stereo image with disparity -->
+  <node name="stereo_view"
+        pkg="image_view"
+        type="stereo_view"
+        output="screen">
+    <param name="approximate_sync" value="True" />
+    <param name="queue_size" value="10" />
+    <remap from="image" to="image_raw" />
+    <remap from="stereo" to="flir_adk" /> 
+  </node>
+</launch>

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<library path="lib/libBosonCameraEthernet">
+  <class name="flir_adk_ethernet/CameraController" type="flir_adk_ethernet::CameraController" base_class_type="nodelet::Nodelet">
+    <description>
+      Handles the connection to a FLIR Boson Ethernet camera and grabs frames using OpenCV.
+    </description>
+  </class>
+  <class name="flir_adk_ethernet/SyncCameraController" type="flir_adk_ethernet::SyncCameraController" base_class_type="nodelet::Nodelet">
+    <description>
+      Handles the connection to a FLIR Boson Ethernet camera and grabs frames using OpenCV.
+    </description>
+  </class>
+  <class name="flir_adk_ethernet/TimeSynchronizer" type="flir_adk_ethernet::TimeSynchronizer" base_class_type="nodelet::Nodelet">
+    <description>
+      Sends signal to trigger sending image frames to topics
+    </description>
+  </class>
+  <class name="flir_adk_ethernet/TimeDifference" type="flir_adk_ethernet::TimeDifference" base_class_type="nodelet::Nodelet">
+    <description>
+      Quantifies the difference in timing between ethernet and ROS timestamps
+    </description>
+  </class>
+</library>
