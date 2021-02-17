@@ -30,6 +30,7 @@ class CameraWrapper {
     virtual void RegisterEvent(Spinnaker::Event &e);
     virtual void UnregisterEvent(Spinnaker::Event &e);
     virtual void BeginAcquisition();
+    virtual void SetUserMode1();
     virtual void EndAcquisition();
     virtual void DeInit();
   private:

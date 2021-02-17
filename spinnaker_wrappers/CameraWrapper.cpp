@@ -46,6 +46,11 @@ void CameraWrapper::BeginAcquisition() {
     _cam->BeginAcquisition();
 }
 
+void CameraWrapper::SetUserMode1() {
+  _cam->UserSetSelector.SetValue(UserSetSelectorEnums::UserSetSelector_UserSet1);
+  _cam->UserSetLoad();
+}
+
 void CameraWrapper::EndAcquisition() {
     _cam->EndAcquisition();
 }

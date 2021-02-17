@@ -8,6 +8,8 @@
   name contains "blackfly" -->
   <arg name="camera_type" default="blackfly" />
 
+  <arg name="right_ip" default="254.135.142.10"/>
+
   <!-- topic frame rate - limited by the max frame rate of the camera -->
   <arg name="frame_rate" default="60.0"/>
 
@@ -28,6 +30,7 @@
         output="screen">
 
     <param name="frame_id" type="str" value="$(arg frame_id)"/>
+    <param name="ip_addr" type="str" value="$(arg right_ip)"/>
     <param name="camera_type" type="str" value="$(arg camera_type)"/>
     <param name="frame_rate" type="double" value="$(arg frame_rate)"/>
     <param name="video_format" type="str" value="$(arg video_format)"/>

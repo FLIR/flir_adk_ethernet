@@ -63,6 +63,8 @@ bool EthernetCamera::openCamera()
     _pCam->Init();
     initPixelFormat();
 
+    //_pCam->SetUserMode1();
+
     if(!setImageInfo()) {
         ROS_ERROR("flir_adk_ethernet - ERROR : GET_CONFIGURATION. Cannot get image for setting dimensions");
         return false;
