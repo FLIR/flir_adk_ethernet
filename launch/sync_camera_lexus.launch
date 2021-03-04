@@ -5,8 +5,8 @@
   <arg name="namespace" default="flir_adk"/>
 
   <!-- IP addresses of the cameras boson left    blackfly right -->
-  <arg name="left_ip" default="192.168.1.200"/>
-  <arg name="right_ip" default="254.135.142.10"/>
+  <arg name="left_ip" default="100.100.3.100"/>
+  <arg name="right_ip" default="100.100.4.100"/>
 
   <!-- topic frame rate - limited by the max frame rate of the camera -->
   <arg name="frame_rate" default="20.0"/>
