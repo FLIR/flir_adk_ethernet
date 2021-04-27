@@ -6,7 +6,7 @@
 
   <!-- IP addresses of the cameras boson left    blackfly right -->
   <arg name="left_ip" default="100.100.3.100"/>
-  <arg name="right_ip" default="100.100.4.100"/>
+  <arg name="right_ip" default="100.100.1.100"/>
 
   <!-- topic frame rate - limited by the max frame rate of the camera -->
   <arg name="frame_rate" default="20.0"/>
@@ -58,7 +58,7 @@
       <param name="camera_type" type="str" value="blackfly"/>
       <param name="video_format" type="str" value="COLOR_8"/>
       <param name="ip_addr" type="str" value="$(arg right_ip)"/>
-      <param name="flip" type="bool" value="false"/>
+      <param name="flip" type="bool" value="true"/>
     </node>
 
     <!-- time_sync notifies left and right nodelets to capture a frame at the
