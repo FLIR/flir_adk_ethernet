@@ -82,6 +82,17 @@ bool EthernetCamera::openCamera()
     initOpenCVBuffers();
     setCameraInfo();
 
+    //// Check heater
+    INodeMap &nodeMap = _pCam->GetNodeMap();
+    CEnumerationPtr ptrHeater = nodeMap.GetNode("BosonSetHeater");
+    if(!IsAvailable(ptrHeater) || !IsWritable(ptrHeater)){
+      ROS_WARN_STREAM("Error Accessing Heater. Aborting...");
+      return -1;
+    } else {
+      ptrHeater->SetIntValue(1);
+      ROS_WARN_STREAM("Current Heater State: " << ptrHeater->GetIntValue());
+    }
+
     return true;
 } 
 

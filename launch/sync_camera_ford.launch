@@ -22,7 +22,7 @@
           args="manager"
           output="screen"/>
 
-    <node pkg="nodelet"
+    <!-- <node pkg="nodelet"
           type="nodelet"
           name="left_camera_node"
           args="load flir_adk_ethernet/SyncCameraController nodelet_manager"
@@ -38,7 +38,7 @@
       <param name="video_format" type="str" value="COLOR_8"/>
       <param name="flip" type="bool" value="false"/>
       <param name="ip_addr" type="str" value="$(arg left_ip)"/>
-    </node>
+    </node> -->
 
     <!-- camera controller nodelets use the SyncCameraController to sync frames -->
     <node pkg="nodelet"
