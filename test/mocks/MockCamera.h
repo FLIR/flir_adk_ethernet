@@ -16,8 +16,8 @@ class MockCamera : public CameraWrapper {
     MOCK_METHOD0(IsValid, bool());
     MOCK_METHOD0(GetNodeMap, INodeMap&());
     MOCK_METHOD0(GetTLDeviceNodeMap, INodeMap&());
-    MOCK_METHOD1(RegisterEvent, void(Spinnaker::Event& e));
-    MOCK_METHOD1(UnregisterEvent, void(Spinnaker::Event& e));
+    //MOCK_METHOD1(RegisterEvent, void(Spinnaker::Event& e));
+    //MOCK_METHOD1(UnregisterEvent, void(Spinnaker::Event& e));
     MOCK_METHOD0(BeginAcquisition, void());
     MOCK_METHOD0(EndAcquisition, void());
     MOCK_METHOD0(DeInit, void());

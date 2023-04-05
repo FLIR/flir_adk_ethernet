@@ -5,10 +5,10 @@
 /*                                                                            */
 /******************************************************************************/
 #include "gmock/gmock.h"
-#include <spinnaker/Spinnaker.h>
-#include <spinnaker/SpinGenApi/SpinnakerGenApi.h>
-#include "spinnaker/SpinGenApi/INodeMap.h"
-#include "spinnaker/SpinGenApi/GCString.h"
+#include "Spinnaker.h"
+#include "SpinGenApi/SpinnakerGenApi.h"
+#include "SpinGenApi/INodeMap.h"
+#include "SpinGenApi/GCString.h"
 
 using namespace Spinnaker;
 using namespace Spinnaker::GenICam;

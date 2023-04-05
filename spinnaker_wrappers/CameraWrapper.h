@@ -7,8 +7,8 @@
 #ifndef CAMERAWRAPPER_H
 #define CAMERAWRAPPER_H
 
-#include <spinnaker/Spinnaker.h>
-#include <spinnaker/SpinGenApi/SpinnakerGenApi.h>
+#include "Spinnaker.h"
+#include "SpinGenApi/SpinnakerGenApi.h"
 
 using namespace std;
 using namespace Spinnaker;
@@ -27,8 +27,8 @@ class CameraWrapper {
     virtual bool IsValid();
     virtual INodeMap& GetNodeMap();
     virtual INodeMap& GetTLDeviceNodeMap();
-    virtual void RegisterEvent(Spinnaker::Event &e);
-    virtual void UnregisterEvent(Spinnaker::Event &e);
+    // virtual void RegisterEvent(Spinnaker::Event &e);
+    // virtual void UnregisterEvent(Spinnaker::Event &e);
     virtual void BeginAcquisition();
     virtual void SetUserMode1();
     virtual void EndAcquisition();

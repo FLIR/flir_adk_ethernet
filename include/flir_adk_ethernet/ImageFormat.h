@@ -28,8 +28,8 @@
 #include <ros/ros.h>
 
 // Spinnaker Includes
-#include <spinnaker/Spinnaker.h>
-#include <spinnaker/SpinGenApi/SpinnakerGenApi.h>
+#include "Spinnaker.h"
+#include "SpinGenApi/SpinnakerGenApi.h"
 
 using namespace Spinnaker;
 using namespace Spinnaker::GenApi;

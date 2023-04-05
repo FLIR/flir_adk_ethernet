@@ -25,7 +25,6 @@ TEST(ImageEventTests, ConstructImageHandler) {
     EXPECT_CALL(camera, GetTLDeviceNodeMap())
         .Times(1)
         .WillRepeatedly(ReturnRef(nodeMap));
-    // EXPECT_CALL(camera, )
 
     auto camPtr = std::make_shared<CameraWrapper>(camera);
     ImageEventHandler handler = ImageEventHandler(camPtr, PixelFormat_RGB8);

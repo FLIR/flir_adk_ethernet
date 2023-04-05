@@ -19,8 +19,28 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
+# -----------------
+#     OpenCV
+# -----------------
 find_package(OpenCV REQUIRED)
 
+# -----------------
+#     Spinnaker
+# -----------------
+# Older Spinnaker library should be here: /usr/lib/libSpinnaker.so
+# Newer Spinnaker library should be here: /opt/spinnaker/lib/libSpinnaker.so
+find_library(SPINNAKER_LIBRARY Spinnaker REQUIRED HINTS /opt/spinnaker/lib)
+
+# Older Spinnaker path is: /usr/include/spinnaker
+# Newer Spinnaker path is: /opt/spinnaker/include/
+find_path(SPINNAKER_INCLUDE_DIR CameraPtr.h REQUIRED HINTS /usr/include/spinnaker /opt/spinnaker/include)
+
+message(STATUS "Spinnaker Library Path: ${SPINNAKER_LIBRARY}")
+message(STATUS "Spinnaker Include Path: ${SPINNAKER_INCLUDE_DIR}")
+
+# -----------------
+#      Build
+# -----------------
 add_message_files(
   FILES
   MultiTimeHeader.msg
@@ -50,7 +70,7 @@ include_directories(
   include
   ${OpenCV_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
-  /usr/include/spinnaker
+  ${SPINNAKER_INCLUDE_DIR}
 )
 
 add_executable(${PROJECT_NAME}_node
@@ -67,7 +87,7 @@ target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
 )
 
-FILE(GLOB SpinLibs /usr/lib/libSpin*.so)
+# FILE(GLOB SpinLibs /usr/lib/libSpin*.so)
 
 add_library(BosonCameraEthernet
   src/nodelets/BaseCameraController.cpp
@@ -92,7 +112,7 @@ add_dependencies(BosonCameraEthernet
 target_link_libraries(BosonCameraEthernet
   ${OpenCV_LIBRARIES}
   ${catkin_LIBRARIES}
-  ${SpinLibs}
+  ${SPINNAKER_LIBRARY}
 )
 
 set(ROSLINT_CPP_OPTS "--filter=-runtime/threadsafe_fn,-build/namespaces,-build/include_what_you_use")

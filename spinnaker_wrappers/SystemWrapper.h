@@ -9,8 +9,8 @@
 
 #include "CameraListWrapper.h"
 
-#include <spinnaker/Spinnaker.h>
-#include <spinnaker/SpinGenApi/SpinnakerGenApi.h>
+#include "Spinnaker.h"
+#include "SpinGenApi/SpinnakerGenApi.h"
 
 using namespace std;
 using namespace Spinnaker;

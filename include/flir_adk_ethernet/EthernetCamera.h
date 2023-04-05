@@ -35,8 +35,8 @@
 #include <sensor_msgs/Image.h>
 
 // Spinnaker Includes
-#include <spinnaker/Spinnaker.h>
-#include <spinnaker/SpinGenApi/SpinnakerGenApi.h>
+#include "Spinnaker.h"
+#include "SpinGenApi/SpinnakerGenApi.h"
 
 // Local Includes
 #include "flir_adk_ethernet/ImageEventHandler.h"

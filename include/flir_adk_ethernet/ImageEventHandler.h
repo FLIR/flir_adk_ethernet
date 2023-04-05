@@ -17,8 +17,8 @@
 #include <ros/ros.h>
 
 // Spinnaker Includes
-#include <spinnaker/Spinnaker.h>
-#include <spinnaker/SpinGenApi/SpinnakerGenApi.h>
+#include "Spinnaker.h"
+#include "SpinGenApi/SpinnakerGenApi.h"
 
 #include "../spinnaker_wrappers/CameraWrapper.h"
 
@@ -35,7 +35,7 @@ struct ImageInfo {
   int32_t width, height, size;
 };
 
-class ImageEventHandler : public ImageEvent {
+class ImageEventHandler : public Spinnaker::ImageEventHandler {
   public:
     // The constructor retrieves the serial number and initializes the image 
     // counter to 0.
@@ -62,7 +62,6 @@ class ImageEventHandler : public ImageEvent {
     PixelFormatEnums _format;
     string m_deviceSerialNumber;
     ImagePtr m_resultImage;
-    // uint8_t *m_imageBuffer;
     std::mutex m_mutex;
 
     std::chrono::_V2::system_clock::time_point startTime;
